@@ -118,12 +118,12 @@ fun IntroScreenContent(
                             genPrivateKey()
                             onFinish(Screen.Main.Home.route)
                         }),
-                    AuthorizationMethod(
-                        title = stringResource(id = R.string.create_identity_selector_option_2),
-                        icon = R.drawable.ic_share_1,
-                        onSelect = {
-                            navigate(Screen.Register.ImportIdentity.route)
-                        }),
+//                    AuthorizationMethod(
+//                        title = stringResource(id = R.string.create_identity_selector_option_2),
+//                        icon = R.drawable.ic_share_1,
+//                        onSelect = {
+//                            navigate(Screen.Register.ImportIdentity.route)
+//                        }),
                 )
             )
         }

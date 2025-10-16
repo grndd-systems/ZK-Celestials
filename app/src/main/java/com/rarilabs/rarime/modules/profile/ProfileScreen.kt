@@ -143,45 +143,45 @@ fun ProfileScreenContent(
                     PassportImage(image = passportImage, size = 40.dp)
                 }
             }
-            Column(
-                modifier = Modifier
-                    .background(
-                        RarimeTheme.colors.componentPrimary, RoundedCornerShape(20.dp)
-                    )
-                    .padding(16.dp)
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                    ProfileRow(
-                        iconId = R.drawable.ic_user_shared_2_line,
-                        title = stringResource(R.string.recovery_method),
-                        onClick = { navigate(Screen.Main.Profile.ExportKeys.route) })
-                    ProfileRow(
-                        iconId = R.drawable.ic_shield_keyhole_line,
-                        title = stringResource(R.string.auth_method),
-                        onClick = { navigate(Screen.Main.Profile.AuthMethod.route) })
-                }
-            }
-            Column(
-                modifier = Modifier
-                    .background(
-                        RarimeTheme.colors.componentPrimary, RoundedCornerShape(20.dp)
-                    )
-                    .padding(16.dp)
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                    ProfileRow(
-                        iconId = R.drawable.ic_sun_line,
-                        title = stringResource(R.string.theme),
-                        value = colorScheme.toLocalizedString(),
-                        onClick = { navigate(Screen.Main.Profile.Theme.route) })
-                    ProfileRow(
-                        iconId = R.drawable.ic_rarime,
-                        title = stringResource(R.string.app_icon),
-                        value = appIcon.toLocalizedString(),
-                        onClick = { navigate(Screen.Main.Profile.AppIcon.route) })
-
-                }
-            }
+//            Column(
+//                modifier = Modifier
+//                    .background(
+//                        RarimeTheme.colors.componentPrimary, RoundedCornerShape(20.dp)
+//                    )
+//                    .padding(16.dp)
+//            ) {
+//                Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+//                    ProfileRow(
+//                        iconId = R.drawable.ic_user_shared_2_line,
+//                        title = stringResource(R.string.recovery_method),
+//                        onClick = { navigate(Screen.Main.Profile.ExportKeys.route) })
+//                    ProfileRow(
+//                        iconId = R.drawable.ic_shield_keyhole_line,
+//                        title = stringResource(R.string.auth_method),
+//                        onClick = { navigate(Screen.Main.Profile.AuthMethod.route) })
+//                }
+//            }
+//            Column(
+//                modifier = Modifier
+//                    .background(
+//                        RarimeTheme.colors.componentPrimary, RoundedCornerShape(20.dp)
+//                    )
+//                    .padding(16.dp)
+//            ) {
+//                Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+//                    ProfileRow(
+//                        iconId = R.drawable.ic_sun_line,
+//                        title = stringResource(R.string.theme),
+//                        value = colorScheme.toLocalizedString(),
+//                        onClick = { navigate(Screen.Main.Profile.Theme.route) })
+//                    ProfileRow(
+//                        iconId = R.drawable.ic_rarime,
+//                        title = stringResource(R.string.app_icon),
+//                        value = appIcon.toLocalizedString(),
+//                        onClick = { navigate(Screen.Main.Profile.AppIcon.route) })
+//
+//                }
+//            }
             Column(
                 modifier = Modifier
                     .background(
