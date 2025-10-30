@@ -1,5 +1,9 @@
 package com.rarilabs.rarime.modules.main
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -23,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rarilabs.rarime.BuildConfig
@@ -41,6 +46,7 @@ enum class BottomTab(
         R.drawable.ic_house_simple,
         R.drawable.ic_house_simple_fill
     ),
+    // disabled the display of buttons on the bottom panel
 //    Identity(
 //        Screen.Main.Identity.route,
 //        R.drawable.ic_passport,
@@ -62,6 +68,18 @@ enum class BottomTab(
         R.drawable.ic_user,
         R.drawable.ic_user_fill
     ),
+    //added new colums on the bottom panel
+    FAQ(
+        Screen.Main.FAQ.route,
+        R.drawable.ic_question_line,
+        R.drawable.ic_question
+    ),
+    Contact(
+        "contact",
+        R.drawable.ic_airdrop,
+        R.drawable.ic_airdrop
+    ),
+    // disabled the display of buttons on the bottom panel
 //    Debug(
 //        Screen.Main.DebugIdentity.route,
 //        R.drawable.welcome_cat,
@@ -76,6 +94,7 @@ fun BottomTabBar(
     onRouteSelected: (String) -> Unit,
     onQrCodeRouteSelected: (String) -> Unit
 ) {
+    val context = LocalContext.current  // added context to fix the bug
     Box(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -87,12 +106,13 @@ fun BottomTabBar(
                 .background(RarimeTheme.colors.backgroundPrimary)
                 .padding(vertical = 12.dp)
         ) {
+            // turned on visibility of button in the Bottom panel
             BottomTab.entries.forEach { tab ->
-                val shouldDraw = when {
-                    tab == BottomTab.Profile && BuildConfig.isTestnet -> true
-                    tab == BottomTab.Home && BuildConfig.isTestnet -> true
-//                    tab == BottomTab.Debug && BuildConfig.isTestnet -> true
-//                    tab != BottomTab.Debug -> true
+                val shouldDraw = when (tab) {
+                    BottomTab.Home -> true
+                    BottomTab.Profile -> true
+                    BottomTab.FAQ -> true
+                    BottomTab.Contact -> true
                     else -> false
                 }
 
@@ -101,7 +121,8 @@ fun BottomTabBar(
                         tab = tab,
                         isSelected = currentRoute == tab.route,
                         onTabSelected = { onRouteSelected(it.route) },
-                        onQrCodeRouteSelected = { onQrCodeRouteSelected(it.route) }
+                        onQrCodeRouteSelected = { onQrCodeRouteSelected(it.route) },
+                        context = context
                     )
                 }
             }
@@ -114,7 +135,8 @@ private fun TabItem(
     tab: BottomTab,
     isSelected: Boolean,
     onTabSelected: (BottomTab) -> Unit,
-    onQrCodeRouteSelected: (BottomTab) -> Unit
+    onQrCodeRouteSelected: (BottomTab) -> Unit,
+    context: Context
 ) {
     val animatedColor by animateColorAsState(
         if (isSelected) RarimeTheme.colors.componentPrimary else Color.Transparent,
@@ -129,10 +151,20 @@ private fun TabItem(
             .background(animatedColor)
             .pointerInput(Unit) {
                 detectTapGestures {
-                    if (tab.route == Screen.Main.QrScan.route) {
-                        onQrCodeRouteSelected(tab)
+                    // Fixed Contact Us button action to open correct screen
+                    if (tab == BottomTab.Contact) {
+                        openEmailClient(
+                            context = context,
+                            email = "help@grndd.systems",
+                            subject = "ZK Celestials ID Support",
+                            body = "Hello,\n\n"
+                        )
+                    } else {
+                        if (tab.route == Screen.Main.QrScan.route) {
+                            onQrCodeRouteSelected(tab)
+                        }
+                        onTabSelected(tab)
                     }
-                    onTabSelected(tab)
                 }
             },
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -145,6 +177,25 @@ private fun TabItem(
     }
 }
 
+// added function to open to send email
+private fun openEmailClient(
+    context: Context,
+    email: String,
+    subject: String,
+    body: String
+) {
+    val intent = Intent(Intent.ACTION_SENDTO).apply {
+        data = Uri.parse("mailto:$email")
+        putExtra(Intent.EXTRA_SUBJECT, subject)
+        putExtra(Intent.EXTRA_TEXT, body)
+    }
+
+    try {
+        context.startActivity(Intent.createChooser(intent, "Send Email"))
+    } catch (e: Exception) {
+        Toast.makeText(context, "No email client found", Toast.LENGTH_SHORT).show()
+    }
+}
 @Preview
 @Composable
 private fun BottomTabBarPreview() {

@@ -4,7 +4,7 @@ plugins {
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
     id("kotlin-parcelize")
-    // id("com.google.gms.google-services")  // ЗАКОМЕНТОВАНО ДЛЯ ТЕСТУВАННЯ
+    // id("com.google.gms.google-services")  // commented for testing-debugging
 }
 
 android {
@@ -33,7 +33,7 @@ android {
         versionCode = 121
         versionName = "2.3.8"
 
-        // ДОДАНО BuildConfig поля для config
+        // added BuildConfig fields for config
         buildConfigField("String", "config", "\"debug\"")
         buildConfigField("Boolean", "isTestnet", "true")
 
@@ -143,7 +143,7 @@ android {
         }
     }
 
-    // ДОДАНО resolution strategy для виправлення конфлікту Espresso
+    // added resolution strategy for the fixing config Espresso
     configurations.all {
         resolutionStrategy.force("androidx.test.espresso:espresso-core:3.5.1")
     }

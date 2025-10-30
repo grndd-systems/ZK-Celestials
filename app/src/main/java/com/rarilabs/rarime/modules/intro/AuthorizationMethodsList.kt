@@ -43,6 +43,7 @@ fun AuthorizationMethodsList(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
+        // commented text
 //        Text(
 //            text = stringResource(id = R.string.create_identity_selector_subtitle),
 //            style = RarimeTheme.typography.body3,

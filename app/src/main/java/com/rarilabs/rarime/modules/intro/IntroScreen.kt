@@ -112,12 +112,14 @@ fun IntroScreenContent(
             AuthorizationMethodsList(
                 listOf(
                     AuthorizationMethod(
-                        title = stringResource(id = R.string.create_identity_selector_option_1),
+                        //change sting enter passport
+                        title = stringResource(id = R.string.Enter_passport),
                         icon = R.drawable.ic_plus,
                         onSelect = {
                             genPrivateKey()
                             onFinish(Screen.Main.Home.route)
                         }),
+                    //disabled the re-authorization button
 //                    AuthorizationMethod(
 //                        title = stringResource(id = R.string.create_identity_selector_option_2),
 //                        icon = R.drawable.ic_share_1,

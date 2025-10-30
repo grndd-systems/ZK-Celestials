@@ -15,14 +15,14 @@ import androidx.compose.ui.unit.dp
 import com.rarilabs.rarime.R
 import com.rarilabs.rarime.ui.theme.RarimeTheme
 
-@Preview(showBackground = true)
 @Composable
 fun AppLogo(
     modifier: Modifier = Modifier,
-    scale: Float = 1f,
-    radius: Int = 48,
-    wrapperSize: Int = 187,
-    iconSize: Int = 96
+    //changed iconsize on the start screen
+    scale: Float = 1.5f,
+    radius: Int = 0,
+    wrapperSize: Int = 250,
+    iconSize: Int = 190
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = RarimeTheme.colors.baseBlack),
@@ -36,10 +36,13 @@ fun AppLogo(
             contentAlignment = Alignment.Center,
             modifier = Modifier.size(wrapperSize.dp)
         ) {
-            AppIconWithGradient(
-                modifier = Modifier.scale(scale),
-                id = R.drawable.ic_rarime,
-                size = iconSize.dp,
+            //changed app logo on the start screen
+            androidx.compose.foundation.Image(
+                painter = androidx.compose.ui.res.painterResource(id = R.drawable.app_icon_celestial_gradient),
+                contentDescription = "App logo",
+                modifier = Modifier
+                    .size(iconSize.dp)
+                    .scale(scale)
             )
         }
     }

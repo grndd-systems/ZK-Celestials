@@ -9,24 +9,24 @@ object Keys {
     // 🔑 Firebase / Google Services
     const val firebaseApiKey: String = "YOUR_FIREBASE_API_KEY"
 
-    // 🔑 Для аірдроп/реферальної системи
+    // 🔑 For airdrops and referral systems
     const val joinProgram: String = "YOUR_JOIN_PROGRAM_KEY"
     const val genesisReferralCode: String = "YOUR_GENESIS_REFERRAL_CODE"
 
-    // 🔑 Інші можливі ключі
+    // 🔑 other possible keys
     const val walletPrivateKey: String = "YOUR_WALLET_PRIVATE_KEY"
     const val walletPublicKey: String = "YOUR_WALLET_PUBLIC_KEY"
 
-    // 🔑 URL бекенду (може бути testnet або mainnet)
+    // 🔑 URL backend
     const val baseUrl: String = "https://api.testnet.rarime.com"
 
-    // 🔑 Приклад токена доступу (якщо потрібен)
+    // 🔑 Example of the accessToken
     const val accessToken: String = "YOUR_ACCESS_TOKEN"
 
-    // 🔑 Ключ для FaceID / біометрії
+    // 🔑 Keys for FaceID
     const val biometricKey: String = "YOUR_BIOMETRIC_KEY"
 
-    // 🔑 Приклади інших сервісів
+    // 🔑 Examples of the other services
     const val nfcScannerKey: String = "YOUR_NFC_SCANNER_KEY"
     const val storageEncryptionKey: String = "YOUR_STORAGE_KEY"
 }
