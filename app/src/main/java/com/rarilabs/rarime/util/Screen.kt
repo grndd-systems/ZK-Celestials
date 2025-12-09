@@ -6,7 +6,8 @@ sealed class Screen(val route: String) {
         data object ScanPassportSpecific : Screen("scan_passport_specific")
         data object ScanPassportPoints : Screen("scan_passport_points")
     }
-
+    //add new page faq
+    data object FAQ : Screen("faq")
     data object Lock : Screen("lock")
 
     data object Register : Screen("register") {
@@ -54,7 +55,9 @@ sealed class Screen(val route: String) {
 
             data object RewardsClaim : Screen("rewards_claim")
         }
+        data object FAQ: Screen("faq") {
 
+        }
         data object Profile : Screen("profile") {
             data object AuthMethod : Screen("auth_method")
             data object ExportKeys : Screen("export_keys")
@@ -62,6 +65,7 @@ sealed class Screen(val route: String) {
             data object Theme : Screen("theme")
             data object AppIcon : Screen("app_icon")
             data object Terms : Screen("terms")
+            data object FAQ : Screen("faq")
             data object Privacy : Screen("privacy")
         }
     }

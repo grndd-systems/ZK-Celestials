@@ -45,7 +45,8 @@ fun HomeHeader(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = name?.substringBefore(" ") ?: stringResource(R.string.stranger),
+                //changed string from Stranger to Celestial
+                text = name?.substringBefore(" ") ?: stringResource(R.string.Celestial),
                 style = RarimeTheme.typography.subtitle4,
                 color = RarimeTheme.colors.textPrimary,
                 maxLines = 1,

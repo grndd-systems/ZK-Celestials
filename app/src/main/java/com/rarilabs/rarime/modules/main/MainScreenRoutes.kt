@@ -31,6 +31,7 @@ import com.rarilabs.rarime.R
 import com.rarilabs.rarime.api.ext_integrator.ext_int_action_preview.ExtIntActionPreview
 import com.rarilabs.rarime.api.voting.models.MOCKED_POLL_ITEM
 import com.rarilabs.rarime.data.enums.SecurityCheckState
+import com.rarilabs.rarime.modules.faq.FAQScreen
 import com.rarilabs.rarime.modules.home.v3.HomeScreenV3
 import com.rarilabs.rarime.modules.intro.IntroScreen
 import com.rarilabs.rarime.modules.main.guards.AuthGuard
@@ -483,6 +484,10 @@ fun MainScreenRoutes(
                             onBack = { navController.popBackStack() })
                     }
                 }
+            }
+            //added faq navcontroller
+            composable("faq") {
+                FAQScreen(navController = navController)
             }
             composable(Screen.Main.Profile.Privacy.route) {
                 AuthGuard(navigate = navigateWithPopUp) {

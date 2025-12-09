@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">RariMe</string>
-    <string name="intro_step_1_title">RariMe</string>
+<!--    changed text app_name -->
+    <string name="app_name">ZK Celestial passport</string>
+    <string name="intro_step_1_title">ZK \nCelestials \nID</string>
     <string name="intro_step_1_text">Welcome to</string>
     <string name="intro_step_2_title">Go Incognito</string>
     <string name="intro_step_2_text">RariMe ensures your history, reputation and actions are not lost, and remain under your control.</string>
@@ -161,6 +162,8 @@
     <string name="dark_mode">Dark Mode</string>
     <string name="system">System</string>
     <string name="app_version">App version: %1$s</string>
+    <!--    added text based_on-->
+    <string name="based_on">Based on Rarime</string>
     <string name="account">Account</string>
     <string name="profile">Profile</string>
     <string name="user_address">Address: %1$s</string>
@@ -238,9 +241,9 @@
     <string name="scan_mrzstep_permission_denied">Camera permission denied, try fill manually</string>
 
     <string name="field_type_date_picker_placeholder">Select date</string>
-
-    <string name="create_identity_selector_subtitle">Select an authorization method</string>
-    <string name="create_identity_selector_option_1">Create a new identity</string>
+<!-- commented and change text create_identity_selector_subtitle and Enter_passport -->
+<!--    <string name="create_identity_selector_subtitle">Select an authorization method</string>-->
+    <string name="Enter_passport">Enter passport</string>
     <string name="create_identity_selector_option_2">Re-activate old profile</string>
 
     <string name="create_identity_continue_btn">Continue</string>
@@ -360,8 +363,9 @@
     <string name="select_icon_description">Select icon</string>
     <string name="from_json_test_only">FROM JSON (TEST ONLY)</string>
     <string name="you">You</string>
-    <string name="hi">Hi</string>
-    <string name="stranger">Stranger</string>
+<!--    changed text hi and Stranger to Celestial-->
+    <string name="hi">Hi,</string>
+    <string name="Celestial">Celestial</string>
     <string name="no_passport_error">First, scan your passport.</string>
     <string name="no_active_identity">No active identity. Please register first.</string>
     <string name="rmo">RMO</string>
@@ -473,6 +477,8 @@
     <string name="icon_green">Green</string>
     <string name="icon_gradient">Gradient</string>
     <string name="icon_cat">Cat</string>
+<!--    added text icon_celestials-->
+    <string name="icon_celestials">Celestials</string>
     <string name="freedomtool_title">Freedomtool</string>
     <string name="fredomtool_accent_title">Voting</string>
     <string name="hidden_prize_on_win_description">Hidden keys: found. Prize: secured. Who’s next to join the winners’ circle? 🔑🏆</string>

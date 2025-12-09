@@ -8,7 +8,7 @@ plugins {
 buildscript {
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.1.1")
-        classpath("com.google.gms:google-services:4.3.15") // Add this line
+        classpath("com.android.tools.build:gradle:8.13.0")
+        classpath("com.google.gms:google-services:4.3.15") // added new version for correct work of the program
     }
 }

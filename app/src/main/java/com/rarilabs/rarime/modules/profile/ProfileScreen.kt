@@ -1,6 +1,8 @@
 package com.rarilabs.rarime.modules.profile
 
+import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -46,6 +48,7 @@ import com.rarilabs.rarime.util.Screen
 import com.rarilabs.rarime.util.SendEmailUtil
 import com.rarilabs.rarime.util.WalletUtil
 import kotlinx.coroutines.launch
+import org.bouncycastle.crypto.params.Blake3Parameters.context
 
 @Composable
 fun ProfileScreen(
@@ -93,6 +96,8 @@ fun ProfileScreenContent(
     onClearConfirm: suspend () -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
+    //added val context
+    val context = LocalContext.current
 
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -140,48 +145,50 @@ fun ProfileScreenContent(
                             color = RarimeTheme.colors.textSecondary
                         )
                     }
-                    PassportImage(image = passportImage, size = 40.dp)
+                        // deleted an icon from Profile
+//                    PassportImage(image = passportImage, size = 40.dp)
                 }
             }
-            Column(
-                modifier = Modifier
-                    .background(
-                        RarimeTheme.colors.componentPrimary, RoundedCornerShape(20.dp)
-                    )
-                    .padding(16.dp)
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                    ProfileRow(
-                        iconId = R.drawable.ic_user_shared_2_line,
-                        title = stringResource(R.string.recovery_method),
-                        onClick = { navigate(Screen.Main.Profile.ExportKeys.route) })
-                    ProfileRow(
-                        iconId = R.drawable.ic_shield_keyhole_line,
-                        title = stringResource(R.string.auth_method),
-                        onClick = { navigate(Screen.Main.Profile.AuthMethod.route) })
-                }
-            }
-            Column(
-                modifier = Modifier
-                    .background(
-                        RarimeTheme.colors.componentPrimary, RoundedCornerShape(20.dp)
-                    )
-                    .padding(16.dp)
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                    ProfileRow(
-                        iconId = R.drawable.ic_sun_line,
-                        title = stringResource(R.string.theme),
-                        value = colorScheme.toLocalizedString(),
-                        onClick = { navigate(Screen.Main.Profile.Theme.route) })
-                    ProfileRow(
-                        iconId = R.drawable.ic_rarime,
-                        title = stringResource(R.string.app_icon),
-                        value = appIcon.toLocalizedString(),
-                        onClick = { navigate(Screen.Main.Profile.AppIcon.route) })
-
-                }
-            }
+            // deleted the columns AppTheme and AppIcon
+//            Column(
+//                modifier = Modifier
+//                    .background(
+//                        RarimeTheme.colors.componentPrimary, RoundedCornerShape(20.dp)
+//                    )
+//                    .padding(16.dp)
+//            ) {
+//                Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+//                    ProfileRow(
+//                        iconId = R.drawable.ic_user_shared_2_line,
+//                        title = stringResource(R.string.recovery_method),
+//                        onClick = { navigate(Screen.Main.Profile.ExportKeys.route) })
+//                    ProfileRow(
+//                        iconId = R.drawable.ic_shield_keyhole_line,
+//                        title = stringResource(R.string.auth_method),
+//                        onClick = { navigate(Screen.Main.Profile.AuthMethod.route) })
+//                }
+//            }
+//            Column(
+//                modifier = Modifier
+//                    .background(
+//                        RarimeTheme.colors.componentPrimary, RoundedCornerShape(20.dp)
+//                    )
+//                    .padding(16.dp)
+//            ) {
+//                Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+//                    ProfileRow(
+//                        iconId = R.drawable.ic_sun_line,
+//                        title = stringResource(R.string.theme),
+//                        value = colorScheme.toLocalizedString(),
+//                        onClick = { navigate(Screen.Main.Profile.Theme.route) })
+//                    ProfileRow(
+//                        iconId = R.drawable.ic_rarime,
+//                        title = stringResource(R.string.app_icon),
+//                        value = appIcon.toLocalizedString(),
+//                        onClick = { navigate(Screen.Main.Profile.AppIcon.route) })
+//
+//                }
+//            }
             Column(
                 modifier = Modifier
                     .background(
@@ -193,19 +200,50 @@ fun ProfileScreenContent(
                     ProfileRow(
                         iconId = R.drawable.ic_question_line,
                         title = stringResource(R.string.privacy_policy),
-                        onClick = { navigate(Screen.Main.Profile.Privacy.route) })
+                        onClick = { navigate(Screen.Main.Profile.Privacy.route) }
+                    )
                     ProfileRow(
                         iconId = R.drawable.ic_flag_line,
                         title = stringResource(R.string.terms_of_use),
-                        onClick = { navigate(Screen.Main.Profile.Terms.route) })
+                        onClick = { navigate(Screen.Main.Profile.Terms.route) }
+                    )
+
+                    // changed the column Contact Us
                     ProfileRow(
                         iconId = R.drawable.ic_chat,
-                        title = stringResource(R.string.give_us_feedback),
+                        title = "Contact Us",
                         onClick = {
-                            scope.launch {
-                                onFeedbackConfirm.invoke()
+                            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                data = Uri.parse("mailto:help@grndd.systems")
+                                putExtra(Intent.EXTRA_SUBJECT, "ZK Celestials ID Support")
+                                putExtra(Intent.EXTRA_TEXT, "Hello Support Team,\n\n")
                             }
-                        })
+                            try {
+                                context.startActivity(Intent.createChooser(intent, "Send Email"))
+                            } catch (e: Exception) {
+                            }
+                        }
+                    )
+
+                    //added the column FAQ
+                    ProfileRow(
+                        iconId = R.drawable.ic_question_line,
+                        title = "FAQ",
+                        onClick = { navigate(Screen.Main.FAQ.route) }
+                    )
+
+                    //added the column Website-Celestial
+                    ProfileRow(
+                        iconId = R.drawable.ic_draggable,
+                        title = "Website",
+                        onClick = {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://celestials.id/"))
+                            try {
+                                context.startActivity(intent)
+                            } catch (e: Exception) {
+                            }
+                        }
+                    )
                 }
             }
 
@@ -248,6 +286,12 @@ fun ProfileScreenContent(
             }
             Text(
                 text = stringResource(R.string.app_version, BuildConfig.VERSION_NAME),
+                style = RarimeTheme.typography.body5,
+                color = RarimeTheme.colors.textPlaceholder
+            )
+            //added text Based on Rarime
+            Text(
+                text = stringResource(R.string.based_on),
                 style = RarimeTheme.typography.body5,
                 color = RarimeTheme.colors.textPlaceholder
             )

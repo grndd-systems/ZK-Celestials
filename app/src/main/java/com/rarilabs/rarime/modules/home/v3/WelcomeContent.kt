@@ -80,21 +80,20 @@ fun WelcomeBottomSheet(
                 imageHeight = 206.dp,
                 accentColor = welcomeAccentColor2
 
+//Removed welcome content on first entry to main screen
+//            ), WelcomeCardContent(
+//                title = context.getString(R.string.welcome_card3_title),
+//                imageId = R.drawable.welcome_identity_card,
+//                description = context.getString(R.string.welcome_card3_description),
+//                imageHeight = 224.dp,
+//                accentColor = welcomeAccentColor3
 
-            ), WelcomeCardContent(
-                title = context.getString(R.string.welcome_card3_title),
-                imageId = R.drawable.welcome_identity_card,
-                description = context.getString(R.string.welcome_card3_description),
-                imageHeight = 224.dp,
-                accentColor = welcomeAccentColor3
-
-
-            ), WelcomeCardContent(
-                title = context.getString(R.string.welcome_card4_title),
-                imageId = R.drawable.welcome_cards,
-                description = context.getString(R.string.welcome_card4_description),
-                imageHeight = 191.dp,
-                accentColor = welcomeAccentColor4
+//            ), WelcomeCardContent(
+//                title = context.getString(R.string.welcome_card4_title),
+//                imageId = R.drawable.welcome_cards,
+//                description = context.getString(R.string.welcome_card4_description),
+//                imageHeight = 191.dp,
+//                accentColor = welcomeAccentColor4
 
             )
         )
