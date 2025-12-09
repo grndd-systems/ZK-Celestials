@@ -24,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -52,18 +53,32 @@ fun ScanGuidesTrigger(
     modifier: Modifier = Modifier,
     type: SpecificPassportGuide = SpecificPassportGuide.Other
 ) {
-
+// changed anim to image
     fun getMrzHintType(type: SpecificPassportGuide): Int {
         return when (type) {
             SpecificPassportGuide.USA -> R.raw.scan_mrz_usa
-            SpecificPassportGuide.Other -> R.raw.scan_mrz_external
+            SpecificPassportGuide.Other -> R.drawable.celestial_scan_passport
+        }
+    }
+
+    fun getMrzHintTypeIsDrawable(type: SpecificPassportGuide): Boolean {
+        return when (type) {
+            SpecificPassportGuide.USA -> false // Still uses animation
+            SpecificPassportGuide.Other -> true // Uses PNG image
         }
     }
 
     fun getNFCHintType(type: SpecificPassportGuide): Int {
         return when (type) {
             SpecificPassportGuide.USA -> R.raw.read_nfc_usa
-            SpecificPassportGuide.Other -> R.raw.read_nfc_external
+            SpecificPassportGuide.Other -> R.drawable.celestial_nfc
+        }
+    }
+
+    fun getNFCHintTypeIsDrawable(type: SpecificPassportGuide): Boolean {
+        return when (type) {
+            SpecificPassportGuide.USA -> false // Still uses animation
+            SpecificPassportGuide.Other -> true // Uses PNG image
         }
     }
 
@@ -84,7 +99,7 @@ fun ScanGuidesTrigger(
                         RarimeTheme.colors.componentPrimary,
                         blendMode = BlendMode.Darken
                     ),
-                    painter = painterResource(id = R.drawable.how_to_scan_preview),
+                    painter = painterResource(id = R.drawable.celestial_scan_passport),
                     contentDescription = ""
                 )
 
@@ -114,7 +129,8 @@ fun ScanGuidesTrigger(
         ) { page ->
             when (page) {
                 0 -> ScanGuides(
-                    mediaId = R.raw.phone_case_warning,
+                    mediaId = R.drawable.celestial_case,
+                    isDrawable = true,
                     title = stringResource(id = R.string.scan_mrzstep_content_bottom_sheet_case_title),
                     desc = stringResource(id = R.string.scan_mrzstep_content_bottom_sheet_case_description),
                     btnText = stringResource(id = R.string.scan_mrzstep_content_bottom_sheet_case_btn),
@@ -127,6 +143,7 @@ fun ScanGuidesTrigger(
 
                 1 -> ScanGuides(
                     mediaId = getMrzHintType(type),
+                    isDrawable = getMrzHintTypeIsDrawable(type),
                     title = stringResource(id = R.string.scan_mrzstep_content_bottom_sheet_mrz_title),
                     desc = stringResource(id = R.string.scan_mrzstep_content_bottom_sheet_mrz_description),
                     btnText = stringResource(id = R.string.scan_mrzstep_content_bottom_sheet_mrz_btn),
@@ -139,6 +156,7 @@ fun ScanGuidesTrigger(
 
                 2 -> ScanGuides(
                     mediaId = getNFCHintType(type),
+                    isDrawable = getNFCHintTypeIsDrawable(type),
                     title = stringResource(id = R.string.scan_mrzstep_content_bottom_sheet_nfc_title),
                     desc = stringResource(id = R.string.scan_mrzstep_content_bottom_sheet_nfc_description),
                     btnText = stringResource(id = R.string.scan_mrzstep_content_bottom_sheet_nfc_btn),
@@ -158,7 +176,7 @@ fun ScanGuidesTrigger(
 
 @Composable
 fun ScanGuides(
-    mediaId: Int, title: String, desc: String, btnText: String, onPress: () -> Unit
+    mediaId: Int,  isDrawable: Boolean = false,  title: String,  desc: String,  btnText: String,  onPress: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -168,12 +186,24 @@ fun ScanGuides(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(48.dp))
-        GifViewer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp)),
-            gifId = mediaId
-        )
+        // replaced animation with PNG image for drawable resources
+        if (isDrawable) {
+            Image(
+                painter = painterResource(id = mediaId),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+            )
+        } else {
+            GifViewer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp)),
+                gifId = mediaId
+            )
+        }
         Spacer(modifier = Modifier.height(40.dp))
         Text(
             text = title,
@@ -204,7 +234,8 @@ fun ScanGuides(
 @Composable
 private fun ScanGuidesPreview() {
     ScanGuides(
-        mediaId = R.raw.phone_case_warning,
+        mediaId = R.drawable.celestial_case,
+        isDrawable = true,
         title = stringResource(id = R.string.scan_mrzstep_content_bottom_sheet_nfc_title),
         desc = stringResource(id = R.string.scan_mrzstep_content_bottom_sheet_nfc_description),
         btnText = stringResource(id = R.string.scan_mrzstep_content_bottom_sheet_nfc_btn),

@@ -117,4 +117,7 @@ interface SecureSharedPrefsManager {
     fun saveIsShownWelcome(isShown: Boolean)
     fun getIsShownWelcome(): Boolean
 
+    fun saveIdentityLegalScreensShown(isShown: Boolean)
+    fun getIdentityLegalScreensShown(): Boolean
+
 }

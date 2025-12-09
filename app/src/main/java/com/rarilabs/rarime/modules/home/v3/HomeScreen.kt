@@ -1,22 +1,35 @@
 package com.rarilabs.rarime.modules.home.v3
 
+import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,11 +43,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.rarilabs.rarime.R
 import com.rarilabs.rarime.data.enums.AppColorScheme
 import com.rarilabs.rarime.modules.home.v3.model.ANIMATION_DURATION_MS
 import com.rarilabs.rarime.modules.home.v3.model.BaseWidgetProps
@@ -56,6 +73,7 @@ import com.rarilabs.rarime.modules.manageWidgets.ManageWidgetsButton
 import com.rarilabs.rarime.ui.components.AppBottomSheet
 import com.rarilabs.rarime.ui.components.rememberAppSheetState
 import com.rarilabs.rarime.ui.theme.RarimeTheme
+import com.rarilabs.rarime.util.ErrorHandler
 import com.rarilabs.rarime.util.PrevireSharedAnimationProvider
 import com.rarilabs.rarime.util.Screen
 import kotlinx.coroutines.delay
@@ -84,7 +102,6 @@ fun HomeScreenV3(
 
     val welcomeAppSheetState = rememberAppSheetState(isWelcomeVisible)
 
-
     val sheetManageWidgets = rememberAppSheetState()
     AppBottomSheet(
         state = sheetManageWidgets,
@@ -94,8 +111,6 @@ fun HomeScreenV3(
     ) {
         ManageWidgetsBottomSheet(onClose = { sheetManageWidgets.hide() })
     }
-
-
 
     HomeScreenContent(
         visibleWidgets = visibleCards,
@@ -111,7 +126,8 @@ fun HomeScreenV3(
     )
 
     AppBottomSheet(
-        state = welcomeAppSheetState, isHeaderEnabled = false,
+        state = welcomeAppSheetState,
+        isHeaderEnabled = false,
         disablePullClose = true,
         onClose = {
             viewModel.saveIsShownWelcome(true)
@@ -123,7 +139,6 @@ fun HomeScreenV3(
             viewModel.saveIsShownWelcome(true)
         }
     }
-
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -141,203 +156,126 @@ fun HomeScreenContent(
     onClick: () -> Unit
 ) {
     var selectedWidgetType by remember { mutableStateOf<WidgetType?>(null) }
+
     LaunchedEffect(selectedWidgetType) {
         setVisibilityOfBottomBar(selectedWidgetType == null)
     }
 
-    val pagerState = rememberPagerState(pageCount = { visibleWidgets.size })
-
     Box(modifier = modifier) {
-        var pagerScrollEnabled by remember { mutableStateOf(true) }
-        LaunchedEffect(selectedWidgetType) {
-            pagerScrollEnabled = false
-            delay((ANIMATION_DURATION_MS + 200).toLong())
-            pagerScrollEnabled = true
-        }
+        // Simple scrollable content with Celestials ID block
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(
+                    top = innerPaddings[ScreenInsets.TOP]?.toFloat()?.dp ?: 0.dp,
+                    bottom = innerPaddings[ScreenInsets.BOTTOM]?.toFloat()?.dp ?: 0.dp
+                )
+        ) {
+            // Header with notifications
+            HomeHeader(
+                notificationsCount = notificationsCount,
+                name = userPassportName,
+                onNotificationClick = { navigate(Screen.NotificationsList.route) }
+            )
 
-        AnimatedContent(selectedWidgetType) { targetCardType ->
-            if (targetCardType == null) {
+            // Add spacing after header
+            Box(modifier = Modifier.height(20.dp))
+
+            // Celestials ID block - opens https://celestials.id/
+            CelestialsIdBlock(
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
+
+            // Add spacing at bottom
+            Box(modifier = Modifier.height(20.dp))
+        }
+    }
+}
+
+/**
+ * Celestials ID promotional block
+ * Opens https://celestials.id/ when clicked
+ */
+@Composable
+fun CelestialsIdBlock(
+    modifier: Modifier = Modifier
+) {
+    // Get context to launch browser intent
+    val context = LocalContext.current
+
+    // Main column without background - only image and text card
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(
+                // Remove ripple effect for cleaner look
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                // Open https://celestials.id/ in browser when clicked
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://celestials.id/"))
+                try {
+                    context.startActivity(intent)
+                } catch (e: Exception) {
+                    // Handle error if browser not available
+                    ErrorHandler.logError("CelestialsIdBlock", "Failed to open URL", e)
+                }
+            },
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Celestials banner image - NO BACKGROUND
+        Image(
+            painter = painterResource(id = R.drawable.celestial_banner), // Replace with your image resource
+            contentDescription = "Celestials Banner",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(500.dp), // Increased height for better proportions
+            contentScale = ContentScale.Fit // Changed to Fit to show full image without cropping
+        )
+
+        // Text card with grey background
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    RarimeTheme.colors.componentPrimary,
+                    RoundedCornerShape(20.dp)
+                )
+                .padding(20.dp)
+        ) {
+            // Title section with arrow
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Column(
-                    modifier = Modifier.padding(
-                        top = innerPaddings[ScreenInsets.TOP]?.toFloat()?.dp ?: 0.dp,
-                        bottom = innerPaddings[ScreenInsets.BOTTOM]?.toFloat()?.dp ?: 0.dp
-                    )
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    HomeHeader(
-                        notificationsCount = notificationsCount,
-                        name = userPassportName,
-                        onNotificationClick = { navigate(Screen.NotificationsList.route) })
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        VerticalPager(
-                            modifier = Modifier.weight(1f),
-                            userScrollEnabled = pagerScrollEnabled,
-                            state = pagerState,
-                            pageSpacing = 5.dp,
-                            contentPadding = PaddingValues(top = 0.dp, bottom = 70.dp),
-                            key = { page -> visibleWidgets[page].layoutId }
-
-                        ) { page ->
-
-                            val widgetType = visibleWidgets[page]
-                            val currentPage = pagerState.currentPage
-                            val currentOffset = pagerState.currentPageOffsetFraction
-                            val pageOffset = (currentPage - page) + currentOffset
-                            val absoluteOffset = abs(pageOffset).coerceIn(0f, 1f)
-                            val targetScale = lerp(0.9f, 1f, 1f - absoluteOffset)
-                            val scale by animateFloatAsState(
-                                targetValue = targetScale, animationSpec = spring(
-                                    dampingRatio = 0.5f, stiffness = 300f
-                                )
-                            )
-
-                            val onExpand = remember(pagerScrollEnabled, widgetType) {
-                                {
-                                    if (pagerScrollEnabled) {
-                                        selectedWidgetType = widgetType
-                                    }
-                                }
-                            }
-
-                            val collapsedWidgetProps = BaseWidgetProps.Collapsed(
-                                onExpand = onExpand,
-                                layoutId = widgetType.layoutId,
-                                animatedVisibilityScope = this@AnimatedContent,
-                                sharedTransitionScope = sharedTransitionScope
-                            )
-
-                            val baseCollapsedModifier = Modifier.graphicsLayer {
-                                scaleX = scale
-                                scaleY = scale
-                                alpha = lerp(0.8f, 1f, 1f - absoluteOffset)
-                            }
-                            when (widgetType) {
-                                WidgetType.EARN -> EarnCollapsedWidget(
-                                    collapsedWidgetProps = collapsedWidgetProps,
-                                    colorScheme = colorScheme
-
-                                )
-
-
-                                WidgetType.FREEDOMTOOL -> FreedomtoolCollapsedWidget(
-                                    collapsedWidgetProps = collapsedWidgetProps,
-                                    modifier = baseCollapsedModifier,
-                                )
-
-//                                WidgetType.LIKENESS -> LikenessCollapsedWidget(
-//                                    collapsedWidgetProps = collapsedWidgetProps,
-//
-//                                    modifier = baseCollapsedModifier,
-//                                )
-
-                                WidgetType.HIDDEN_PRIZE -> HiddenPrizeCollapsedWidget(
-                                    collapsedWidgetProps = collapsedWidgetProps,
-                                    modifier = baseCollapsedModifier,
-                                    colorScheme = colorScheme
-                                )
-
-                                WidgetType.RECOVERY_METHOD -> RecoveryMethodCollapsedWidget(
-                                    collapsedWidgetProps = collapsedWidgetProps,
-                                    modifier = baseCollapsedModifier,
-                                    colorScheme = colorScheme
-                                )
-
-                                // TODO: Implement rest collapsed cards here
-                            }
-
-
-                        }
-                        VerticalPageIndicator(
-                            totalPages = pagerState.pageCount,
-                            selectedPage = pagerState.currentPage,
-                            modifier = Modifier.padding(end = 8.dp),
-                            defaultSize = 6.dp,
-                            selectedColor = RarimeTheme.colors.primaryMain,
-                            defaultColor = RarimeTheme.colors.primaryLight,
-                            selectedHeight = 16.dp,
-                            space = 8.dp
-                        )
-
-                    }
-
-                }
-
-                if (pagerState.currentPage == pagerState.pageCount - 1) {
-                    ManageWidgetsButton(innerPaddings = innerPaddings, onClick = onClick)
-                }
-
-            } else {
-                // Expanded: one card is visible on top
-                BackHandler {
-                    selectedWidgetType = null
-                }
-
-                Box(
-                    modifier = Modifier.align(Alignment.TopCenter)
-                ) {
-                    // Common props for every expanded card
-                    val expandedCardProps = BaseWidgetProps.Expanded(
-                        onCollapse = { selectedWidgetType = null },
-                        layoutId = targetCardType.layoutId,
-                        animatedVisibilityScope = this@AnimatedContent,
-                        sharedTransitionScope = sharedTransitionScope
+                    // Title
+                    Text(
+                        text = "CELESTIALS ID",
+                        style = RarimeTheme.typography.h6,
+                        color = RarimeTheme.colors.textPrimary
                     )
 
-                    when (targetCardType) {
-                        WidgetType.FREEDOMTOOL -> FreedomtoolExpandedWidget(
-                            expandedWidgetProps = expandedCardProps,
-                            innerPaddings = innerPaddings,
-                            navigate = navigate
-                        )
-
-//                        WidgetType.LIKENESS -> DigitalLikenessExpandedWidget(
-//                            expandedWidgetProps = expandedCardProps,
-//                            innerPaddings = innerPaddings,
-//                            navigate = navigate
-//                        )
-
-                        WidgetType.EARN -> EarnExpandedWidget(
-
-                            expandedWidgetProps = expandedCardProps,
-                            innerPaddings = innerPaddings,
-                            navigate = navigate,
-
-                            )
-
-                        WidgetType.HIDDEN_PRIZE -> HiddenPrizeExpandedWidget(
-                            expandedWidgetProps = expandedCardProps,
-                            innerPaddings = innerPaddings,
-                            navigate = navigate,
-                        )
-
-                        WidgetType.RECOVERY_METHOD -> RecoveryMethodExpandedWidget(
-                            expandedWidgetProps = expandedCardProps,
-                            innerPaddings = innerPaddings,
-                            navigate = navigate
-                        )
-
-                        // TODO: Implement rest expanded cards here
-                    }
+                    // Description
+                    Text(
+                        text = "Explore more about the next\ngeneration of identity on the web.",
+                        style = RarimeTheme.typography.body4,
+                        color = RarimeTheme.colors.textSecondary
+                    )
                 }
+
+                // Arrow icon indicating it's clickable/external link
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_arrow_right_up_line), // or ic_external_link_line
+                    contentDescription = "Open external link",
+                    tint = RarimeTheme.colors.textSecondary,
+                    modifier = Modifier.size(24.dp)
+                )
             }
-        }
-
-
-        if (!pagerScrollEnabled) {
-            Box(
-                modifier = Modifier
-                    .background(Color.Transparent)
-                    .zIndex(200f)
-                    .matchParentSize()
-                    .pointerInput(Unit) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                awaitPointerEvent()
-                            }
-                        }
-                    })
         }
     }
 }
@@ -358,7 +296,8 @@ private fun HomeScreenPreview() {
                 innerPaddings = mapOf(ScreenInsets.TOP to 0, ScreenInsets.BOTTOM to 0),
                 visibleWidgets = WidgetType.entries,
                 colorScheme = AppColorScheme.SYSTEM,
-                onClick = {})
+                onClick = {}
+            )
         }
     }
 }

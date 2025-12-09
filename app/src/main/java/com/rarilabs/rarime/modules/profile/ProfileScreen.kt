@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -15,12 +16,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,6 +44,7 @@ import com.rarilabs.rarime.R
 import com.rarilabs.rarime.data.enums.AppColorScheme
 import com.rarilabs.rarime.data.enums.AppIcon
 import com.rarilabs.rarime.data.enums.toLocalizedString
+import com.rarilabs.rarime.modules.passportScan.models.Image
 import com.rarilabs.rarime.ui.components.AppIcon
 import com.rarilabs.rarime.ui.components.ConfirmationDialog
 import com.rarilabs.rarime.ui.components.PassportImage
@@ -62,16 +67,25 @@ fun ProfileScreen(
             isFeedbackDialogShown = false
         })
 
-    val image = remember {
-        viewModel.getImage()
+    // Use LaunchedEffect to load image asynchronously to avoid blocking composition
+    var image by remember { mutableStateOf<Bitmap?>(null) }
+    LaunchedEffect(Unit) {
+        image = viewModel.getImage()
     }
 
     val colorScheme by viewModel.colorScheme.collectAsState()
 
+    // Collect the formatted address from ViewModel
+    val formattedAddress by viewModel.formattedAddress.collectAsState()
 
+    // Load the address when screen is displayed
+    // LaunchedEffect already runs in a coroutine scope, no need for coroutineScope.launch
+    LaunchedEffect(Unit) {
+        viewModel.loadAddress()
+    }
 
     ProfileScreenContent(
-        evmAddress = WalletUtil.formatAddress(viewModel.evmAddress),
+        evmAddress = formattedAddress,
         passportImage = image,
         navigate = navigate,
         colorScheme = colorScheme,
@@ -117,38 +131,6 @@ fun ProfileScreenContent(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier
-                    .background(
-                        RarimeTheme.colors.componentPrimary, RoundedCornerShape(20.dp)
-                    )
-                    .padding(20.dp)
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = stringResource(R.string.account),
-                            style = RarimeTheme.typography.buttonLarge,
-                            color = RarimeTheme.colors.textPrimary
-                        )
-                        Text(
-                            text = WalletUtil.formatAddress(
-                                stringResource(
-                                    R.string.user_address, evmAddress
-                                )
-                            ),
-                            style = RarimeTheme.typography.body5,
-                            color = RarimeTheme.colors.textSecondary
-                        )
-                    }
-                        // deleted an icon from Profile
-//                    PassportImage(image = passportImage, size = 40.dp)
-                }
-            }
             // deleted the columns AppTheme and AppIcon
 //            Column(
 //                modifier = Modifier
@@ -198,20 +180,20 @@ fun ProfileScreenContent(
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
                     ProfileRow(
-                        iconId = R.drawable.ic_question_line,
+                        iconId = R.drawable.zk_check_bold,
                         title = stringResource(R.string.privacy_policy),
                         onClick = { navigate(Screen.Main.Profile.Privacy.route) }
                     )
                     ProfileRow(
-                        iconId = R.drawable.ic_flag_line,
+                        iconId = R.drawable.zk_flag,
                         title = stringResource(R.string.terms_of_use),
                         onClick = { navigate(Screen.Main.Profile.Terms.route) }
                     )
 
                     // changed the column Contact Us
                     ProfileRow(
-                        iconId = R.drawable.ic_chat,
-                        title = "Contact Us",
+                        iconId = R.drawable.zk_email,
+                        title = "Give us Feedback",
                         onClick = {
                             val intent = Intent(Intent.ACTION_SENDTO).apply {
                                 data = Uri.parse("mailto:help@grndd.systems")
@@ -227,22 +209,9 @@ fun ProfileScreenContent(
 
                     //added the column FAQ
                     ProfileRow(
-                        iconId = R.drawable.ic_question_line,
+                        iconId = R.drawable.zk_frequently_asked_questions,
                         title = "FAQ",
                         onClick = { navigate(Screen.Main.FAQ.route) }
-                    )
-
-                    //added the column Website-Celestial
-                    ProfileRow(
-                        iconId = R.drawable.ic_draggable,
-                        title = "Website",
-                        onClick = {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://celestials.id/"))
-                            try {
-                                context.startActivity(intent)
-                            } catch (e: Exception) {
-                            }
-                        }
                     )
                 }
             }
@@ -257,7 +226,7 @@ fun ProfileScreenContent(
                 var isDeleteAccountDialogShown by remember { mutableStateOf(false) }
 
                 ProfileRow(
-                    iconId = R.drawable.ic_trash_simple,
+                    iconId = R.drawable.zk_delete,
                     title = "Delete account",
                     onClick = { isDeleteAccountDialogShown = true },
                     contentColors = getProfileRowContentColors(
@@ -286,12 +255,6 @@ fun ProfileScreenContent(
             }
             Text(
                 text = stringResource(R.string.app_version, BuildConfig.VERSION_NAME),
-                style = RarimeTheme.typography.body5,
-                color = RarimeTheme.colors.textPlaceholder
-            )
-            //added text Based on Rarime
-            Text(
-                text = stringResource(R.string.based_on),
                 style = RarimeTheme.typography.body5,
                 color = RarimeTheme.colors.textPlaceholder
             )
@@ -384,7 +347,7 @@ private fun ProfileRow(
 @Composable
 private fun ProfileScreenPreview() {
     ProfileScreenContent(
-        evmAddress = "0xbF1823EF5Ca4484517F930c695b07544C2b43Efe",
+        evmAddress = "123...23242",
         passportImage = null,
         navigate = {},
         colorScheme = AppColorScheme.LIGHT,

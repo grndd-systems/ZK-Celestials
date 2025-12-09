@@ -2,6 +2,7 @@
 // file to generate new window in app to check faq
 package com.rarilabs.rarime.modules.faq
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -12,15 +13,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.rarilabs.rarime.ui.theme.RarimeTheme
 import com.rarilabs.rarime.util.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FAQScreen(navController: NavController) {
     Scaffold(
+        containerColor = RarimeTheme.colors.backgroundPrimary,
         topBar = {
             TopAppBar(
-                title = { Text("FAQ") },
+                title = {
+                    Text(
+                        text = "FAQ",
+                        color = RarimeTheme.colors.textPrimary
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = RarimeTheme.colors.backgroundPrimary,
+                    titleContentColor = RarimeTheme.colors.textPrimary
+                ),
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.navigate(Screen.Main.Home.route) {
@@ -28,7 +40,11 @@ fun FAQScreen(navController: NavController) {
                             launchSingleTop = true
                         }
                     }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = RarimeTheme.colors.textPrimary
+                        )
                     }
                 }
             )
@@ -37,31 +53,48 @@ fun FAQScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(RarimeTheme.colors.backgroundPrimary)
                 .padding(paddingValues)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            // FAQ контент
+            // FAQ content
             FAQItem(
-                question = "What is ZK Celestials ID?",
-                answer = "ZK Celestials ID is a decentralized identity solution based on zero-knowledge proofs..."
+                question = "What does the QR code contain?",
+                answer = "The QR code contains only your Celestial ID number — nothing else. It does not store personal data, passport details, or any sensitive information."
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             FAQItem(
-                question = "How to use my wallet key?",
-                answer = "Your Celestials ID is your private key (40 characters). Keep it safe and never share it..."
+                question = "What happens when I scan the QR code?",
+                answer = "Your phone receives the Celestial ID from the QR code and uses it to link the verification process to your account. The QR itself does not provide any personal information."
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             FAQItem(
-                question = "Is my data secure?",
-                answer = "Yes, all your data is encrypted and stored locally on your device..."
+                question = "How is my passport processed during verification?",
+                answer = "Your passport is scanned locally on your device. The data never leaves your phone. It’s used only to generate a zero-knowledge proof confirming that your passport is valid."
             )
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Додайте більше питань тут
+            FAQItem(
+                question = "Is any passport information stored?",
+                answer = "No. Passport data is never uploaded, never stored, and never shared. Only the zero-knowledge proof — a mathematical confirmation — is sent to the network."
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            FAQItem(
+                question = "Can someone misuse my QR code?",
+                answer = "No. The QR code only contains an ID number, not your personal info. Without your wallet and your device, no one can generate proofs on your behalf."
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            FAQItem(
+                question = "What happens if the proof submission fails?",
+                answer = "You can try again. Since all data stays on your device until the proof is sent, nothing is lost and no personal information is leaked."
+            )
         }
     }
 }
@@ -70,6 +103,9 @@ fun FAQScreen(navController: NavController) {
 fun FAQItem(question: String, answer: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = RarimeTheme.colors.componentPrimary
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -77,13 +113,14 @@ fun FAQItem(question: String, answer: String) {
         ) {
             Text(
                 text = question,
-                style = MaterialTheme.typography.titleMedium
+                style = RarimeTheme.typography.buttonLarge,
+                color = RarimeTheme.colors.textPrimary
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = answer,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = RarimeTheme.typography.body4,
+                color = RarimeTheme.colors.textSecondary
             )
         }
     }

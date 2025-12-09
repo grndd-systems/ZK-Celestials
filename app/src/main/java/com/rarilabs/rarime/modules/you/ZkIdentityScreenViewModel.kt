@@ -84,4 +84,12 @@ class ZkIdentityScreenViewModel @Inject constructor(
     fun getIsAlreadyReserved(): Boolean {
         return sharedPrefsManager.getIsAlreadyReserved()
     }
+
+    fun getIdentityLegalScreensShown(): Boolean {
+        return sharedPrefsManager.getIdentityLegalScreensShown()
+    }
+
+    fun saveIdentityLegalScreensShown(isShown: Boolean) {
+        sharedPrefsManager.saveIdentityLegalScreensShown(isShown)
+    }
 }

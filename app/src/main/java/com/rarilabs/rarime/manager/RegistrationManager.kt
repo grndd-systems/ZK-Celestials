@@ -105,6 +105,8 @@ class RegistrationManager @Inject constructor(
     ) {
         _eDocument.value = eDocument
 
+        ErrorHandler.logDebug("RegistrationManager", "Starting registration. Circuit: $registerIdentityCircuitName, IsRevoking: $isUserRevoking")
+
         val pubKeyPem = if (!eDocument.dg15.isNullOrEmpty()) {
             eDocument.getDg15File()!!.publicKey.publicKeyToPem()
                 .toByteArray()
@@ -119,6 +121,7 @@ class RegistrationManager @Inject constructor(
 
         val callData = when (zkProof) {
             is UniversalProof.Groth -> {
+                ErrorHandler.logDebug("RegistrationManager", "Building Groth registration calldata")
                 callDataBuilder.buildRegisterCalldata(
                     zkProof.getProofJson().toByteArray(),
                     eDocument.aaSignature,
@@ -131,6 +134,7 @@ class RegistrationManager @Inject constructor(
             }
 
             is UniversalProof.Light -> {
+                ErrorHandler.logDebug("RegistrationManager", "Building Light registration calldata")
                 callDataBuilder.buildRegisterCalldata(
                     zkProof.getProofJson().toByteArray(),
                     eDocument.aaSignature,
@@ -143,9 +147,7 @@ class RegistrationManager @Inject constructor(
             }
 
             is UniversalProof.Plonk -> {
-
-                Log.i("UniversalProof.Plonk", zkProof.proof.proof)
-
+                ErrorHandler.logDebug("RegistrationManager", "Building Plonk registration calldata")
                 callDataBuilder.buildNoirRegisterCalldata(
                     zkProof.proof.rawProof,
                     eDocument.aaSignature,
@@ -159,10 +161,22 @@ class RegistrationManager @Inject constructor(
         }
 
         withContext(Dispatchers.IO) {
-            val response = relayerRegister(callData, BaseConfig.REGISTER_CONTRACT_ADDRESS)
+            try {
+                ErrorHandler.logDebug("RegistrationManager", "Submitting registration to contract: ${BaseConfig.REGISTER_CONTRACT_ADDRESS}")
+                val response = relayerRegister(callData, BaseConfig.REGISTER_CONTRACT_ADDRESS)
 
-            response.data.attributes.tx_hash.let {
-                rarimoContractManager.checkIsTransactionSuccessful(it)
+                response.data.attributes.tx_hash.let {
+                    ErrorHandler.logDebug("RegistrationManager", "Registration transaction submitted. Tx Hash: $it")
+                    val isSuccessful = rarimoContractManager.checkIsTransactionSuccessful(it)
+                    if (isSuccessful) {
+                        ErrorHandler.logDebug("RegistrationManager", "Registration transaction confirmed successfully")
+                    } else {
+                        ErrorHandler.logError("RegistrationManager", "Registration transaction failed: $it")
+                    }
+                }
+            } catch (e: Exception) {
+                ErrorHandler.logError("RegistrationManager", "Error during registration", e)
+                throw e
             }
         }
     }
@@ -177,14 +191,31 @@ class RegistrationManager @Inject constructor(
     ): Tuple2<StateKeeper.PassportInfo, StateKeeper.IdentityInfo>? {
         try {
             val stateKeeperContract = rarimoContractManager.getStateKeeper()
+            ErrorHandler.logDebug("RegistrationManager", "StateKeeper contract loaded: ${BaseConfig.STATE_KEEPER_CONTRACT_ADDRESS}")
 
             val passportInfoKeyBytes =
                 passportManager.getPassportInfoKeyBytes(eDocument, zkProof)
+            ErrorHandler.logDebug("RegistrationManager", "Passport info key: ${org.web3j.utils.Numeric.toHexString(passportInfoKeyBytes)}")
 
             val passportInfo = withContext(Dispatchers.IO) {
-                stateKeeperContract.getPassportInfo(passportInfoKeyBytes).send()
+                try {
+                    stateKeeperContract.getPassportInfo(passportInfoKeyBytes).send()
+                } catch (e: Exception) {
+                    ErrorHandler.logError("RegistrationManager", "Error calling getPassportInfo on contract", e)
+                    throw e
+                }
             }
 
+            if (passportInfo == null) {
+                ErrorHandler.logDebug("RegistrationManager", "Passport info is null - passport not registered")
+                return null
+            }
+
+            val activeIdentity = passportInfo.component1()?.activeIdentity
+            val ZERO_BYTES32 = ByteArray(32) { 0 }
+            val isRegistered = activeIdentity != null && !activeIdentity.contentEquals(ZERO_BYTES32)
+            ErrorHandler.logDebug("RegistrationManager", "Passport registration status: $isRegistered")
+            
             return passportInfo
         } catch (e: Exception) {
             ErrorHandler.logError("RegistrationManager", "Error getting passport info", e)
@@ -328,7 +359,7 @@ class RegistrationManager @Inject constructor(
             if (!NOT_ALLOWED_COUNTRIES.contains(eDocument.value!!.personDetails?.nationality)) {
                 passportManager.updatePassportStatus(PassportStatus.ALLOWED)
             } else {
-                passportManager.updatePassportStatus(PassportStatus.NOT_ALLOWED)
+                passportManager.updatePassportStatus(PassportStatus.UNSUPPORTED_FOR_REWARDS)
             }
 
         } catch (e: Exception) {

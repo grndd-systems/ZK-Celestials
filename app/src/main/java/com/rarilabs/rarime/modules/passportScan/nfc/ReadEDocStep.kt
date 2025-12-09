@@ -1,12 +1,14 @@
 package com.rarilabs.rarime.modules.passportScan.nfc
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -16,9 +18,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.AutofillType
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,11 +37,11 @@ import com.rarilabs.rarime.modules.passportScan.components.SpecificPassportGuide
 import com.rarilabs.rarime.modules.passportScan.models.EDocument
 import com.rarilabs.rarime.modules.passportScan.models.ReadEDocStepViewModel
 import com.rarilabs.rarime.ui.base.ButtonSize
-import com.rarilabs.rarime.ui.components.AppAnimation
 import com.rarilabs.rarime.ui.components.AppBottomSheet
 import com.rarilabs.rarime.ui.components.PrimaryButton
 import com.rarilabs.rarime.ui.components.rememberAppSheetState
 import com.rarilabs.rarime.ui.theme.RarimeTheme
+import net.sf.scuba.data.Gender
 import okio.IOException
 import org.jmrtd.lds.icao.MRZInfo
 
@@ -143,7 +148,8 @@ private fun ReadEDocStepContent(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(1f)
+                    .fillMaxWidth()
                     .padding(top = 50.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -152,13 +158,15 @@ private fun ReadEDocStepContent(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    AppAnimation(
+                    // PNG image - made smaller for better layout
+                    Image(
+                        painter = painterResource(id = R.drawable.celestial_nfc_reader),
+                        contentDescription = null,
                         modifier = Modifier
-                            .scale(1.4f)
-                            .size(240.dp),
-                        id = R.raw.anim_passport_nfc,
+                            .scale(1.1f)
+                            .size(200.dp)
                     )
-
+                    Spacer(Modifier.height(10.dp))
                     when (state) {
                         ScanNFCState.NOT_SCANNING -> {
                             Column(
@@ -192,35 +200,33 @@ private fun ReadEDocStepContent(
                             handleScanPassportLayoutError()
                         }
                     }
-
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(RarimeTheme.colors.backgroundPure)
-                        .padding(bottom = 20.dp)
-                        .padding(horizontal = 20.dp)
-                ) {
-
-                    ScanGuidesTrigger(
-                        type = hintType,
-                    )
-                    PrimaryButton(
-                        modifier = Modifier
-                            .padding(top = 24.dp)
-                            .fillMaxWidth(),
-                        onClick = { scanSheetState.show() },
-                        size = ButtonSize.Large,
-                        text = stringResource(R.string.scan)
-                    )
                 }
             }
-        }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(RarimeTheme.colors.backgroundPure)
+                    .padding(bottom = 20.dp)
+                    .padding(horizontal = 20.dp)
+            ) {
 
+                ScanGuidesTrigger(
+                    type = hintType,
+                )
+                PrimaryButton(
+                    modifier = Modifier
+                        .padding(top = 24.dp)
+                        .fillMaxWidth(),
+                    onClick = { scanSheetState.show() },
+                    size = ButtonSize.Large,
+                    text = stringResource(R.string.scan)
+                )
+            }
+        }
     }
 
 }
+
 
 @Preview
 @Composable

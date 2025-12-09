@@ -1,3 +1,4 @@
+//added brand colors Celestial ID
 package com.rarilabs.rarime.ui.theme
 
 import androidx.compose.runtime.Stable
@@ -522,9 +523,9 @@ class RarimeColors(
 
 fun darkColors() = RarimeColors(
     // primary
-    primaryDarker = Color(0xFFFFFFFF),
-    primaryDark = Color(0xFFFFFFFF),
-    primaryMain = Color(0xFFFFFFFF),
+    primaryDarker = Color(0xFFEEECDF),
+    primaryDark = Color(0xFFEEECDF),
+    primaryMain = Color(0xFFEEECDF),
     primaryLight = Color(0x1FFFFFFF),
     primaryLighter = Color(0x0FFFFFFF),
 
@@ -565,7 +566,7 @@ fun darkColors() = RarimeColors(
     warningLighter = Color(0x0FED9E19),
 
     // text
-    textPrimary = Color(0xE5FFFFFF),
+    textPrimary = Color(0xFFEEECDF),
     textSecondary = Color(0x8FFFFFFF),
     textPlaceholder = Color(0x70FFFFFF),
     textDisabled = Color(0x47FFFFFF),
@@ -578,20 +579,20 @@ fun darkColors() = RarimeColors(
     componentDisabled = Color(0x0DFFFFFF),
 
     // background
-    backgroundPrimary = Color(0xFF0E0E0E),
-    backgroundContainer = Color(0xFF171717),
-    backgroundBlur = Color(0xE50E0E0E),
-    backgroundPure = Color(0xFF0E0E0E),
+    backgroundPrimary = Color( 0xFF080807),
+    backgroundContainer = Color(0xFF141413),
+    backgroundBlur = Color(0xE5141413),
+    backgroundPure = Color(0xFF080807),
     backgroundSurface1 = Color(0xFF272827),
     backgroundSurface2 = Color(0xFF3F403F),
 
     // base
-    baseBlack = Color(0xFF202020),
-    baseWhite = Color(0xFFFFFFFF),
+    baseBlack = Color(0xFF080807),
+    baseWhite = Color(0xFFEEECDF),
 
     // inverted
-    invertedDark = Color(0xFFF3F6F2),
-    invertedLight = Color(0xFF141614),
+    invertedDark = Color(0xFFEEECDF),
+    invertedLight = Color(0xFF080807),
 
     // additional
     gradient1 = Brush.linearGradient(colors = listOf(Color(0xFF9AFE8A), Color(0xFF8AFECC))),
@@ -663,24 +664,24 @@ fun darkColors() = RarimeColors(
     additionalGreen = Color(0xFFF1F7F1),
 
 
-    baseBlackOp40 = Color(0x66141614),
-    baseBlackOp50 = Color(0x80141614),
-    inverted = Color(0xFF000000),
+    baseBlackOp40 = Color(0x661B1B1A),
+    baseBlackOp50 = Color(0x801B1B1A),
+    inverted = Color(0xFF080807),
     hiddenPrizeAccent = Color(0xFF9D4EDD),
     hiddenPrizeBackground = Color(0xFFF5EDFC),
     welcomeAccent1 = Color(0xFF1B1B1A),
-    welcomeAccent2 = Color(0xFF1E2020),
-    welcomeAccent3 = Color(0xFF1F221F),
-    welcomeAccent4 = Color(0xFF201F21)
+    welcomeAccent2 = Color(0xFF141413),
+    welcomeAccent3 = Color(0xFF141413),
+    welcomeAccent4 = Color(0xFF1B1B1A)
 )
 
 fun lightColors() = RarimeColors(
     // primary
-    primaryDarker = Color(0xFF050505),
-    primaryDark = Color(0xFF111211),
-    primaryMain = Color(0xFF141614),
-    primaryLight = Color(0x1416141F),
-    primaryLighter = Color(0x1416140F),
+    primaryDarker = Color(0xFF080807),
+    primaryDark = Color(0xFF141413),
+    primaryMain = Color(0xFF141413),
+    primaryLight = Color(0x141B1B1A),
+    primaryLighter = Color(0x141B1B1A),
 
     // secondary
     secondaryDarker = Color(0xFF4D7C0F),
@@ -690,7 +691,7 @@ fun lightColors() = RarimeColors(
     secondaryLighter = Color(0x0F84CC16),
 
     // success
-    successDarker = Color(0xFF15803D),
+    successDarker = Color(0xFF59BD33),
     successDark = Color(0xFF16A34A),
     successMain = Color(0xFF22C55E),
     successLight = Color(0x1F22C55E),
@@ -719,34 +720,34 @@ fun lightColors() = RarimeColors(
     warningLighter = Color(0x0FF59E0B),
 
     // text
-    textPrimary = Color(0xFF141614),
-    textSecondary = Color(0x8F141614),
-    textPlaceholder = Color(0x70141614),
-    textDisabled = Color(0x47141614),
+    textPrimary = Color(0xFF141413),
+    textSecondary = Color(0x8F141413),
+    textPlaceholder = Color(0x70141413),
+    textDisabled = Color(0x47141413),
 
     // component
-    componentPrimary = Color(0x0D141614),
-    componentHovered = Color(0x1A141614),
-    componentPressed = Color(0x26141614),
-    componentSelected = Color(0x0D141614),
-    componentDisabled = Color(0x0D141614),
+    componentPrimary = Color(0x0D141413),
+    componentHovered = Color(0x1A141413),
+    componentPressed = Color(0x26141413),
+    componentSelected = Color(0x0D141413),
+    componentDisabled = Color(0x0D141413),
 
     // background
-    backgroundPrimary = Color(0xFFFFFFFF),
-    backgroundContainer = Color(0xFFFFFFFF),
-    backgroundBlur = Color(0xE5FFFFFF),
-    backgroundPure = Color(0xFFFFFFFF),
-    backgroundSurface1 = Color(0xFFFFFFFF),
-    backgroundSurface2 = Color(0xFFFFFFFF),
+    backgroundPrimary = Color(0xFFEEECDF),
+    backgroundContainer = Color(0xFFEEECDF),
+    backgroundBlur = Color(0xFFEEECDF),
+    backgroundPure = Color(0xFFEEECDF),
+    backgroundSurface1 = Color(0xFFEEECDF),
+    backgroundSurface2 = Color(0xFFEEECDF),
 
     // base
-    baseBlack = Color(0xFF141614),
-    baseWhite = Color(0xFFFFFFFF),
+    baseBlack = Color(0xFF080807),
+    baseWhite = Color(0xFFEEECDF),
 
 
     // inverted
-    invertedDark = Color(0xFF141614),
-    invertedLight = Color(0xFFFFFFFF),
+    invertedDark = Color(0xFF080807),
+    invertedLight = Color(0xFFEEECDF),
 
     // additional
     gradient1 = Brush.linearGradient(colors = listOf(Color(0xFF9AFE8A), Color(0xFF8AFECC))),
@@ -816,19 +817,19 @@ fun lightColors() = RarimeColors(
         )
     ),
 
-    baseBlackOp40 = Color(0x66141614),
-    baseBlackOp50 = Color(0x80141614),
+    baseBlackOp40 = Color(0x66080807),
+    baseBlackOp50 = Color(0x80080807),
 
-    additionalGreen = Color(0xFFF1F7F1),
-    inverted = Color(0xFFFFFFFF),
+    additionalGreen = Color(0xFFEEECDF),
+    inverted = Color(0xFFEEECDF),
 
     hiddenPrizeAccent = Color(0xFF9D4EDD),
-    hiddenPrizeBackground = Color(0xFFF5EDFC),
+    hiddenPrizeBackground = Color(0xFFEEECDF),
 
-    welcomeAccent1 = Color(0xFFF9F9F2),
-    welcomeAccent2 = Color(0xFFE2EBED),
-    welcomeAccent3 = Color(0xFFEEF4EE),
-    welcomeAccent4 = Color(0xFFF7F4F9)
+    welcomeAccent1 = Color(0xFFEEECDF),
+    welcomeAccent2 = Color(0xFFEEECDF),
+    welcomeAccent3 = Color(0xFFEEECDF),
+    welcomeAccent4 = Color(0xFFEEECDF)
 
 )
 

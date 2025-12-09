@@ -32,13 +32,13 @@ fun UiPrivacyCheckbox(
         append(stringResource(R.string.terms_check_agreement))
         pushStringAnnotation("URL", Constants.TERMS_URL)
         withStyle(SpanStyle(textDecoration = TextDecoration.Underline)) {
-            append(stringResource(R.string.rarime_general_terms_conditions))
+            append(stringResource(R.string.Celestial))
         }
         pop()
         append(", ")
         pushStringAnnotation("URL", Constants.PRIVACY_URL)
         withStyle(SpanStyle(textDecoration = TextDecoration.Underline)) {
-            append(stringResource(R.string.rarime_privacy_notice))
+            append(stringResource(R.string.Celestial))
         }
         pop()
         append(stringResource(R.string.and))

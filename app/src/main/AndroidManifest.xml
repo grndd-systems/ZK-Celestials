@@ -79,8 +79,8 @@
             android:name="com.rarilabs.rarime.MainActivityBlack"
             android:enabled="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_black"
-            android:roundIcon="@mipmap/ic_launcher_black_round"
+            android:icon="@mipmap/celestials"
+            android:roundIcon="@mipmap/celestials_round"
             android:label="@string/app_name"
             android:targetActivity="com.rarilabs.rarime.MainActivity">
             <intent-filter>
@@ -94,8 +94,8 @@
             android:name="com.rarilabs.rarime.MainActivityBW"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_green"
-            android:roundIcon="@mipmap/ic_launcher_green_round"
+            android:icon="@mipmap/celestials"
+            android:roundIcon="@mipmap/celestials_round"
             android:label="@string/app_name"
             android:targetActivity="com.rarilabs.rarime.MainActivity">
             <intent-filter>
@@ -108,8 +108,8 @@
             android:name="com.rarilabs.rarime.MainActivityBG"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_gradient"
-            android:roundIcon="@mipmap/ic_launcher_gradient_round"
+            android:icon="@mipmap/celestials"
+            android:roundIcon="@mipmap/celestials_round"
             android:label="@string/app_name"
             android:targetActivity="com.rarilabs.rarime.MainActivity">
             <intent-filter>
@@ -122,8 +122,8 @@
             android:name="com.rarilabs.rarime.MainActivityGB"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_white"
-            android:roundIcon="@mipmap/ic_launcher_white_round"
+            android:icon="@mipmap/celestials"
+            android:roundIcon="@mipmap/celestials_round"
             android:label="@string/app_name"
             android:targetActivity="com.rarilabs.rarime.MainActivity">
             <intent-filter>
@@ -136,8 +136,8 @@
             android:name="com.rarilabs.rarime.MainActivityCat"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_cat"
-            android:roundIcon="@mipmap/ic_launcher_cat_round"
+            android:icon="@mipmap/celestials"
+            android:roundIcon="@mipmap/celestials_round"
             android:label="@string/app_name"
             android:targetActivity="com.rarilabs.rarime.MainActivity">
             <intent-filter>

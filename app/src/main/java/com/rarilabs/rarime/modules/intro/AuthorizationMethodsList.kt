@@ -43,12 +43,11 @@ fun AuthorizationMethodsList(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        // commented text
-//        Text(
-//            text = stringResource(id = R.string.create_identity_selector_subtitle),
-//            style = RarimeTheme.typography.body3,
-//            color = RarimeTheme.colors.textSecondary,
-//        )
+        Text(
+            text = stringResource(id = R.string.Celestial),
+            style = RarimeTheme.typography.body3,
+            color = RarimeTheme.colors.textSecondary,
+        )
         Spacer(modifier = Modifier.height(16.dp))
         Column(
             modifier = Modifier
