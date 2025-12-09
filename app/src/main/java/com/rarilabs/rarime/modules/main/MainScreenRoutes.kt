@@ -18,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
@@ -33,7 +34,7 @@ import com.rarilabs.rarime.api.voting.models.MOCKED_POLL_ITEM
 import com.rarilabs.rarime.data.enums.SecurityCheckState
 import com.rarilabs.rarime.modules.faq.FAQScreen
 import com.rarilabs.rarime.modules.home.v3.HomeScreenV3
-import com.rarilabs.rarime.modules.intro.IntroScreen
+import com.rarilabs.rarime.modules.intro.IntroLegalScreen
 import com.rarilabs.rarime.modules.main.guards.AuthGuard
 import com.rarilabs.rarime.modules.maintenance.MaintenanceScreen
 import com.rarilabs.rarime.modules.notifications.NotificationsScreen
@@ -56,6 +57,8 @@ import com.rarilabs.rarime.modules.wallet.WalletScreen
 import com.rarilabs.rarime.modules.wallet.WalletSendScreen
 import com.rarilabs.rarime.modules.you.ZkIdentityDebugScreen
 import com.rarilabs.rarime.modules.you.ZkIdentityScreen
+import com.rarilabs.rarime.modules.you.ZkIdentityScreenViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.rarilabs.rarime.ui.components.AppWebView
 import com.rarilabs.rarime.ui.components.CongratsInvitationModalContent
 import com.rarilabs.rarime.util.AppIconUtil
@@ -67,6 +70,7 @@ import com.rarilabs.rarime.util.Screen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -153,13 +157,22 @@ fun MainScreenRoutes(
 
         composable(Screen.Loading.route) {
             val appLoadingState by mainViewModel.appLoadingStates.collectAsState()
-            val isPkInit = remember {
-                mainViewModel.getIsPkInit()
-            }
             val isScreenLocked by mainViewModel.isScreenLocked.collectAsState()
 
+            // Track if we've shown the splash for 2 seconds
+            var hasShownSplash by remember { mutableStateOf(false) }
 
-            LaunchedEffect(appLoadingState, isPkInit, isScreenLocked) {
+            // Wait 2 seconds before allowing navigation
+            LaunchedEffect(Unit) {
+                delay(2000)
+                hasShownSplash = true
+            }
+
+            LaunchedEffect(appLoadingState, isScreenLocked, hasShownSplash) {
+                // Only navigate after splash has been shown for 2 seconds
+                // Note: Private key is now automatically generated in initApp() if missing
+                if (!hasShownSplash) return@LaunchedEffect
+
                 when (appLoadingState) {
                     AppLoadingStates.MAINTENANCE -> {
                         navController.navigate(Screen.Maintenance.route) {
@@ -168,7 +181,6 @@ fun MainScreenRoutes(
                     }
 
                     AppLoadingStates.LOAD_FAILED -> {
-                        delay(50)
                         navController.navigate(Screen.LoadFailed.route) {
                             popUpTo(Screen.Loading.route) { inclusive = true }
                         }
@@ -177,8 +189,9 @@ fun MainScreenRoutes(
                     AppLoadingStates.LOADED -> {
                         delay(50)
 
+                        // Key is now automatically generated in initApp() if missing
+                        // Skip intro screen and go directly to main screen
                         val destination = when {
-                            !isPkInit -> Screen.Intro.route
                             extIntDataURI != null -> Screen.ExtIntegrator.route
                             else -> Screen.Main.Home.route
                         }
@@ -204,19 +217,9 @@ fun MainScreenRoutes(
             AppLoadingFailedScreen()
         }
 
-        composable(Screen.Intro.route) {
-            ScreenInsetsContainer {
-                IntroScreen(
-                    onFinish = {
-                        coroutineScope.launch(Dispatchers.IO) {
-                            mainViewModel.finishIntro()
-                        }
-                        simpleNavigate(Screen.Main.Home.route)
-                    },
-                    onNavigate = simpleNavigate
-                )
-            }
-        }
+        // Intro screen removed - key is now auto-generated on first launch
+        // Keeping route commented out in case it's referenced elsewhere
+        // composable(Screen.Intro.route) { ... }
 
         navigation(
             startDestination = Screen.Register.NewIdentity.route, route = Screen.Register.route
@@ -373,16 +376,20 @@ fun MainScreenRoutes(
 
             composable(Screen.Main.Identity.route) {
                 AuthGuard(navigate = simpleNavigate) {
-                    ZkIdentityScreen(navigate = simpleNavigate, onClose = {
-                        coroutineScope.launch {
-                            navigateWithPopUp(Screen.Main.route)
-                        }
-                    }, onClaim = {
-                        coroutineScope.launch {
-                            navigateWithPopUp(Screen.Claim.Specific.route)
-
-                        }
-                    }, setBottomBarVisibility = { mainViewModel.setBottomBarVisibility(it) })
+                    IdentityScreenWithLegalFlow(
+                        navigate = simpleNavigate,
+                        onClose = {
+                            coroutineScope.launch {
+                                navigateWithPopUp(Screen.Main.route)
+                            }
+                        },
+                        onClaim = {
+                            coroutineScope.launch {
+                                navigateWithPopUp(Screen.Claim.Specific.route)
+                            }
+                        },
+                        setBottomBarVisibility = { mainViewModel.setBottomBarVisibility(it) }
+                    )
                 }
             }
 
@@ -546,7 +553,97 @@ fun MainScreenRoutes(
 
     }
 }
+// changed main routes with identity
+private enum class IdentityLegalScreenStep {
+    TERMS,
+    PRIVACY,
+    IDENTITY
+}
 
+@Composable
+fun IdentityScreenWithLegalFlow(
+    navigate: (String) -> Unit,
+    onClose: () -> Unit,
+    onClaim: () -> Unit,
+    setBottomBarVisibility: (Boolean) -> Unit,
+    viewModel: ZkIdentityScreenViewModel = hiltViewModel()
+) {
+    val hasShownLegalScreens = remember { viewModel.getIdentityLegalScreensShown() }
+    var currentStep by remember { mutableStateOf<IdentityLegalScreenStep?>(
+        if (hasShownLegalScreens) IdentityLegalScreenStep.IDENTITY else IdentityLegalScreenStep.TERMS
+    ) }
+
+    // Hide bottom bar immediately when showing legal screens (runs during composition)
+    SideEffect {
+        when (currentStep) {
+            IdentityLegalScreenStep.TERMS, IdentityLegalScreenStep.PRIVACY -> {
+                setBottomBarVisibility(false)
+            }
+            IdentityLegalScreenStep.IDENTITY -> {
+                setBottomBarVisibility(true)
+            }
+            null -> {
+                setBottomBarVisibility(true)
+            }
+        }
+    }
+
+    // Also use LaunchedEffect to ensure it persists after MainScreen's automatic behavior
+    LaunchedEffect(currentStep) {
+        // Small delay to ensure this runs after MainScreen's LaunchedEffect
+        kotlinx.coroutines.delay(10)
+        when (currentStep) {
+            IdentityLegalScreenStep.TERMS, IdentityLegalScreenStep.PRIVACY -> {
+                setBottomBarVisibility(false)
+            }
+            IdentityLegalScreenStep.IDENTITY -> {
+                setBottomBarVisibility(true)
+            }
+            null -> {
+                setBottomBarVisibility(true)
+            }
+        }
+    }
+
+    when (currentStep) {
+        IdentityLegalScreenStep.TERMS -> {
+            IntroLegalScreen(
+                url = "https://rarime.com/general-terms.html",
+                title = "Terms of Use",
+                onAgree = {
+                    currentStep = IdentityLegalScreenStep.PRIVACY
+                }
+            )
+        }
+        IdentityLegalScreenStep.PRIVACY -> {
+            IntroLegalScreen(
+                url = "https://rarime.com/privacy-notice.html",
+                title = "Privacy Policy",
+                onAgree = {
+                    viewModel.saveIdentityLegalScreensShown(true)
+                    currentStep = IdentityLegalScreenStep.IDENTITY
+                }
+            )
+        }
+        IdentityLegalScreenStep.IDENTITY -> {
+            ZkIdentityScreen(
+                navigate = navigate,
+                onClose = onClose,
+                onClaim = onClaim,
+                setBottomBarVisibility = setBottomBarVisibility
+            )
+        }
+        null -> {
+            // This shouldn't happen, but handle it gracefully
+            ZkIdentityScreen(
+                navigate = navigate,
+                onClose = onClose,
+                onClaim = onClaim,
+                setBottomBarVisibility = setBottomBarVisibility
+            )
+        }
+    }
+}
 
 @Composable
 fun AcceptInvitation(

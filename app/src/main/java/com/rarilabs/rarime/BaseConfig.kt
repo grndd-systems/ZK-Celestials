@@ -8,11 +8,24 @@ import com.rarilabs.rarime.data.RarimoChains
 val BaseConfig: IConfig = if (BuildConfig.isTestnet) TestNetConfig else MainnetConfig
 
 interface IConfig {
+    val registerIdentity_26_512_3_2_336_248_1_1384_2_256: String
+    val registerIdentity_1_256_3_4_336_248_1_560_4_256: String
+    val registerIdentity_1_256_3_4_336_232_1_1480_4_256: String
+    val registerIdentity_1_256_3_7_336_264_20_2760_6_2008: String
+    val registerIdentity_1_256_3_5_336_232_NA: String
+    val registerIdentity_1_256_3_5_344_232_NA: String
+    val registerIdentity_11_256_3_4_576_248_1_1496_5_296: String
+    val registerIdentity_1_256_3_4_336_248_1_1496_4_256: String
+    val registerIdentity_2_256_3_5_336_248_22_1808_7_2408: String
+    val registerIdentity_1_256_3_6_336_248_1_2432_3_256: String
+    val registerIdentity_25_384_3_5_576_248_20_3768_3_2008: String
     val APPSFLYER_DEV_KEY: String
     val RELAYER_URL: String
     val EVM_RPC_URL: String
+    val EVM_WS_URL: String
     val COSMOS_RPC_URL: String
     val EVM_SERVICE_URL: String
+    val FAUCET_URL: String
     val DISCORD_URL: String
     val TWITTER_URL: String
     val INVITATION_BASE_URL: String
@@ -191,9 +204,12 @@ object TestNetConfig : IConfig {
     override val MASTER_CERTIFICATES_BUCKETNAME = "rarimo-temp"
     override val EVM_STABLE_COIN_RPC = "https://ethereum-sepolia-rpc.publicnode.com"
     override val STABLE_COIN_ADDRESS = "0xbd03f0fC994fd1015eAdc37c943055330e238Ad9"
-    override val EXPLORER_API_URL = "https://api.evmscan.rarimo.com"
-    override val RARIMO_EXPLORER = "https://api.evmscan.rarimo.com/tx"
-    override val EVM_RPC_URL = "https://rpc.evm.mainnet.rarimo.com"
+    // Eden Network Configuration
+    override val EVM_RPC_URL = "https://ev-reth-eden-testnet.binarybuilders.services:8545"
+    override val EVM_WS_URL = "https://ev-reth-eden-testnet.binarybuilders.services:8546"
+    override val EXPLORER_API_URL = "https://explorer-eden-testnet.binarybuilders.services"
+    override val RARIMO_EXPLORER = "https://explorer-eden-testnet.binarybuilders.services/tx"
+    override val FAUCET_URL = "https://faucet-eden-testnet.binarybuilders.services"
     override val REGISTER_CONTRACT_ADDRESS = "0x435E8833bC8c6F5Fdfc1cd7E45D5760b523f4020"
     override val REGISTRATION_SIMPLE_CONTRACT_ADRRESS = "0xd63782478CA40b587785700Ce49248775398b045"
     override val CERTIFICATES_SMT_CONTRACT_ADDRESS = "0xc2974679359c756bf97ff6B698377E02c083F3D4"
@@ -211,6 +227,28 @@ object TestNetConfig : IConfig {
 
     override val GLOBAL_NOTIFICATION_TOPIC = "rarime-stage"
     override val REWARD_NOTIFICATION_TOPIC: String = "rarime-rewardable-stage"
+    override val registerIdentity_26_512_3_2_336_248_1_1384_2_256: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_1_256_3_4_336_248_1_560_4_256: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_1_256_3_4_336_232_1_1480_4_256: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_1_256_3_7_336_264_20_2760_6_2008: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_1_256_3_5_336_232_NA: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_1_256_3_5_344_232_NA: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_11_256_3_4_576_248_1_1496_5_296: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_1_256_3_4_336_248_1_1496_4_256: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_2_256_3_5_336_248_22_1808_7_2408: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_1_256_3_6_336_248_1_2432_3_256: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_25_384_3_5_576_248_20_3768_3_2008: String
+        get() = TODO("Not yet implemented")
 
     override val APPSFLYER_DEV_KEY = Keys.APPSFLYER_DEV_KEY
 
@@ -433,7 +471,9 @@ object TestNetConfig : IConfig {
 object MainnetConfig : IConfig {
     override val RELAYER_URL = "https://api.app.rarime.com"
     override val EVM_RPC_URL = "https://l2.rarimo.com"
+    override val EVM_WS_URL = "wss://l2.rarimo.com" // WebSocket URL for mainnet (if available)
     override val COSMOS_RPC_URL = "https://rpc-api.mainnet.rarimo.com"
+    override val FAUCET_URL = "" // No faucet for mainnet
     override val EVM_SERVICE_URL =
         "https://api.orgs.app.rarime.com/integrations/evm-airdrop-svc-glo/"
     override val DISCORD_URL = "https://discord.gg/Bzjm5MDXrU"
@@ -467,6 +507,28 @@ object MainnetConfig : IConfig {
     override val RARIMO_EXPLORER = "https://scan.rarimo.com/tx"
     override val GLOBAL_NOTIFICATION_TOPIC = "rarime"
     override val REWARD_NOTIFICATION_TOPIC: String = "rarime-rewardable"
+    override val registerIdentity_26_512_3_2_336_248_1_1384_2_256: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_1_256_3_4_336_248_1_560_4_256: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_1_256_3_4_336_232_1_1480_4_256: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_1_256_3_7_336_264_20_2760_6_2008: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_1_256_3_5_336_232_NA: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_1_256_3_5_344_232_NA: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_11_256_3_4_576_248_1_1496_5_296: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_1_256_3_4_336_248_1_1496_4_256: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_2_256_3_5_336_248_22_1808_7_2408: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_1_256_3_6_336_248_1_2432_3_256: String
+        get() = TODO("Not yet implemented")
+    override val registerIdentity_25_384_3_5_576_248_20_3768_3_2008: String
+        get() = TODO("Not yet implemented")
     override val APPSFLYER_DEV_KEY = Keys.APPSFLYER_DEV_KEY
 
     override val VOTING_WEBSITE_URL = "https://freedomtool.org"

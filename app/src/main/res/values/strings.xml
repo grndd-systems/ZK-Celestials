@@ -1,7 +1,7 @@
 <resources>
-<!--    changed text app_name -->
+    <!--    changed text app_name -->
     <string name="app_name">ZK Celestial passport</string>
-    <string name="intro_step_1_title">ZK \nCelestials \nID</string>
+    <string name="intro_step_1_title">ZK-KYC\ncelestials id</string>
     <string name="intro_step_1_text">Welcome to</string>
     <string name="intro_step_2_title">Go Incognito</string>
     <string name="intro_step_2_text">RariMe ensures your history, reputation and actions are not lost, and remain under your control.</string>
@@ -31,7 +31,7 @@
     <string name="status_failed">FAILED</string>
     <string name="scan_your_passport_title">Scan your Passport</string>
     <string name="scan_your_passport_text">Data never leaves this device</string>
-    <string name="scan_your_passport_hint">Move your passport page inside the border</string>
+    <string name="scan_your_passport_hint">Scan the first page of your passport, keeping it fully within the borders. </string>
     <string name="nfc_reader_hint">Place your passport cover to the back of your phone</string>
     <string name="passport_data_title">Document data</string>
     <string name="passport_data_text">Data generates an incognito profile</string>
@@ -48,14 +48,14 @@
     <string name="success_status_text">Your passport proof is ready</string>
     <string name="failure_status_text">Please try again later</string>
     <string name="camera_permission_title">Camera permission</string>
-    <string name="camera_permission_description">Grant permission to use the camera</string>
+    <string name="camera_permission_description">Grant access to your camera</string>
     <string name="confirm">Confirm</string>
     <string name="dismiss">Dismiss</string>
 
     <!--SCAN PASSPORT : NFC-->
     <string name="nfc_reader_title">NFC Reader</string>
     <string name="nfc_reader_text">Reading personal data</string>
-    <string name="nfc_reader_hint_1">Press Scan and place your passport cover to the back of your phone</string>
+    <string name="nfc_reader_hint_1">Press the scanning button, then hold the passport cover to the back of your phone.</string>
     <string name="nfc_reader_scanning">Scanning…</string>
     <string name="nfc_error_interrupt">Scan interrupted, try again</string>
     <string name="nfc_error_unknown">Try again</string>
@@ -241,9 +241,9 @@
     <string name="scan_mrzstep_permission_denied">Camera permission denied, try fill manually</string>
 
     <string name="field_type_date_picker_placeholder">Select date</string>
-<!-- commented and change text create_identity_selector_subtitle and Enter_passport -->
-<!--    <string name="create_identity_selector_subtitle">Select an authorization method</string>-->
-    <string name="Enter_passport">Enter passport</string>
+    <!-- commented and change text create_identity_selector_subtitle and Enter_passport -->
+    <!--    <string name="create_identity_selector_subtitle">Select an authorization method</string>-->
+    <string name="Enter_passport">Start</string>
     <string name="create_identity_selector_option_2">Re-activate old profile</string>
 
     <string name="create_identity_continue_btn">Continue</string>
@@ -312,22 +312,22 @@
 
     <string name="drive_backup_description">Your account is not backed up. If you lose your device, you will lose access to your account</string>
     <string name="passport_already_registered_no_dg15_title">You have already registered</string>
-    <string name="scan">Scan</string>
+    <string name="scan">I\'m not a bot</string>
     <string name="connection_lost_circuits_header">Connection Lost</string>
     <string name="connection_lost_circuits_body">Please check your internet connection and try again.</string>
     <string name="connection_lost_circuits_retry">Retry</string>
-    <string name="scan_mrzstep_content_tutorial_title">How to scan?</string>
+    <string name="scan_mrzstep_content_tutorial_title">Watch the instruction</string>
     <string name="passport_already_registered_no_dg15_description">You can`t revoke your passport. try to find your previous private key</string>
-    <string name="scan_mrzstep_content_tutorial_desc">Watch the tutorial</string>
+    <string name="scan_mrzstep_content_tutorial_desc">Guidelines for scanning your passport correctly</string>
     <string name="scan_mrzstep_content_bottom_sheet_case_title">Remove Case</string>
-    <string name="scan_mrzstep_content_bottom_sheet_case_description">Make sure you remove the case from the device</string>
+    <string name="scan_mrzstep_content_bottom_sheet_case_description">Please remove the case from your device before proceeding.</string>
     <string name="scan_mrzstep_content_bottom_sheet_case_btn">Next</string>
     <string name="scan_mrzstep_content_bottom_sheet_mrz_title">Scan your document</string>
     <string name="scan_mrzstep_content_bottom_sheet_mrz_description">Place the document inside the white borders</string>
     <string name="scan_mrzstep_content_bottom_sheet_mrz_btn">Next</string>
 
     <string name="scan_mrzstep_content_bottom_sheet_nfc_title">NFC Reader</string>
-    <string name="scan_mrzstep_content_bottom_sheet_nfc_description">Place your Passport\/ID to the back of your phone and press continue</string>
+    <string name="scan_mrzstep_content_bottom_sheet_nfc_description">Position your passport or ID to the back of your phone without a case, then press the scanning button.</string>
     <string name="scan_mrzstep_content_bottom_sheet_nfc_btn">Let\'s scan</string>
     <string name="maintenance_in_progress">Maintenance in Progress</string>
     <string name="we_re_upgrading_for_a_better_experience_back_soon">We\'re upgrading for a better\nexperience. Back soon!</string>
@@ -363,7 +363,7 @@
     <string name="select_icon_description">Select icon</string>
     <string name="from_json_test_only">FROM JSON (TEST ONLY)</string>
     <string name="you">You</string>
-<!--    changed text hi and Stranger to Celestial-->
+    <!--    changed text hi and Stranger to Celestial-->
     <string name="hi">Hi,</string>
     <string name="Celestial">Celestial</string>
     <string name="no_passport_error">First, scan your passport.</string>
@@ -412,11 +412,11 @@
     <string name="hidden_prize_congrats_share_btn_final">Claimed</string>
     <string name="welcome_card1_title">Welcome!</string>
     <string name="welcome_card2_title">Privacy</string>
-    <string name="welcome_card3_title">Managing identity</string>
+    <string name="welcome_card3_title">Safe verification </string>
     <string name="welcome_card4_title">Add widgets</string>
-    <string name="welcome_card1_description">This app is where you privately store your digital identities, enabling you to go incognito across the web</string>
-    <string name="welcome_card2_description">No one can trace your actions\nNo system can connect the dots\nNo data ever leaves your phone</string>
-    <string name="welcome_card3_description">RariMe lets you prove your identity - without giving anything away\n</string>
+    <string name="welcome_card1_description">Access your favorite on-chain applications by simply proving you exist. Don\'t be a bot. </string>
+    <string name="welcome_card2_description">Keep your data private. Using novel cryptography to prove your identity without revealing any personal sensitive information.\nYour data stays only on your phone, always.</string>
+    <string name="welcome_card3_description">Confirm your origin or age-eligible while keeping your ID fully protected. Your passport never leaves your phone. </string>
     <string name="welcome_card4_description">Add different type of applications that you can interact with anonymously\n</string>
     <string name="wallet_success_title">Transaction Successful</string>
     <string name="wallet_success_message">Your transaction has been sent successfully.</string>
@@ -477,7 +477,7 @@
     <string name="icon_green">Green</string>
     <string name="icon_gradient">Gradient</string>
     <string name="icon_cat">Cat</string>
-<!--    added text icon_celestials-->
+    <!--    added text icon_celestials-->
     <string name="icon_celestials">Celestials</string>
     <string name="freedomtool_title">Freedomtool</string>
     <string name="fredomtool_accent_title">Voting</string>

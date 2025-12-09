@@ -150,9 +150,26 @@ class MainViewModel @Inject constructor(
                 _appLoadingState.value = AppLoadingStates.MAINTENANCE
                 return@withContext
             }
-            if (identityManager.privateKey.value == null) {
-                _appLoadingState.value = AppLoadingStates.LOADED
-                return@withContext
+            
+            // Check if private key exists, if not generate one automatically
+            val existingKey = identityManager.privateKey.value
+            if (existingKey.isNullOrEmpty()) {
+                android.util.Log.d("MainViewModel", "First launch detected - generating private key automatically")
+                try {
+                    // Generate new private key automatically
+                    val newKey = identityManager.genPrivateKey()
+                    
+                    // Save the generated key
+                    identityManager.savePrivateKey(newKey)
+                    
+                    android.util.Log.d("MainViewModel", "Private key generated and saved successfully")
+                } catch (e: Exception) {
+                    ErrorHandler.logError("MainViewModel", "Failed to generate private key on first launch", e)
+                    _appLoadingState.value = AppLoadingStates.LOAD_FAILED
+                    return@withContext
+                }
+            } else {
+                android.util.Log.d("MainViewModel", "Existing private key found - skipping generation")
             }
 
 

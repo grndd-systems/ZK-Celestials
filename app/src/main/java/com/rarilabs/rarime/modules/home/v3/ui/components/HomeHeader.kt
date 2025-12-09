@@ -53,23 +53,23 @@ fun HomeHeader(
                 overflow = TextOverflow.Ellipsis,
             )
         }
-
-        Spacer(modifier = Modifier.weight(1f))
-        CircledBadgeWithCounter(
-            modifier = Modifier.clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(
-                    bounded = true,
-                    radius = 20.dp,
-                )
-            ) { onNotificationClick() },
-            iconId = R.drawable.ic_bell,
-            containerSize = 40,
-            containerColor = RarimeTheme.colors.componentPrimary,
-            contentSize = 20,
-            badgeSize = 16,
-            count = notificationsCount ?: 0,
-            contentColor = RarimeTheme.colors.textPrimary
-        )
+        // turned off notification
+//        Spacer(modifier = Modifier.weight(1f))
+//        CircledBadgeWithCounter(
+//            modifier = Modifier.clickable(
+//                interactionSource = remember { MutableInteractionSource() },
+//                indication = rememberRipple(
+//                    bounded = true,
+//                    radius = 20.dp,
+//                )
+//            ) { onNotificationClick() },
+//            iconId = R.drawable.ic_bell,
+//            containerSize = 40,
+//            containerColor = RarimeTheme.colors.componentPrimary,
+//            contentSize = 20,
+//            badgeSize = 16,
+//            count = notificationsCount ?: 0,
+//            contentColor = RarimeTheme.colors.textPrimary
+//        )
     }
 }
