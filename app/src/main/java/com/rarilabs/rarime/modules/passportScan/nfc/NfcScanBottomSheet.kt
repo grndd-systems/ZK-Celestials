@@ -16,7 +16,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rarilabs.rarime.R
 import com.rarilabs.rarime.ui.base.ButtonSize
-import com.rarilabs.rarime.ui.components.AppAnimation
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import com.rarilabs.rarime.ui.components.AppSheetState
 import com.rarilabs.rarime.ui.components.DottedProgressBar
 import com.rarilabs.rarime.ui.components.SecondaryButton
@@ -80,10 +84,14 @@ fun NfcScanBottomSheet(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-
-            AppAnimation(
-                id = R.raw.anim_nfc_scan,
-                modifier = Modifier.height(200.dp)
+// changed anim to image
+            Image(
+                painter = painterResource(id = R.drawable.celestial_scan),
+                contentDescription = null,
+                modifier = Modifier
+                    .height(200.dp)
+                    .fillMaxWidth(),
+                contentScale = ContentScale.Fit
             )
 
             Spacer(modifier = Modifier.height(48.dp))

@@ -67,7 +67,8 @@ class SecureSharedPrefsManagerImpl @Inject constructor(
         "LIKENESS_DATA" to "LIKENESS_DATA",
         "LIKENESS_FACE" to "LIKENESS_FACE",
         "WELCOME_FIRST_OPEN" to "WELCOME_FIRST_OPEN",
-        "VISIBLE_WIDGETS" to "VISIBLE_WIDGETS"
+        "VISIBLE_WIDGETS" to "VISIBLE_WIDGETS",
+        "IDENTITY_LEGAL_SCREENS_SHOWN" to "IDENTITY_LEGAL_SCREENS_SHOWN"
     )
 
     private val PREFS_FILE_NAME = "sharedPrefFile12"
@@ -598,5 +599,15 @@ class SecureSharedPrefsManagerImpl @Inject constructor(
         }
 
         return null
+    }
+
+    override fun saveIdentityLegalScreensShown(isShown: Boolean) {
+        val editor = getEditor()
+        editor.putBoolean(accessTokens["IDENTITY_LEGAL_SCREENS_SHOWN"], isShown)
+        editor.apply()
+    }
+
+    override fun getIdentityLegalScreensShown(): Boolean {
+        return getSharedPreferences().getBoolean(accessTokens["IDENTITY_LEGAL_SCREENS_SHOWN"], false)
     }
 }

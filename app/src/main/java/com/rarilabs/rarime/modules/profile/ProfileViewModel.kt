@@ -17,13 +17,17 @@ import com.rarilabs.rarime.manager.WalletManager
 import com.rarilabs.rarime.store.SecureSharedPrefsManager
 import com.rarilabs.rarime.store.room.notifications.NotificationsRepository
 import com.rarilabs.rarime.store.room.voting.VotingRepository
+import com.rarilabs.rarime.util.AddressFormatter
+//import com.rarilabs.rarime.util.AddressFormatter
 import com.rarilabs.rarime.util.ErrorHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
@@ -47,6 +51,32 @@ class ProfileViewModel @Inject constructor(
 
     val language = settingsManager.language
     val colorScheme = settingsManager.colorScheme
+
+    // State flow to hold the formatted address
+    private val _formattedAddress = MutableStateFlow("Not set")
+    val formattedAddress: StateFlow<String> = _formattedAddress.asStateFlow()
+
+    /**
+     * Loads the private key and formats it into an address
+     * Applies the rule: FIRST 3 + "..." + LAST 8
+     * Uses privateKey.value directly from IdentityManager StateFlow
+     */
+    fun loadAddress() {
+        viewModelScope.launch {
+            try {
+                // Get private key directly from StateFlow
+                val key = identityManager.privateKey.value
+
+                // Format the key into address format: FIRST 3 + "..." + LAST 8
+                _formattedAddress.value = AddressFormatter.formatAddress(key)
+
+            } catch (e: Exception) {
+                // If there's an error, show "Not set"
+                ErrorHandler.logError("ProfileViewModel", "Failed to load address", e)
+                _formattedAddress.value = "Not set"
+            }
+        }
+    }
 
     fun getImage(): Bitmap? {
         val passport = passportManager.passport.value

@@ -43,21 +43,21 @@ enum class BottomTab(
 ) {
     Home(
         Screen.Main.Home.route,
-        R.drawable.ic_house_simple,
-        R.drawable.ic_house_simple_fill
+        R.drawable.zk_home,
+        R.drawable.zk_home
+    ),
+    Identity(
+        Screen.Main.Identity.route,
+        R.drawable.zk_passport_biometric,
+        R.drawable.zk_passport_biometric
+    ),
+
+    QrScan(
+        Screen.Main.QrScan.route,
+        R.drawable.zk_qr,
+        R.drawable.zk_qr
     ),
     // disabled the display of buttons on the bottom panel
-//    Identity(
-//        Screen.Main.Identity.route,
-//        R.drawable.ic_passport,
-//        R.drawable.ic_passport_fill
-//    ),
-//    QrScan(
-//        Screen.Main.QrScan.route,
-//        R.drawable.ic_qr_scan,
-//        R.drawable.ic_qr_scan
-//    ),
-//
 //    Wallet(
 //        Screen.Main.Wallet.route,
 //        R.drawable.ic_wallet,
@@ -65,19 +65,19 @@ enum class BottomTab(
 //    ),
     Profile(
         Screen.Main.Profile.route,
-        R.drawable.ic_user,
-        R.drawable.ic_user_fill
+        R.drawable.zk_account,
+        R.drawable.zk_account
     ),
     //added new colums on the bottom panel
-    FAQ(
-        Screen.Main.FAQ.route,
-        R.drawable.ic_question_line,
-        R.drawable.ic_question
-    ),
+//    FAQ(
+//        Screen.Main.FAQ.route,
+//        R.drawable.zk_frequently_asked_questions,
+//        R.drawable.zk_frequently_asked_questions
+//    ),
     Contact(
         "contact",
-        R.drawable.ic_airdrop,
-        R.drawable.ic_airdrop
+        R.drawable.zk_email,
+        R.drawable.zk_email
     ),
     // disabled the display of buttons on the bottom panel
 //    Debug(
@@ -111,8 +111,9 @@ fun BottomTabBar(
                 val shouldDraw = when (tab) {
                     BottomTab.Home -> true
                     BottomTab.Profile -> true
-                    BottomTab.FAQ -> true
+                    BottomTab.QrScan -> true
                     BottomTab.Contact -> true
+                    BottomTab.Identity -> true
                     else -> false
                 }
 

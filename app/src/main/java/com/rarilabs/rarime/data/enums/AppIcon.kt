@@ -25,11 +25,6 @@ enum class AppIcon(val activity: String, @DrawableRes val iconId: Int) {
     CAT(
         activity = "com.rarilabs.rarime.MainActivityCat",
         iconId = R.drawable.ic_logo_cat
-    ),
-    //add logo celestials
-    Celestials(
-        activity = "com.rarilabs.rarime.MainActivityCelestials",
-        iconId = R.drawable.celestials_logo
     )
 
 
@@ -43,7 +38,6 @@ fun AppIcon.toLocalizedString(): String {
         AppIcon.GREEN -> stringResource(R.string.icon_green)
         AppIcon.GRADIENT -> stringResource(R.string.icon_gradient)
         AppIcon.CAT -> stringResource(R.string.icon_cat)
-        AppIcon.Celestials ->stringResource(R.string.icon_celestials)
     }
 }
 
@@ -55,6 +49,5 @@ fun AppIcon.getInAppIcon(): Int {
         AppIcon.GREEN -> R.drawable.app_icon_green
         AppIcon.GRADIENT -> R.drawable.app_icon_gradeint
         AppIcon.CAT -> R.drawable.app_icon_cat
-        AppIcon.Celestials -> R.drawable.app_icon_celestial
     }
 }

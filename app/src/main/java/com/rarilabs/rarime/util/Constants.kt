@@ -87,7 +87,8 @@ object Constants {
                 bech32PrefixConsPub = "rarimovalconspub"
             ),
             beta = true,
-            rpcEvm = "https://rpc.evm.node1.mainnet-beta.rarimo.com",
+            // Eden Network EVM RPC
+            rpcEvm = "https://ev-reth-eden-testnet.binarybuilders.services:8545",
             stateContractAddress = "0x753a8678c85d5fb70A97CFaE37c84CE2fD67EDE8"
         ),
         RarimoChains.Mainnet.chainId to ChainInfo(

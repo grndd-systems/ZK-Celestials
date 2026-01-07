@@ -28,6 +28,9 @@ fun AuthGuard(
             content()
         }
     } else {
-        navigate(Screen.Intro.route)
+        // Key should have been auto-generated in initApp()
+        // If somehow missing, show content anyway (key will be generated on next app launch)
+        // This prevents navigation to removed Intro screen
+        content()
     }
 }

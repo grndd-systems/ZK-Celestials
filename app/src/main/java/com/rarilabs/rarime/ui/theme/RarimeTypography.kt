@@ -1,3 +1,4 @@
+//added brand font Celestial ID
 package com.rarilabs.rarime.ui.theme
 
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -16,6 +17,9 @@ val interFontFamily = FontFamily(
     Font(R.font.inter_bold, FontWeight.Bold),
 )
 
+val celestial = FontFamily(
+    Font(R.font.sudo, FontWeight.Bold),
+)
 val playfairFontFamily = FontFamily(
     Font(R.font.playfair_regular, FontWeight.Normal),
     Font(R.font.playfair_medium, FontWeight.Medium),
@@ -24,6 +28,13 @@ val playfairFontFamily = FontFamily(
 )
 
 data class RarimeTypography(
+    val Celestial: TextStyle = TextStyle(
+        fontFamily = celestial,
+        fontWeight = FontWeight.Bold,
+        fontSize = 48.sp,
+        lineHeight = 50.sp,
+        letterSpacing = 23.em
+    ),
     val additional1: TextStyle = TextStyle(
         fontFamily = playfairFontFamily,
         fontWeight = FontWeight.Bold,

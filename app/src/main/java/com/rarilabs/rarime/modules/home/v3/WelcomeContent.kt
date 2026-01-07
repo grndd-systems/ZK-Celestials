@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Surface
@@ -68,25 +70,26 @@ fun WelcomeBottomSheet(
         listOf(
             WelcomeCardContent(
                 title = context.getString(R.string.welcome_card1_title),
-                imageId = R.drawable.welcome_cat,
+                imageId = R.drawable.widgets_celestial_wisp,
                 description = context.getString(R.string.welcome_card1_description),
                 imageHeight = 268.dp,
+
                 accentColor = welcomeAccentColor1
 
+            ),WelcomeCardContent(
+                title = context.getString(R.string.welcome_card3_title),
+                imageId = R.drawable.widgets_celestial_id,
+                description = context.getString(R.string.welcome_card3_description),
+                imageHeight = 224.dp,
+                accentColor = welcomeAccentColor3
             ), WelcomeCardContent(
                 title = context.getString(R.string.welcome_card2_title),
-                imageId = R.drawable.welcome_lock,
+                imageId = R.drawable.widgets_celestial_privacy,
                 description = context.getString(R.string.welcome_card2_description),
-                imageHeight = 206.dp,
+                imageHeight = 300.dp,
                 accentColor = welcomeAccentColor2
 
 //Removed welcome content on first entry to main screen
-//            ), WelcomeCardContent(
-//                title = context.getString(R.string.welcome_card3_title),
-//                imageId = R.drawable.welcome_identity_card,
-//                description = context.getString(R.string.welcome_card3_description),
-//                imageHeight = 224.dp,
-//                accentColor = welcomeAccentColor3
 
 //            ), WelcomeCardContent(
 //                title = context.getString(R.string.welcome_card4_title),
@@ -102,23 +105,15 @@ fun WelcomeBottomSheet(
     val pagerState = rememberPagerState { cardContent.size }
 
 
+    // reason: Removed animated color gradient - using solid black background only
     Box {
-        val animatedColor by animateColorAsState(
-            targetValue = cardContent[pagerState.currentPage].accentColor,
-            animationSpec = tween(durationMillis = 500)
-        )
         Column(modifier = Modifier.matchParentSize()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(225.dp)
-                    .background(animatedColor)
-            ) {}
+            // reason: Removed grey top section - replaced with solid black background
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxSize()
-                    .background(RarimeTheme.colors.backgroundSurface1)
+                    .background(Color(0xFF141413))
             ) {}
         }
 
@@ -175,28 +170,19 @@ fun BaseWelcomeContent(
 ) {
 
     Column(modifier) {
-        Row(modifier = Modifier.fillMaxWidth()) {
-            CircledBadge(
-                iconId = R.drawable.ic_rarime,
-                containerColor = RarimeTheme.colors.componentPrimary,
-                contentSize = 24,
-                containerSize = 40
+        // centered image layout
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                modifier = Modifier.height(imageHeight),
+                contentScale = ContentScale.Fit,
+                painter = painterResource(imageId),
+                contentDescription = ""
             )
-            Spacer(Modifier.weight(1f))
-            Column(
-                modifier = Modifier.height(268.dp),
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Image(
-                    modifier = Modifier.height(imageHeight),
-                    contentScale = ContentScale.Crop,
-                    painter = painterResource(imageId),
-                    contentDescription = ""
-                )
-            }
-
-            Spacer(Modifier.weight(0.5f))
         }
 
         Column(modifier = Modifier.padding(top = 32.dp)) {
@@ -232,7 +218,7 @@ fun WelcomeBottomBar(
         if (numberOfPages - 1 == selectedPage) {
             PrimaryButton(
                 modifier = Modifier.fillMaxWidth(),
-                text = "Explore Apps",
+                text = "Got it",
                 onClick = onExplore,
                 size = ButtonSize.Large
             )
@@ -243,7 +229,7 @@ fun WelcomeBottomBar(
                 selectedLength = 16.dp,
                 space = 8.dp,
                 selectedColor = RarimeTheme.colors.primaryMain,
-                defaultColor = RarimeTheme.colors.primaryLight,
+                defaultColor = RarimeTheme.colors.primaryMain,
                 selectedPage = selectedPage,
                 numberOfPages = numberOfPages
             )
