@@ -23,9 +23,11 @@ import com.rarilabs.rarime.util.ZkpUtil
 import com.rarilabs.rarime.util.data.GrothProof
 import com.rarilabs.rarime.util.decodeHexString
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.web3j.utils.Numeric
 import javax.inject.Inject
@@ -112,28 +114,66 @@ class ExtIntegratorApiManager @Inject constructor(
     val passportInfo: StateFlow<StateKeeper.PassportInfo?>
         get() = _passportInfo.asStateFlow()
 
-    private var _identityInfo = MutableStateFlow<StateKeeper.IdentityInfo?>(null)
-    val identityInfo: StateFlow<StateKeeper.IdentityInfo?>
+    // In new architecture, SessionInfo replaces IdentityInfo
+    private var _identityInfo = MutableStateFlow<StateKeeper.SessionInfo?>(null)
+    val identityInfo: StateFlow<StateKeeper.SessionInfo?>
         get() = _identityInfo.asStateFlow()
 
     suspend fun loadPassportInfo() {
-        val eDocument = passportManager.passport.value
+        try {
+            Log.d("ExtIntegrator", "→ Loading passport info...")
+            val eDocument = passportManager.passport.value
 
-        if (eDocument == null) return
+            if (eDocument == null) {
+                Log.e("ExtIntegrator", "✗ eDocument is null")
+                return
+            }
 
-        val passportInfoKey = passportManager.getPassportInfoKeyBytes(
-            eDocument,
-            identityManager.registrationProof.value!!
-        )
+            val passportInfoKey = passportManager.getPassportInfoKeyBytes(
+                eDocument,
+                identityManager.registrationProof.value!!
+            )
 
-        val stateKeeperContract = contractManager.getStateKeeper()
+            val stateKeeperContract = contractManager.getStateKeeper()
 
-        val passportInfoRaw = withContext(Dispatchers.IO) {
-            stateKeeperContract.getPassportInfo(passportInfoKey).send()
+            val passportInfo = withContext(Dispatchers.IO) {
+                stateKeeperContract.getPassportInfo(passportInfoKey).send()
+            }
+
+            _passportInfo.value = passportInfo
+            Log.d("ExtIntegrator", "✓ Passport info loaded: activeSessionCount=${passportInfo.activeSessionCount}")
+
+            // Get session info to populate identityInfo
+            // In new architecture, identity info comes from sessions
+            val sessionsInfo = withContext(Dispatchers.IO) {
+                stateKeeperContract.getPassportSessionsInfo(passportInfoKey).send()
+            }
+
+            Log.d("ExtIntegrator", "Sessions found: ${sessionsInfo.value2.size}")
+
+            // Use the first active session if available
+            if (!sessionsInfo.value2.isEmpty()) {
+                val firstSession = sessionsInfo.value2[0]
+                // Create a mock IdentityInfo from SessionInfo for backwards compatibility
+                _identityInfo.value = StateKeeper.SessionInfo(
+                    firstSession.activePassport,
+                    firstSession.issueTimestamp
+                )
+                Log.d("ExtIntegrator", "✓ Identity info populated from session: issueTimestamp=${firstSession.issueTimestamp}")
+            } else {
+                Log.w("ExtIntegrator", "No sessions found in contract - using mock session data")
+                // For WebRTC: если нет сессий в контракте, создаем mock с нулевыми значениями
+                // Timestamp 0 означает что проверка timestamp будет пропущена в query proof
+                _identityInfo.value = StateKeeper.SessionInfo(
+                    ByteArray(32), // Empty 32-byte array for activePassport
+                    java.math.BigInteger.ZERO // timestamp = 0
+                )
+                Log.d("ExtIntegrator", "✓ Mock identity info created with zero timestamp")
+            }
+        } catch (e: Exception) {
+            Log.e("ExtIntegrator", "✗ Failed to load passport info", e)
+            throw e
         }
-
-        _passportInfo.value = passportInfoRaw.component1()
-        _identityInfo.value = passportInfoRaw.component2()
     }
 
     private suspend fun getQueryParams(): Pair<ByteArray, String> {
@@ -161,6 +201,200 @@ class ExtIntegratorApiManager @Inject constructor(
 
     }
 
+    suspend fun generateQueryProofPlonk(
+        context: Context,
+        queryProofParametersRequest: QueryProofGenResponse
+    ): com.rarilabs.rarime.util.data.PlonkProof? {
+        try {
+            Log.d("PlonkQuery", "=== Starting generateQueryProofPlonk ===")
+
+            if (passportInfo.value == null) {
+                Log.e("PlonkQuery", "✗ passportInfo is null")
+                return null
+            }
+            if (identityInfo.value == null) {
+                Log.e("PlonkQuery", "✗ identityInfo is null")
+                return null
+            }
+
+            Log.d("PlonkQuery", "✓ passportInfo and identityInfo are available")
+
+            // Построить inputs для Plonk query proof
+            Log.d("PlonkQuery", "→ Building query inputs...")
+            val inputs = buildPlonkQueryInputs(queryProofParametersRequest)
+            Log.d("PlonkQuery", "✓ Query inputs built: ${inputs.keys}")
+
+            // Read bytecode from assets
+            Log.d("PlonkQuery", "→ Reading circuit bytecode from assets...")
+            val assetContext: Context = context.createPackageContext("com.rarilabs.rarime", 0)
+            val assetManager = assetContext.assets
+            val circuitByteCode = assetManager.open("query.json").bufferedReader().use { it.readText() }
+            Log.d("PlonkQuery", "✓ Circuit bytecode loaded: ${circuitByteCode.length} bytes")
+
+            // Download trusted setup (same as for registration)
+            Log.d("PlonkQuery", "→ Downloading trusted setup...")
+            val circuitDownloader = com.rarilabs.rarime.modules.passportScan.CircuitNoirDownloader(context)
+            val trustedSetupPath = circuitDownloader.downloadTrustedSetup { progress, isEnded ->
+                Log.d("PlonkQuery", "Trusted setup download: $progress% ${if (isEnded) "(done)" else ""}")
+            }
+            Log.d("PlonkQuery", "✓ Trusted setup ready at: $trustedSetupPath")
+
+            val customDispatcher = java.util.concurrent.Executors.newFixedThreadPool(1) { runnable ->
+                Thread(null, runnable, "LargeStackThread", 100 * 1024 * 1024) // 100 MB stack size
+            }.asCoroutineDispatcher()
+
+            return withContext(customDispatcher) {
+                try {
+                    Log.d("PlonkQuery", "→ Creating circuit from JSON manifest...")
+                    val circuit = com.noirandroid.lib.Circuit.fromJsonManifest(circuitByteCode)
+                    Log.d("PlonkQuery", "✓ Circuit created")
+
+                    Log.d("PlonkQuery", "→ Setting up SRS...")
+                    circuit.setupSrs(trustedSetupPath, false)
+                    Log.d("PlonkQuery", "✓ SRS setup complete")
+
+                    Log.d("PlonkQuery", "→ Starting Plonk query proof generation...")
+                    val noirProof = circuit.prove(inputs, proofType = "plonk", recursive = false)
+                    Log.d("PlonkQuery", "✓ Proof generated: ${noirProof.proof.take(50)}...")
+
+                    Log.d("PlonkQuery", "→ Parsing PlonkProof for query circuit...")
+                    // Query circuit has different number of public signals than registration
+                    // Parse public inputs from the proof bytes manually
+                    val proofBytes = Numeric.hexStringToByteArray(noirProof.proof)
+
+                    // Public inputs are at the beginning of the proof, each is 32 bytes
+                    // Calculate how many public inputs we have
+                    val pubInputSize = 32
+                    // For query circuit, figure out the number of public inputs
+                    // We know registration has 5, query likely has more
+                    val numPubInputs = (proofBytes.size - 2144) / pubInputSize // 2144 is proof data size
+
+                    Log.d("PlonkQuery", "  Detected $numPubInputs public inputs")
+
+                    val pubSignalsList = (0 until numPubInputs).map { i ->
+                        val start = i * pubInputSize
+                        val end = start + pubInputSize
+                        val bytes = proofBytes.copyOfRange(start, end)
+                        java.math.BigInteger(bytes).toString()
+                    }
+
+                    Log.d("PlonkQuery", "  Public signals extracted: ${pubSignalsList.size} items")
+
+                    val plonkProof = com.rarilabs.rarime.util.data.PlonkProof(
+                        rawProof = proofBytes,
+                        proof = noirProof.proof,
+                        pub_signals = pubSignalsList
+                    )
+
+                    Log.d("PlonkQuery", "✓ PlonkProof created successfully with ${pubSignalsList.size} public signals")
+                    plonkProof
+                } catch (e: Exception) {
+                    Log.e("PlonkQuery", "✗ Error in proof generation", e)
+                    throw e
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("PlonkQuery", "✗ generateQueryProofPlonk failed", e)
+            return null
+        }
+    }
+
+    private fun buildPlonkQueryInputs(
+        queryProofParametersRequest: QueryProofGenResponse
+    ): Map<String, Any> {
+        try {
+            Log.d("PlonkQuery", "  → Extracting DG1...")
+            val dg1 = passportManager.passport.value!!.dg1!!.decodeHexString()
+            Log.d("PlonkQuery", "  ✓ DG1 extracted: ${dg1.size} bytes")
+
+            // Get identity key from registration proof (pub_signals[3])
+            // This is a large number (field element), keep as BigInteger
+            val pkIdentity = identityManager.registrationProof.value!!.getIdentityKey().toBigInteger()
+            val selector = queryProofParametersRequest.data.attributes.selector
+            val issueTimestamp = 0
+            val identityCounter = 0
+            val eventID = queryProofParametersRequest.data.attributes.event_id
+            val eventData = queryProofParametersRequest.data.attributes.event_data
+
+            // Encode current date in passport format: YYMMDD as hex ASCII codes
+            // Example: "251011" becomes "0x323531303131"
+            val currentDateEncoded = run {
+                val calendar = java.util.Calendar.getInstance()
+                val year = (calendar.get(java.util.Calendar.YEAR) % 100).toString().padStart(2, '0')
+                val month = (calendar.get(java.util.Calendar.MONTH) + 6).toString().padStart(2, '0')
+                val day = calendar.get(java.util.Calendar.DAY_OF_MONTH).toString().padStart(2, '0')
+                val dateStr = year + month + day // YYMMDD
+
+                // Convert each character to hex ASCII code
+                val hex = dateStr.map { c -> c.code.toString(16) }.joinToString("")
+                "0x$hex"
+            }
+
+            val timestampUpperbound = queryProofParametersRequest.data.attributes.timestamp_upper_bound
+
+            val identityCountUpperbound = 0
+                
+
+            // Convert to hex list for Plonk (u8 array)
+            val toHexList: (ByteArray) -> List<String> = { bytes ->
+                bytes.map { byte -> Numeric.toHexString(byteArrayOf(byte)) }
+            }
+
+            Log.d("PlonkQuery", "  → Getting private key...")
+            val privateKey = identityManager.privateKeyBytes
+                ?: throw IllegalStateException("Private key not found")
+            Log.d("PlonkQuery", "  ✓ Private key obtained")
+
+            Log.d("PlonkQuery", "  Input values:")
+            Log.d("PlonkQuery", "    eventID: $eventID")
+            Log.d("PlonkQuery", "    eventData: $eventData")
+            Log.d("PlonkQuery", "    selector: $selector")
+            Log.d("PlonkQuery", "    currentDate: $currentDateEncoded")
+            Log.d("PlonkQuery", "    pkIdentity: $pkIdentity")
+            Log.d("PlonkQuery", "    issueTimestamp: $issueTimestamp")
+            Log.d("PlonkQuery", "    identityCounter: $identityCounter")
+
+            // Helper to convert Long to hex string
+            val toHexString: (Long) -> String = { value ->
+                "0x${value.toString(16).padStart(1, '0')}"
+            }
+
+            // Helper to convert BigInteger to hex string
+            val bigIntToHexString: (java.math.BigInteger) -> String = { value ->
+                "0x${value.toString(16)}"
+            }
+
+            // Based on ABI: event_id, event_data, selector, current_date, timestamp_lowerbound, timestamp_upperbound,
+            // identity_count_lowerbound, identity_count_upperbound, birth_date_lowerbound, birth_date_upperbound,
+            // expiration_date_lowerbound, expiration_date_upperbound, citizenship_mask, pk_identity, sk_identity,
+            // dg1 (u8 array length 93), timestamp, identity_counter
+            // Circuit expects ALL parameters as hex strings with 0x prefix
+            return mapOf(
+                "event_id" to eventID,
+                "event_data" to eventData,
+                "selector" to selector,
+                "current_date" to currentDateEncoded,
+                "timestamp_lowerbound" to queryProofParametersRequest.data.attributes.timestamp_lower_bound,
+                "timestamp_upperbound" to queryProofParametersRequest.data.attributes.timestamp_upper_bound,
+                "identity_count_lowerbound" to toHexString(queryProofParametersRequest.data.attributes.identity_counter_lower_bound),
+                "identity_count_upperbound" to toHexString(queryProofParametersRequest.data.attributes.identity_counter_upper_bound),
+                "birth_date_lowerbound" to queryProofParametersRequest.data.attributes.birth_date_lower_bound,
+                "birth_date_upperbound" to queryProofParametersRequest.data.attributes.birth_date_upper_bound,
+                "expiration_date_lowerbound" to queryProofParametersRequest.data.attributes.expiration_date_lower_bound,
+                "expiration_date_upperbound" to queryProofParametersRequest.data.attributes.expiration_date_upper_bound,
+                "citizenship_mask" to queryProofParametersRequest.data.attributes.citizenship_mask,
+                "pk_identity" to bigIntToHexString(pkIdentity),
+                "sk_identity" to Numeric.toHexString(privateKey),
+                "dg1" to toHexList(dg1),
+                "timestamp" to toHexString(issueTimestamp.toLong()),
+                "identity_counter" to toHexString(identityCounter.toLong())
+            )
+        } catch (e: Exception) {
+            Log.e("PlonkQuery", "  ✗ Error building inputs", e)
+            throw e
+        }
+    }
+
     suspend fun generateQueryProof(
         context: Context,
         queryProofParametersRequest: QueryProofGenResponse
@@ -176,8 +410,9 @@ class ExtIntegratorApiManager @Inject constructor(
 
         val profiler = identityManager.getProfiler()
 
+        // In new architecture, use activeSessionCount instead of identityReissueCounter
         val targets_identity_counter_upper_bound =
-            if (passportInfo.value!!.identityReissueCounter.toLong() > queryProofParametersRequest.data.attributes.identity_counter_upper_bound) passportInfo.value!!.identityReissueCounter.toString()
+            if (passportInfo.value!!.activeSessionCount.toLong() > queryProofParametersRequest.data.attributes.identity_counter_upper_bound) passportInfo.value!!.activeSessionCount.toString()
             else queryProofParametersRequest.data.attributes.identity_counter_upper_bound.toString()
 
         val dg1 = passportManager.passport.value!!.dg1!!.decodeHexString()
@@ -185,7 +420,8 @@ class ExtIntegratorApiManager @Inject constructor(
         val selector = queryProofParametersRequest.data.attributes.selector
         val pkPassportHash = queryParams.second
         val issueTimestamp = identityInfo.value!!.issueTimestamp.toString()
-        val identityCounter = passportInfo.value!!.identityReissueCounter.toString()
+        // In new architecture, use activeSessionCount instead of identityReissueCounter
+        val identityCounter = passportInfo.value!!.activeSessionCount.toString()
         val eventID = queryProofParametersRequest.data.attributes.event_id
         val eventData = queryProofParametersRequest.data.attributes.event_data
         val TimestampLowerbound = queryProofParametersRequest.data.attributes.timestamp_lower_bound
@@ -200,8 +436,9 @@ class ExtIntegratorApiManager @Inject constructor(
 
         val IdentityCounterLowerbound =
             queryProofParametersRequest.data.attributes.identity_counter_lower_bound.toString()
+        // In new architecture, use activeSessionCount instead of identityReissueCounter
         val IdentityCounterUpperbound =
-            (passportInfo.value!!.identityReissueCounter.toLong() + 1).toString()
+            (passportInfo.value!!.activeSessionCount.toLong() + 1).toString()
         val ExpirationDateLowerbound =
             queryProofParametersRequest.data.attributes.expiration_date_lower_bound
         val ExpirationDateUpperbound =

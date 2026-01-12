@@ -26,8 +26,10 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -182,6 +184,7 @@ fun MainScreenContent(
 ) {
     val mainViewModel = LocalMainViewModel.current
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
 
     val passportStatus by mainViewModel.passportStatus.collectAsState()
@@ -320,10 +323,69 @@ fun MainScreenContent(
             ) {
                 ScanQrScreen(onBack = {
                     qrCodeState.hide()
-                }, onScan = {
-                    val uri = it.toUri()
+                }, onScan = { scannedData ->
                     qrCodeState.hide()
-                    mainViewModel.setExtIntDataURI(uri)
+
+                    Log.d("MainScreen", "=== QR Code Scanned ===")
+                    Log.d("MainScreen", "Scanned data: $scannedData")
+
+                    // Check if this is a WebRTC QR code
+                    // Expected formats:
+                    // - zkpassport://connect?peerId={id}&type=registration
+                    // - webrtc://peer/{peerId}
+                    // - ?peer={peerId} or ?peerId={id}
+                    if (scannedData.contains("zkpassport://", ignoreCase = true) ||
+                        scannedData.contains("webrtc", ignoreCase = true) ||
+                        scannedData.contains("peerId=", ignoreCase = true) ||
+                        scannedData.contains("peer=", ignoreCase = true)) {
+                        Log.d("MainScreen", "✓ Detected WebRTC QR code")
+
+                        // Extract peer ID from the QR data
+                        val peerId = when {
+                            scannedData.contains("peerId=", ignoreCase = true) -> {
+                                // Extract from query parameter: ?peerId={id}
+                                val index = scannedData.indexOf("peerId=", ignoreCase = true)
+                                if (index >= 0) {
+                                    scannedData.substring(index + "peerId=".length)
+                                        .substringBefore("&").trim()
+                                } else ""
+                            }
+                            scannedData.contains("peer=", ignoreCase = true) -> {
+                                // Extract from query parameter: ?peer={id}
+                                val index = scannedData.indexOf("peer=", ignoreCase = true)
+                                if (index >= 0) {
+                                    scannedData.substring(index + "peer=".length)
+                                        .substringBefore("&").trim()
+                                } else ""
+                            }
+                            scannedData.contains("/peer/") -> {
+                                // Extract from path: webrtc://peer/{peerId}
+                                scannedData.substringAfter("/peer/").trim()
+                            }
+                            else -> scannedData.trim() // Assume whole string is peer ID
+                        }
+
+                        Log.d("MainScreen", "Extracted peer ID: $peerId")
+
+                        if (peerId.isNotEmpty()) {
+                            Log.d("MainScreen", "→ Starting WebRTC proof flow...")
+                            coroutineScope.launch {
+                                try {
+                                    mainViewModel.startWebRTCProofFlow(peerId)
+                                    Log.d("MainScreen", "✓ WebRTC flow started successfully")
+                                } catch (e: Exception) {
+                                    Log.e("MainScreen", "✗ Failed to start WebRTC flow", e)
+                                }
+                            }
+                        } else {
+                            Log.w("MainScreen", "⚠ Empty peer ID after extraction")
+                        }
+                    } else {
+                        Log.d("MainScreen", "→ Handling as external integrator URI")
+                        // Handle as external integrator URI (existing behavior)
+                        val uri = scannedData.toUri()
+                        mainViewModel.setExtIntDataURI(uri)
+                    }
                 })
             }
 

@@ -27,7 +27,7 @@ import com.rarilabs.rarime.api.points.models.VerifyPassportData
 import com.rarilabs.rarime.api.points.models.WithdrawBody
 import com.rarilabs.rarime.api.points.models.WithdrawPayload
 import com.rarilabs.rarime.api.points.models.WithdrawPayloadAttributes
-import com.rarilabs.rarime.Keys
+import com.rarilabs.rarime.config.Keys
 import com.rarilabs.rarime.data.ProofTxFull
 import com.rarilabs.rarime.modules.passportScan.models.EDocument
 import com.rarilabs.rarime.store.SecureSharedPrefsManager
@@ -216,20 +216,25 @@ class PointsManager @Inject constructor(
 
         val profiler = Profile().newProfile(privateKey)
 
-        val passportInfoRaw = withContext(Dispatchers.IO) {
+        val passportInfo = withContext(Dispatchers.IO) {
             stateKeeperContract.getPassportInfo(passportInfoKeyBytes).send()
         }
 
-        val passportInfo = passportInfoRaw.component1()
-        val identityInfo = passportInfoRaw.component2()
+        // Get session info for issueTimestamp
+        val sessionsInfo = withContext(Dispatchers.IO) {
+            stateKeeperContract.getPassportSessionsInfo(passportInfoKeyBytes).send()
+        }
+
+        // Use first active session if available, otherwise use default values
+        val identityInfo = if (!sessionsInfo.value2.isEmpty()) sessionsInfo.value2[0] else null
 
         val queryProofInputs = profiler.buildAirdropQueryIdentityInputs(
             eDocument.dg1!!.decodeHexString(),
             smtProofJson.toByteArray(Charsets.UTF_8),
             BaseConfig.POINTS_SVC_SELECTOR,
             passportInfoKey,
-            identityInfo.issueTimestamp.toString(),
-            passportInfo.identityReissueCounter.toString(),
+            identityInfo?.issueTimestamp?.toString() ?: "0",
+            passportInfo.activeSessionCount.toString(),  // Use activeSessionCount instead of identityReissueCounter
             BaseConfig.POINTS_SVC_ID,
             BaseConfig.POINTS_SVC_ALLOWED_IDENTITY_TIMESTAMP,
         )

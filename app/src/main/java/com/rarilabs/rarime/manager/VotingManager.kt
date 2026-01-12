@@ -459,12 +459,17 @@ class VotingManager @Inject constructor(
         }
 
 
-        val tupleContractInfo = withContext(Dispatchers.IO) {
+        val passportInfo = withContext(Dispatchers.IO) {
             stateKeeperContract.getPassportInfo(passportInfoKeyBytes).send()
         }
 
-        val passportInfo = tupleContractInfo.component1()
-        val identityInfo = tupleContractInfo.component2()
+        // Get session info for issueTimestamp
+        val sessionsInfo = withContext(Dispatchers.IO) {
+            stateKeeperContract.getPassportSessionsInfo(passportInfoKeyBytes).send()
+        }
+
+        // Use first active session if available
+        val identityInfo = if (!sessionsInfo.value2.isEmpty()) sessionsInfo.value2[0] else null
 
         val (voteProof, isReissuedAfterVoting) = try {
             generateVoteProof(
@@ -528,7 +533,7 @@ class VotingManager @Inject constructor(
         passportInfoKey: String,
         pollResultJson: ByteArray,
         passportInfo: StateKeeper.PassportInfo,
-        identityInfo: StateKeeper.IdentityInfo
+        identityInfo: StateKeeper.SessionInfo?
     ): Pair<GrothProof, Boolean> = withContext(Dispatchers.Default) {
 
         val eventData = profile.calculateVotingEventData(pollResultJson)
@@ -552,10 +557,11 @@ class VotingManager @Inject constructor(
         var identityCounterUpperBound = BigInteger(UInt.MAX_VALUE.toString())
 
         var isReissuedAfterVoting = false
-        if (identityInfo.issueTimestamp > votingData.identityCreationTimestampUpperBound) {
-            if (passportInfo.identityReissueCounter > votingData.identityCounterUpperBound) {
+        // In new architecture, use activeSessionCount instead of identityReissueCounter
+        if (identityInfo != null && identityInfo.issueTimestamp > votingData.identityCreationTimestampUpperBound) {
+            if (passportInfo.activeSessionCount > votingData.identityCounterUpperBound) {
                 throw VoteError.UniquenessError(
-                    "Your identity can not be uniquely verified for voting: " + "identityInfo.issueTimestamp > votingData.identityCreationTimestampUpperBound:  ${identityInfo.issueTimestamp} > ${votingData.identityCreationTimestampUpperBound}." + " passportInfo.identityReissueCounter > votingData.identityCounterUpperBound ${passportInfo.identityReissueCounter} > ${votingData.identityCounterUpperBound}"
+                    "Your identity can not be uniquely verified for voting: " + "identityInfo.issueTimestamp > votingData.identityCreationTimestampUpperBound:  ${identityInfo.issueTimestamp} > ${votingData.identityCreationTimestampUpperBound}." + " passportInfo.activeSessionCount > votingData.identityCounterUpperBound ${passportInfo.activeSessionCount} > ${votingData.identityCounterUpperBound}"
                 )
             }
 
@@ -570,8 +576,9 @@ class VotingManager @Inject constructor(
         Log.i("VoteProof", "smtProofJson: ${smtProofJson.toByteArray().joinToString()}")
         Log.i("VoteProof", "selector: ${votingData.selector}")
         Log.i("VoteProof", "passportInfoKey: $passportInfoKey")
-        Log.i("VoteProof", "issueTimestamp: ${identityInfo.issueTimestamp}")
-        Log.i("VoteProof", "identityReissueCounter: ${passportInfo.identityReissueCounter}")
+        Log.i("VoteProof", "issueTimestamp: ${identityInfo?.issueTimestamp ?: 0}")
+        // In new architecture, use activeSessionCount instead of identityReissueCounter
+        Log.i("VoteProof", "activeSessionCount: ${passportInfo.activeSessionCount}")
         Log.i("VoteProof", "eventId: $eventId")
         Log.i("VoteProof", "eventData: ${Numeric.toHexString(eventData)}")
         Log.i("VoteProof", "timestampLowerbound: 0")
@@ -598,8 +605,9 @@ class VotingManager @Inject constructor(
             smtProofJson.toByteArray(),
             votingData.selector.toString(),
             passportInfoKey,
-            identityInfo.issueTimestamp.toString(),
-            passportInfo.identityReissueCounter.toString(),
+            identityInfo?.issueTimestamp?.toString() ?: "0",
+            // In new architecture, use activeSessionCount instead of identityReissueCounter
+            passportInfo.activeSessionCount.toString(),
             eventId,
             Numeric.toHexString(eventData),
             "0",

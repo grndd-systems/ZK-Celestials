@@ -43,10 +43,33 @@ sealed class UniversalProof {
     data class Plonk internal constructor(val proof: PlonkProof) : UniversalProof() {
         override fun getPubSignals() = proof.pub_signals
         override fun getIdentityKey() = proof.pub_signals[3]
+
+        // Returns decimal string (for compatibility with existing code)
         override fun getPublicKey() = proof.pub_signals[0]
+
+        // Returns decimal string (for compatibility with existing code)
         override fun getPassportHash() = proof.pub_signals[1]
+
         override fun getProofJson(): String {
             return Gson().toJson(proof)
+        }
+
+        /**
+         * Returns public key as hex string with 0x prefix
+         */
+        fun getPublicKeyHex(): String {
+            val decimal = BigInteger(proof.pub_signals[0])
+            return Numeric.toHexString(decimal.toByteArray())
+        }
+
+        /**
+         * Returns passport hash as hex string with 0x prefix (32 bytes padded)
+         */
+        fun getPassportHashHex(): String {
+            val decimal = BigInteger(proof.pub_signals[1])
+            // Ensure 32 bytes (64 hex chars after 0x)
+            val hexStr = Numeric.toHexStringNoPrefix(decimal.toByteArray())
+            return "0x" + hexStr.padStart(64, '0')
         }
     }
 

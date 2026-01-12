@@ -40,6 +40,8 @@ import com.rarilabs.rarime.manager.StableCoinContractManager
 import com.rarilabs.rarime.manager.TestContractManager
 import com.rarilabs.rarime.manager.VotingManager
 import com.rarilabs.rarime.manager.WalletManager
+import com.grndd.celestials.webrtc.core.WebRTCManager
+import com.rarilabs.rarime.modules.webrtc.WebRTCProofCoordinator
 import com.rarilabs.rarime.store.SecureSharedPrefsManager
 import com.rarilabs.rarime.store.SecureSharedPrefsManagerImpl
 import com.rarilabs.rarime.store.room.notifications.AppDatabase
@@ -511,5 +513,26 @@ class APIModule {
         return NotificationManager(notificationsRepository, passportManager)
     }
 
+    // WebRTC bindings moved to WebRTCModule.kt
+
+    @Provides
+    @Singleton
+    fun provideWebRTCProofCoordinator(
+        @ApplicationContext context: Context,
+        webRTCManager: WebRTCManager,
+        identityManager: IdentityManager,
+        passportManager: PassportManager,
+        proofGenerationManager: ProofGenerationManager,
+        extIntegratorApiManager: ExtIntegratorApiManager
+    ): WebRTCProofCoordinator {
+        return WebRTCProofCoordinator(
+            context,
+            webRTCManager,
+            identityManager,
+            passportManager,
+            proofGenerationManager,
+            extIntegratorApiManager
+        )
+    }
 
 }

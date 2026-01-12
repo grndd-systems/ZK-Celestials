@@ -112,12 +112,11 @@ class IdentityManager @Inject constructor(
 
     @OptIn(ExperimentalStdlibApi::class)
     suspend fun getPassportActiveIdentity(eDocument: EDocument): String? {
-
         try {
             val passportInfoKey: String = if (eDocument.dg15.isNullOrEmpty()) {
-                registrationProof.value!!.getPassportHash() //lightProofData.passport_hash
+                registrationProof.value!!.getPassportHash()
             } else {
-                registrationProof.value!!.getPublicKey() //lightProofData.public_key
+                registrationProof.value!!.getPublicKey()
             }
 
             var passportInfoKeyBytes = Identity.bigIntToBytes(passportInfoKey)
@@ -126,19 +125,40 @@ class IdentityManager @Inject constructor(
                 passportInfoKeyBytes = passportInfoKeyBytes.copyOf(32)
             }
 
-
             val stateKeeperContract = rarimoContractManager.getStateKeeper()
 
-            val passportInfoRaw = withContext(Dispatchers.IO) {
-                stateKeeperContract.getPassportInfo(passportInfoKeyBytes).send()
+            // Get all sessions for this passport
+            val sessionsInfo = withContext(Dispatchers.IO) {
+                stateKeeperContract.getPassportSessionsInfo(passportInfoKeyBytes).send()
             }
 
-            return passportInfoRaw.component1().activeIdentity.toHexString()
+            val sessionKeys = sessionsInfo.component1() // bytes32[] sessionKeys_
+            val sessionInfos = sessionsInfo.component2() // SessionInfo[] sessionInfos_
+
+            ErrorHandler.logDebug("getPassportActiveIdentity", "Passport has ${sessionKeys.size} sessions")
+
+            // Get our identity key from registration proof
+            val ourIdentityKey = registrationProof.value!!.getIdentityKey()
+            var ourIdentityKeyBytes = Identity.bigIntToBytes(ourIdentityKey)
+
+            if (ourIdentityKeyBytes.size != 32) {
+                ourIdentityKeyBytes = ourIdentityKeyBytes.copyOf(32)
+            }
+
+            // Check if our identity key is among the sessions
+            for (i in sessionKeys.indices) {
+                if (sessionKeys[i].contentEquals(ourIdentityKeyBytes)) {
+                    ErrorHandler.logDebug("getPassportActiveIdentity", "Found our identity key at session index $i")
+                    return org.web3j.utils.Numeric.toHexString(sessionKeys[i])
+                }
+            }
+
+            ErrorHandler.logDebug("getPassportActiveIdentity", "Our identity key not found in sessions")
+            return null
         } catch (e: Exception) {
             ErrorHandler.logError("getPassportActiveIdentity", e.message.toString(), e)
             return null
         }
-
     }
 
 }

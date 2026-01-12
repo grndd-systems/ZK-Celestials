@@ -28,6 +28,7 @@ class RegistrationAPIManager @Inject constructor(
 ) {
     @OptIn(ExperimentalStdlibApi::class)
     suspend fun register(callData: ByteArray, destination: String): RegisterResponseBody {
+        ErrorHandler.logDebug("RegistrationAPIManager calldata", callData.toHexString())
         val response = registrationAPI.register(
             RegisterBody(
                 data = RegisterData(

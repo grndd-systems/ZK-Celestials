@@ -70,6 +70,28 @@ data class EDocument(
         return Dg15FileOwn(dG15File)
     }
 
+    /**
+     * Extracts the Active Authentication public key from DG15 as hex string
+     * Returns modulus for RSA or concatenated X,Y coordinates for ECDSA
+     */
+    fun getAAPublicKeyHex(): String? {
+        val dg15File = getDg15File() ?: return null
+        val publicKey = dg15File.publicKey
+
+        val pubkeyData = when {
+            publicKey.algorithm.equals("RSA", ignoreCase = true) -> {
+                CryptoUtilsPassport.getModulusFromRSAPublicKey(publicKey)
+            }
+            publicKey.algorithm.equals("EC", ignoreCase = true) -> {
+                val pubKey = publicKey as ECPublicKey
+                CryptoUtilsPassport.getXYFromECDSAPublicKey(pubKey)
+            }
+            else -> null
+        }
+
+        return pubkeyData?.let { "0x" + Numeric.toHexStringNoPrefix(it) }
+    }
+
     private fun getPublicKeySize(publicKey: PublicKey?): Int {
         return when (publicKey) {
             is RSAPublicKey -> publicKey.modulus.bitLength()

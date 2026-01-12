@@ -15,6 +15,7 @@ import com.rarilabs.rarime.manager.PointsManager
 import com.rarilabs.rarime.manager.SecurityManager
 import com.rarilabs.rarime.manager.SettingsManager
 import com.rarilabs.rarime.manager.WalletManager
+import com.rarilabs.rarime.modules.webrtc.WebRTCProofCoordinator
 import com.rarilabs.rarime.ui.components.SnackbarShowOptions
 import com.rarilabs.rarime.util.AppIconUtil
 import com.rarilabs.rarime.util.ErrorHandler
@@ -47,7 +48,7 @@ class MainViewModel @Inject constructor(
     private val identityManager: IdentityManager,
     private val passportManager: PassportManager,
     private val pointsManager: PointsManager,
-
+    private val webRTCProofCoordinator: WebRTCProofCoordinator,
     ) : AndroidViewModel(app) {
 
     val isScreenLocked = securityManager.isScreenLocked
@@ -261,5 +262,19 @@ class MainViewModel @Inject constructor(
 
     fun updateBiometricsState(state: SecurityCheckState) {
         securityManager.updateBiometricsState(state)
+    }
+
+    suspend fun startWebRTCProofFlow(peerId: String) {
+        android.util.Log.d("MainViewModel", "=== startWebRTCProofFlow called ===")
+        android.util.Log.d("MainViewModel", "Peer ID: $peerId")
+        android.util.Log.d("MainViewModel", "WebRTCProofCoordinator: $webRTCProofCoordinator")
+
+        try {
+            webRTCProofCoordinator.startProofFlow(peerId)
+            android.util.Log.d("MainViewModel", "✓ Successfully called webRTCProofCoordinator.startProofFlow")
+        } catch (e: Exception) {
+            android.util.Log.e("MainViewModel", "✗ Exception in startWebRTCProofFlow", e)
+            throw e
+        }
     }
 }
