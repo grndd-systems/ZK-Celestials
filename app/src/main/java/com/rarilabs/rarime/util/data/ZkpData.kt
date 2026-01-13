@@ -132,6 +132,10 @@ data class PlonkProof(
     val pub_signals: List<String>,
 ) {
     companion object {
+        /**
+         * Parse PlonkProof from byte array with known structure (Registration circuit)
+         * Registration circuit: 5 public signals + 2144 bytes proof data = 2304 bytes total
+         */
         fun fromByteArray(data: ByteArray): PlonkProof {
             require(data.size == 2304) { "data.size != 2304, got ${data.size}" }
 
@@ -150,6 +154,47 @@ data class PlonkProof(
 
             return PlonkProof(
                 rawProof = data, proof = proofHex, pub_signals = pubSignalsList
+            )
+        }
+
+        /**
+         * Parse PlonkProof from hex string with dynamic public signal detection
+         *
+         * This function automatically determines the number of public signals based on
+         * the proof size. Plonk proofs have a fixed proof data size (2144 bytes),
+         * with public signals prepended (32 bytes each).
+         *
+         * @param hexProof Hex string with 0x prefix (from Noir circuit.prove())
+         * @param proofDataSize Size of the proof data in bytes (default: 2144 for Plonk)
+         * @return PlonkProof with automatically detected number of public signals
+         *
+         * Example:
+         * - Registration circuit: 5 pub signals * 32 + 2144 = 2304 bytes total
+         * - Query circuit: N pub signals * 32 + 2144 = variable size
+         */
+        fun fromHexString(hexProof: String, proofDataSize: Int = 2144): PlonkProof {
+            val proofBytes = Numeric.hexStringToByteArray(hexProof)
+
+            // Public signals are at the beginning, each is 32 bytes
+            val pubSignalSize = 32
+            val numPubSignals = (proofBytes.size - proofDataSize) / pubSignalSize
+
+            require(numPubSignals >= 0) {
+                "Invalid proof structure: proofBytes.size=${proofBytes.size}, proofDataSize=$proofDataSize"
+            }
+
+            // Extract public signals
+            val pubSignalsList = (0 until numPubSignals).map { i ->
+                val start = i * pubSignalSize
+                val end = start + pubSignalSize
+                val bytes = proofBytes.copyOfRange(start, end)
+                BigInteger(bytes).toString()
+            }
+
+            return PlonkProof(
+                rawProof = proofBytes,
+                proof = hexProof,
+                pub_signals = pubSignalsList
             )
         }
     }

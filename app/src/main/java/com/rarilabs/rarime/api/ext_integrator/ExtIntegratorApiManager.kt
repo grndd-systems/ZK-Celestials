@@ -162,8 +162,8 @@ class ExtIntegratorApiManager @Inject constructor(
                 Log.d("ExtIntegrator", "✓ Identity info populated from session: issueTimestamp=${firstSession.issueTimestamp}")
             } else {
                 Log.w("ExtIntegrator", "No sessions found in contract - using mock session data")
-                // For WebRTC: если нет сессий в контракте, создаем mock с нулевыми значениями
-                // Timestamp 0 означает что проверка timestamp будет пропущена в query proof
+                // For WebRTC: if no sessions in contract, create mock with zero values
+                // Timestamp 0 means timestamp verification will be skipped in query proof
                 _identityInfo.value = StateKeeper.SessionInfo(
                     ByteArray(32), // Empty 32-byte array for activePassport
                     java.math.BigInteger.ZERO // timestamp = 0
@@ -219,7 +219,7 @@ class ExtIntegratorApiManager @Inject constructor(
 
             Log.d("PlonkQuery", "✓ passportInfo and identityInfo are available")
 
-            // Построить inputs для Plonk query proof
+            // Build inputs for Plonk query proof
             Log.d("PlonkQuery", "→ Building query inputs...")
             val inputs = buildPlonkQueryInputs(queryProofParametersRequest)
             Log.d("PlonkQuery", "✓ Query inputs built: ${inputs.keys}")
@@ -258,35 +258,10 @@ class ExtIntegratorApiManager @Inject constructor(
                     Log.d("PlonkQuery", "✓ Proof generated: ${noirProof.proof.take(50)}...")
 
                     Log.d("PlonkQuery", "→ Parsing PlonkProof for query circuit...")
-                    // Query circuit has different number of public signals than registration
-                    // Parse public inputs from the proof bytes manually
-                    val proofBytes = Numeric.hexStringToByteArray(noirProof.proof)
+                    // Use PlonkProof.fromHexString() for automatic public signal detection
+                    val plonkProof = com.rarilabs.rarime.util.data.PlonkProof.fromHexString(noirProof.proof)
 
-                    // Public inputs are at the beginning of the proof, each is 32 bytes
-                    // Calculate how many public inputs we have
-                    val pubInputSize = 32
-                    // For query circuit, figure out the number of public inputs
-                    // We know registration has 5, query likely has more
-                    val numPubInputs = (proofBytes.size - 2144) / pubInputSize // 2144 is proof data size
-
-                    Log.d("PlonkQuery", "  Detected $numPubInputs public inputs")
-
-                    val pubSignalsList = (0 until numPubInputs).map { i ->
-                        val start = i * pubInputSize
-                        val end = start + pubInputSize
-                        val bytes = proofBytes.copyOfRange(start, end)
-                        java.math.BigInteger(bytes).toString()
-                    }
-
-                    Log.d("PlonkQuery", "  Public signals extracted: ${pubSignalsList.size} items")
-
-                    val plonkProof = com.rarilabs.rarime.util.data.PlonkProof(
-                        rawProof = proofBytes,
-                        proof = noirProof.proof,
-                        pub_signals = pubSignalsList
-                    )
-
-                    Log.d("PlonkQuery", "✓ PlonkProof created successfully with ${pubSignalsList.size} public signals")
+                    Log.d("PlonkQuery", "✓ PlonkProof parsed successfully with ${plonkProof.pub_signals.size} public signals")
                     plonkProof
                 } catch (e: Exception) {
                     Log.e("PlonkQuery", "✗ Error in proof generation", e)
