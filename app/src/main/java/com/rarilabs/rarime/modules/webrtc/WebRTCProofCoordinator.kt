@@ -383,10 +383,12 @@ class WebRTCProofCoordinator @Inject constructor(
         val dataType = PassportTypeUtils.getPassportDataType(circuitType)
         val zkType = PassportTypeUtils.getVerifierType(circuitName)
 
-        Log.d(TAG, "Circuit name (original): $circuitName")
-        Log.d(TAG, "Circuit name (verifier): Z_NOIR_PASSPORT_${circuitName.removePrefix("registerIdentity_")}")
+        Log.d(TAG, "=== Passport Type Computation ===")
+        Log.d(TAG, "Circuit name: $circuitName")
+        Log.d(TAG, "Verifier name: Z_NOIR_PASSPORT_${circuitName.removePrefix("registerIdentity_")}")
         Log.d(TAG, "Passport dataType: $dataType")
         Log.d(TAG, "Verifier zkType: $zkType")
+        Log.d(TAG, "===================================")
 
         // Get passport hash from proof in hex format (with 0x prefix and 32-byte formatted)
         val passportHashHex = when (registrationProof) {
@@ -409,8 +411,8 @@ class WebRTCProofCoordinator @Inject constructor(
         } ?: "0x"
 
         val passportData = PassportData(
-            dataType = "0x42ec2321c321a7ac25cb817a4e29d805e64817ab3a18b50127e0ccae327a111b",
-            zkType = "0xcc1bb2df849a138e63711ccc2b5bc9a8c3a6c1b3277c2a4dc9bbce7d03d16a1c",
+            dataType = dataType,  // Computed from passport AA algorithm
+            zkType = zkType,      // Computed from circuit name
             signature =  aaSignatureHex,
             publicKey = aaPublicKeyHex,
             passportHash = passportHashHex

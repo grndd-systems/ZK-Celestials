@@ -14,6 +14,11 @@ import org.web3j.utils.Numeric
 object PassportTypeUtils {
     /**
      * Determines the passport data type constant name based on circuit configuration
+     *
+     * The number in the constant name represents:
+     * dg15DigestPositionShift + aaKeyPositionShift
+     *
+     * For example: P_RSA_SHA1_2688 where 2688 = 2432 + 256
      */
     private fun getPassportDataTypeName(circuitType: RegisterIdentityCircuitType): String {
         val aaType = circuitType.aaType
@@ -26,38 +31,36 @@ object PassportTypeUtils {
         val aaAlgorithm = aaType.aaAlgorithm
         val algorithm = aaAlgorithm.algorithm
         val hashAlgo = aaAlgorithm.hashAlgorithm
-        val keySize = aaAlgorithm.keySize
+        val exponent = aaAlgorithm.exponent
 
-        return when {
-            // RSA with SHA1
-            algorithm == CircuitAlgorithmType.RSA &&
-            hashAlgo == CircuitHashAlgorithmType.HA160 &&
-            keySize == CircuitKeySizeType.B2048 &&
-            aaAlgorithm.exponent?.name != "E3" -> "P_RSA_SHA1_2688"
+        // Calculate the circuit size number
+        // This represents: dg15DigestPositionShift + aaKeyPositionShift
+        val circuitSize = aaType.dg15DigestPositionShift + aaType.aaKeyPositionShift
 
-            // RSA with SHA1 and exponent 3
-            algorithm == CircuitAlgorithmType.RSA &&
-            hashAlgo == CircuitHashAlgorithmType.HA160 &&
-            keySize == CircuitKeySizeType.B2048 &&
-            aaAlgorithm.exponent?.name == "E3" -> "P_RSA_SHA1_2688_3"
+        // Determine algorithm prefix
+        val algorithmPrefix = when (algorithm) {
+            CircuitAlgorithmType.RSA -> "RSA"
+            CircuitAlgorithmType.ECDSA -> "ECDSA"
+            else -> return "P_NO_AA"
+        }
 
-            // ECDSA with SHA1
-            algorithm == CircuitAlgorithmType.ECDSA &&
-            hashAlgo == CircuitHashAlgorithmType.HA160 -> "P_ECDSA_SHA1_2704"
+        // Determine hash algorithm suffix
+        val hashSuffix = when (hashAlgo) {
+            CircuitHashAlgorithmType.HA160 -> "SHA1"
+            CircuitHashAlgorithmType.HA256 -> "SHA256"
+            CircuitHashAlgorithmType.HA384 -> "SHA384"
+            CircuitHashAlgorithmType.HA512 -> "SHA512"
+            else -> return "P_NO_AA"
+        }
 
-            // RSA with SHA256
-            algorithm == CircuitAlgorithmType.RSA &&
-            hashAlgo == CircuitHashAlgorithmType.HA256 &&
-            keySize == CircuitKeySizeType.B2048 &&
-            aaAlgorithm.exponent?.name != "E3" -> "P_RSA_SHA256_2688"
+        // Build the constant name: P_{ALGORITHM}_{HASH}_{SIZE}[_3]
+        val baseName = "P_${algorithmPrefix}_${hashSuffix}_${circuitSize}"
 
-            // RSA with SHA256 and exponent 3
-            algorithm == CircuitAlgorithmType.RSA &&
-            hashAlgo == CircuitHashAlgorithmType.HA256 &&
-            keySize == CircuitKeySizeType.B2048 &&
-            aaAlgorithm.exponent?.name == "E3" -> "P_RSA_SHA256_2688_3"
-
-            else -> "P_NO_AA" // Default fallback
+        // Add exponent suffix if it's E3
+        return if (exponent?.name == "E3") {
+            "${baseName}_3"
+        } else {
+            baseName
         }
     }
 
@@ -86,10 +89,12 @@ object PassportTypeUtils {
 }
 
 /**
- * Computes keccak256 hash of a string (matching ethers.js solidityPackedKeccak256)
+ * Computes keccak256 hash of a string (matching ethers.js keccak256(["string"], [value]))
+ * This matches the TypeScript implementation: keccak256(["string"], ["Z_NOIR_PASSPORT_..."])
  */
 fun keccak256(input: String): String {
-    // Use UTF-8 encoding like ethers.js does with toUtf8Bytes()
-    val hash = Hash.sha3(input.toByteArray(Charsets.UTF_8))
-    return Numeric.toHexString(hash)
+    // web3j's Hash.sha3String() encodes the string using ABI encoding then hashes it
+    // This matches ethers.js keccak256(["string"], [value])
+    val hash = Hash.sha3String(input)
+    return hash
 }
