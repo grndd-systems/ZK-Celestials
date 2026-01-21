@@ -246,6 +246,7 @@ class WebRTCProofCoordinator @Inject constructor(
                             birth_date_lower_bound = params.birthDateLowerBound,
                             birth_date_upper_bound = params.birthDateUpperBound,
                             citizenship_mask = params.citizenshipMask,
+                            current_date = params.currentDate,
                             event_data = params.eventData,
                             event_id = params.eventId,
                             expiration_date_lower_bound = params.expirationDateLowerBound,
@@ -263,15 +264,12 @@ class WebRTCProofCoordinator @Inject constructor(
 
                 // Generate query proof using ExtIntegratorApiManager (Plonk)
                 _flowState.value = ProofFlowState.GeneratingProof("Generating query proof...")
-                val queryProofPlonk = extIntegratorApiManager.generateQueryProofPlonk(context, queryProofRequest)
+                val queryProof = extIntegratorApiManager.generateQueryProofPlonk(context, queryProofRequest)
 
-                if (queryProofPlonk == null) {
+                if (queryProof == null) {
                     _flowState.value = ProofFlowState.Error("Failed to generate query proof")
                     return@launch
                 }
-
-                // Convert to UniversalProof for consistency
-                val queryProof = UniversalProof.fromPlonk(queryProofPlonk)
 
                 Log.d(TAG, "✓ Query proof generated (Plonk)")
 
@@ -306,13 +304,23 @@ class WebRTCProofCoordinator @Inject constructor(
             try {
                 _flowState.value = ProofFlowState.SendingProofs
 
-                // Extract zkPoints
+                // Extract zkPoints (proof bytes only, without public signals)
                 val zkPoints = when (queryProof) {
                     is UniversalProof.Plonk -> {
-                        queryProof.proof.proof // This is the proofHex = zkPoints
+                        // queryProof.proof.proof contains 0x prefix + proof bytes only (no public signals)
+                        val proofHex = queryProof.proof.proof
+                        Log.d(TAG, "=== Query Proof Public Signals ===")
+                        Log.d(TAG, "Public signals count: ${queryProof.proof.pub_signals.size}")
+                        queryProof.proof.pub_signals.forEachIndexed { index, signal ->
+                            Log.d(TAG, "  [$index] = $signal")
+                        }
+                        Log.d(TAG, "Proof hex starts: ${proofHex.take(100)}")
+                        Log.d(TAG, "Proof hex length: ${proofHex.length} chars")
+                        Log.d(TAG, "=================================")
+                        proofHex
                     }
                     is UniversalProof.Groth -> {
-                        Gson().toJson(queryProof.proof.proof) // Serialize proof as zkPoints
+                        Gson().toJson(queryProof.proof.proof)
                     }
                     is UniversalProof.Light -> {
                         throw Exception("Light registration not supported for WebRTC")
@@ -327,7 +335,7 @@ class WebRTCProofCoordinator @Inject constructor(
                 }
 
                 val responseData = QueryProofResponseData(
-                    zkPoints = "0x$zkPoints",
+                    zkPoints = zkPoints, // Already has 0x prefix from PlonkProof.proof
                     registration = registrationData
                 )
 

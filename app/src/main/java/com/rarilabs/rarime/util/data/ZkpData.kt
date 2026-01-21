@@ -134,14 +134,15 @@ data class PlonkProof(
     companion object {
         /**
          * Parse PlonkProof from byte array with known structure (Registration circuit)
-         * Registration circuit: 5 public signals + 2144 bytes proof data = 2304 bytes total
+         * Registration circuit: N public signals + 2144
          */
         fun fromByteArray(data: ByteArray): PlonkProof {
-            require(data.size == 2304) { "data.size != 2304, got ${data.size}" }
 
-            val pubSignalLen = 5
+            val proofDataSize = 2144
             val pubSignalData = 32
-            val pubSignalSize = pubSignalLen * pubSignalData
+
+            val numPubSignals = (data.size - proofDataSize) / pubSignalData
+            val pubSignalSize = numPubSignals * pubSignalData
 
             // Extract public signals
             val pubSignalsRaw = data.copyOfRange(0, pubSignalSize)
@@ -191,9 +192,14 @@ data class PlonkProof(
                 BigInteger(bytes).toString()
             }
 
+            // Extract only proof bytes (without public signals)
+            val pubSignalsTotalSize = numPubSignals * pubSignalSize
+            val proofOnlyBytes = proofBytes.copyOfRange(pubSignalsTotalSize, proofBytes.size)
+            val proofOnlyHex = Numeric.toHexString(proofOnlyBytes)
+
             return PlonkProof(
                 rawProof = proofBytes,
-                proof = hexProof,
+                proof = proofOnlyHex,
                 pub_signals = pubSignalsList
             )
         }

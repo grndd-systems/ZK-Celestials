@@ -97,6 +97,9 @@ data class QueryProofAttributes(
     @Json(name = "citizenship_mask")
     val citizenshipMask: String,
 
+    @Json(name = "current_date")
+    val currentDate: String,
+
     @Json(name = "event_data")
     val eventData: String,
 

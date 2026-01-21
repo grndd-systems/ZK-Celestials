@@ -44,6 +44,7 @@ data class QueryProofGenResponseAttributes(
     val birth_date_lower_bound: String,
     val birth_date_upper_bound: String,
     val citizenship_mask: String,
+    val current_date: String,
     val event_data: String,
     val event_id: String,
     val expiration_date_lower_bound: String,

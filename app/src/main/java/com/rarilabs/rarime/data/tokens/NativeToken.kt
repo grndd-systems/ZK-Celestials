@@ -90,7 +90,7 @@ class NativeToken @Inject constructor(
         val gasLimit = BigInteger.valueOf(21000L)
         val value = amount
 
-        val chainId = 7368L
+        val chainId = 3735928814L
 
         val rawTransaction = RawTransaction.createEtherTransaction(
             nonce, gasPrice, gasLimit, to, value
