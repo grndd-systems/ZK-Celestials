@@ -20,7 +20,7 @@ fun AppTheme(
         LocalTypography provides RarimeTypography(),
     ) {
         ProvideTextStyle(
-            value = RarimeTheme.typography.body3.copy(color = RarimeTheme.colors.textPrimary),
+            value = RarimeTheme.typography.body3.copy(color = RarimeTheme.colors.backgroundPrimary),
             content = content
         )
     }

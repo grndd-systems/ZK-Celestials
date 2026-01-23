@@ -143,44 +143,7 @@ fun IntroScreenContent(
                     modifier = Modifier.padding(horizontal = 48.dp),
                     verticalArrangement = Arrangement.spacedBy(48.dp)
                 ) {
-                    // Simple button without icon - just centered text
-                    var isLoading by remember { mutableStateOf(false) }
-                    
-                    PrimaryButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = if (isLoading) "Generating..." else "Start",
-                        enabled = !isLoading,
-                        onClick = {
-                            isLoading = true
-                            coroutineScope.launch {
-                                try {
-                                    // Generate new private key automatically
-                                    viewModel.generateAndSavePrivateKey()
-                                    
-                                    // Proceed to main screen
-                                    onFinish(Screen.Main.Home.route)
-                                } catch (e: Exception) {
-                                    isLoading = false
-                                    // Error will be logged in ViewModel
-                                    // In a production app, you might want to show an error dialog here
-                                }
-                            }
-                        }
-                    )
-                    
-                    if (isLoading) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(48.dp),
-                                color = RarimeTheme.colors.primaryMain
-                            )
-                        }
-                    }
+
                 }
             }
         }
@@ -210,9 +173,7 @@ internal fun IntroLegalScreen(
                 factory = { context ->
                     WebView(context).apply {
                         webViewClient = object : WebViewClient() {
-                            override fun onPageFinished(view: WebView?, url: String?) {
-                                isLoading = false
-                            }
+
                         }
                         settings.javaScriptEnabled = true
                         settings.domStorageEnabled = true
@@ -222,29 +183,6 @@ internal fun IntroLegalScreen(
                 },
                 modifier = Modifier.fillMaxSize()
             )
-
-            if (isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(RarimeTheme.colors.backgroundPrimary),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            color = RarimeTheme.colors.textPrimary
-                        )
-                        Text(
-                            text = "Loading $title...",
-                            style = RarimeTheme.typography.body4,
-                            color = RarimeTheme.colors.textSecondary
-                        )
-                    }
-                }
-            }
         }
 
         // Bottom button area with navigation bar insets to ensure button is always visible
