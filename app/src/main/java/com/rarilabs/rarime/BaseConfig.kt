@@ -193,7 +193,7 @@ interface IConfig {
 
 /* TESTNET */
 object TestNetConfig : IConfig {
-    override val RELAYER_URL = "http://192.168.0.167:8000"
+    override val RELAYER_URL = "https://registration-relayer-1062715874572.europe-west1.run.app"
     override val COSMOS_RPC_URL = "https://rpc-api.node1.mainnet-beta.rarimo.com"
     override val EVM_SERVICE_URL =
         "https://api.orgs.app.stage.rarime.com/integrations/evm-airdrop-svc-glo/"
@@ -477,68 +477,71 @@ object TestNetConfig : IConfig {
 
 // Mainnet
 object MainnetConfig : IConfig {
-    override val RELAYER_URL = "https://api.app.rarime.com"
-    override val EVM_RPC_URL = "https://l2.rarimo.com"
-    override val COSMOS_RPC_URL = "https://rpc-api.mainnet.rarimo.com"
+  override val RELAYER_URL = "https://registration-relayer-1062715874572.europe-west1.run.app"
+    override val COSMOS_RPC_URL = "https://rpc-api.node1.mainnet-beta.rarimo.com"
     override val EVM_SERVICE_URL =
-        "https://api.orgs.app.rarime.com/integrations/evm-airdrop-svc-glo/"
+        "https://api.orgs.app.stage.rarime.com/integrations/evm-airdrop-svc-glo/"
     override val DISCORD_URL = "https://discord.gg/Bzjm5MDXrU"
     override val TWITTER_URL = "https://x.com/Rarimo_protocol"
 
-    override val INVITATION_BASE_URL = "https://app.rarime.com"
+    override val INVITATION_BASE_URL = "https://app.stage.rarime.com"
 
     override val POINTS_SVC_ID = "0x77fabbc6cb41a11d4fb6918696b3550d5d602f252436dd587f9065b7c4e62b"
     override val AIRDROP_SVC_ID = "0xac42d1a986804618c7a793fbe814d9b31e47be51e082806363dca6958f3062"
 
-    override val ICAO_COSMOS_RPC = "core-api.mainnet.rarimo.com:443"
+    override val ICAO_COSMOS_RPC = "core-api.node1.mainnet-beta.rarimo.com:443"
     override val MASTER_CERTIFICATES_FILENAME = "icaopkd-list.ldif"
     override val MASTER_CERTIFICATES_BUCKETNAME = "rarimo-temp"
     override val EVM_STABLE_COIN_RPC = "https://ethereum-sepolia-rpc.publicnode.com"
-
-    override val REGISTER_CONTRACT_ADDRESS = "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c"
-    override val CERTIFICATES_SMT_CONTRACT_ADDRESS = "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82"
-    override val REGISTRATION_SMT_CONTRACT_ADDRESS = "0x479F84502Db545FA8d2275372E0582425204A879"
-    override val STATE_KEEPER_CONTRACT_ADDRESS = "0x0B306BF915C4d645ff596e518fAf3F9669b97016"
-
     override val STABLE_COIN_ADDRESS = "0xbd03f0fC994fd1015eAdc37c943055330e238Ad9"
-    override val EXPLORER_API_URL = "https://evmscan.l2.rarimo.com"
+    override val EXPLORER_API_URL = "https://explorer-eden-testnet.binarybuilders.services/api/"
+    override val RARIMO_EXPLORER = "https://explorer-eden-testnet.binarybuilders.services"
+    override val EVM_RPC_URL = "https://ev-reth-eden-testnet.binarybuilders.services:8545"
+    override val REGISTER_CONTRACT_ADDRESS = "0x6BF01a93ED6134681BDDd63933867F982895ca8c"
+    override val CERTIFICATES_SMT_CONTRACT_ADDRESS = "0xfe23b53440A3cF87F463C446EfAd128294085b93"
+    override val REGISTRATION_SMT_CONTRACT_ADDRESS = "0x479F84502Db545FA8d2275372E0582425204A879"
+    override val STATE_KEEPER_CONTRACT_ADDRESS = "0x91784Fd7FCC9D557e24e180016F1377120661475"
     override val REGISTRATION_SIMPLE_CONTRACT_ADRRESS = "0x497D6957729d3a39D43843BD27E6cbD12310F273"
-
     override val POINTS_SVC_SELECTOR = "23073"
     override val POINTS_SVC_ALLOWED_IDENTITY_TIMESTAMP = 1715688000L
-    override val FEEDBACK_EMAIL = "info@rarilabs.com"
-    override val CHAIN = RarimoChains.Mainnet
+
+    override val FEEDBACK_EMAIL = "apereliez1@gmail.com"
+    override val CHAIN = RarimoChains.MainnetBeta
     override val lightVerificationSKHex = Keys.lightVerificationSKHex
     override val GOOGLE_WEB_KEY = Keys.GOOGLE_WEB_KEY
     override val APP_ID_FIREBASE = Keys.APP_ID
-    override val RARIMO_EXPLORER = "https://scan.rarimo.com/tx"
-    override val GLOBAL_NOTIFICATION_TOPIC = "rarime"
-    override val REWARD_NOTIFICATION_TOPIC: String = "rarime-rewardable"
+
+
+    override val GLOBAL_NOTIFICATION_TOPIC = "rarime-stage"
+    override val REWARD_NOTIFICATION_TOPIC: String = "rarime-rewardable-stage"
+
     override val APPSFLYER_DEV_KEY = Keys.APPSFLYER_DEV_KEY
 
-    override val VOTING_WEBSITE_URL = "https://freedomtool.org"
-    override val VOTING_RELAYER_URL: String = "https://api.freedomtool.org"
+    override val VOTING_RELAYER_URL: String = "https://api.stage.freedomtool.org"
     override val VOTING_REGISTRATION_SMT_CONTRACT_ADDRESS: String =
-        "0x479F84502Db545FA8d2275372E0582425204A879"
-    override val VOTING_RPC_URL: String = "https://l2.rarimo.com"
-    override val PROPOSAL_CONTRACT_ADDRESS: String = "0x9C4b84a940C9D3140a1F40859b3d4367DC8d099a"
-    override val MULTICALL_CONTRACT_ADDRRESS: String = "0xb4EE49BDf7cf199081b2a286B2B9B5f87AE930b1"
+        "0xFbae44a113A6f07687b180605f425e43066a6179"
+    override val VOTING_RPC_URL: String = "https://rpc.qtestnet.org"
 
-    override val FACE_REGISTRY_ADDRESS: String = "0x15DCd57B70D97F1D1F220ccb4e6B8E886aF3e3B9"
+    override val PROPOSAL_CONTRACT_ADDRESS: String = "0x4C61d7454653720DAb9e26Ca25dc7B8a5cf7065b"
+    override val MULTICALL_CONTRACT_ADDRRESS: String = "0xcA11bde05977b3631167028862bE2a173976CA11"
 
+    override val VOTING_WEBSITE_URL: String = "https://freedomtool.org"
+
+    override val NOIR_TRUSTED_SETUP_URL: String =
+        "https://storage.googleapis.com/rarimo-store/trusted-setups/ultraPlonkTrustedSetup.dat"
+
+
+    override val FACE_REGISTRY_ADDRESS: String = "0x3C0f27AC1817820C1BA41337B53090652aE4F448"
 
     override val GUESS_CELEBRITY_CONTRACT_ADDRESS: String =
-        "0x5283f7B6A011433A6631701875A6f147e5c17a96"
+        "0x411AA3eF21AdC9e84c60e17451B0732119C8f0c7"
 
 
     override val FACE_REGISTRY_ZKEY_URL: String =
         "https://storage.googleapis.com/zk-celestial-store/zkey/circuit_final.zkey"
-
     override val FACE_RECOGNITION_MODEL_URL: String =
         "https://storage.googleapis.com/zk-celestial-store/face-recognition/face-recognition.tflite"
 
-    override val NOIR_TRUSTED_SETUP_URL: String =
-        "https://storage.googleapis.com/rarimo-store/trusted-setups/ultraPlonkTrustedSetup.dat"
 
     override val registerIdentity_1_160_3_4_576_200_NA: String =
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentity_1_160_3_4_576_200_NA-download.zip"
@@ -556,6 +559,18 @@ object MainnetConfig : IConfig {
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentity_4_160_3_3_336_216_1_1296_3_256-download.zip"
     override val registerIdentity_20_160_3_3_736_200_NA: String =
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentity_20_160_3_3_736_200_NA-download.zip"
+
+
+    override val registerIdentityLight160: String =
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight160-download.zip"
+    override val registerIdentityLight224: String =
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight224-download.zip"
+    override val registerIdentityLight256: String =
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight256-download.zip"
+    override val registerIdentityLight384: String =
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight384-download.zip"
+    override val registerIdentityLight512: String =
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight512-download.zip"
 
 
     override val registerIdentity_10_256_3_3_576_248_1_1184_5_264: String =
@@ -598,9 +613,9 @@ object MainnetConfig : IConfig {
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_3_256_3_4_600_248_1_1496_3_256.json"
     override val registerIdentity_3_512_3_3_336_264_NA: String =
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_3_512_3_3_336_264_NA.json"
+
     override val registerIdentity_6_160_3_3_336_216_1_1080_3_256: String =
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_6_160_3_3_336_216_1_1080_3_256.json"
-
     override val registerIdentity_1_256_3_5_576_248_NA: String =
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_5_576_248_NA.json"
     override val registerIdentity_1_256_3_6_576_264_1_2448_3_256: String =
@@ -635,20 +650,6 @@ object MainnetConfig : IConfig {
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_25_384_3_4_336_264_1_2904_2_256.json"
     override val registerIdentity_26_512_3_3_336_248_NA: String =
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_26_512_3_3_336_248_NA.json"
-
-
-    override val registerIdentityLight160: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight160-download.zip"
-    override val registerIdentityLight224: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight224-download.zip"
-    override val registerIdentityLight256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight256-download.zip"
-    override val registerIdentityLight384: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight384-download.zip"
-    override val registerIdentityLight512: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight512-download.zip"
-
-
     override val registerIdentity_26_512_3_3_336_264_1_1968_2_256: String =
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_26_512_3_3_336_264_1_1968_2_256.json"
     override val registerIdentity_27_512_3_4_336_248_NA: String =
