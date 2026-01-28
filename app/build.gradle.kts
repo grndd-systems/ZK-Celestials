@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.rarilabs.rarime"
+    namespace = "com.grnddsystems.celestials"
     compileSdk = 35
 
     bundle {
@@ -27,7 +27,7 @@ android {
 
     defaultConfig {
 
-        applicationId = "com.rarilabs.rarime"
+        applicationId = "com.grnddsystems.celestials"
         minSdk = 27
         targetSdk = 35
         versionCode = 121
