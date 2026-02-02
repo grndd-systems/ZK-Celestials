@@ -122,6 +122,7 @@ class ExtIntegratorApiManager @Inject constructor(
 
     suspend fun loadPassportInfo() {
         try {
+            val start = System.currentTimeMillis()
             Log.d("ExtIntegrator", "→ Loading passport info...")
             val eDocument = passportManager.passport.value
 
@@ -142,7 +143,7 @@ class ExtIntegratorApiManager @Inject constructor(
             }
 
             _passportInfo.value = passportInfo
-            Log.d("ExtIntegrator", "✓ Passport info loaded: activeSessionCount=${passportInfo.activeSessionCount}")
+            Log.d("ExtIntegrator", "✓ getPassportInfo: ${System.currentTimeMillis() - start}ms, activeSessionCount=${passportInfo.activeSessionCount}")
 
             // Get session info to populate identityInfo
             // In new architecture, identity info comes from sessions
@@ -150,7 +151,7 @@ class ExtIntegratorApiManager @Inject constructor(
                 stateKeeperContract.getPassportSessionsInfo(passportInfoKey).send()
             }
 
-            Log.d("ExtIntegrator", "Sessions found: ${sessionsInfo.value2.size}")
+            Log.d("ExtIntegrator", "✓ getPassportSessionsInfo: ${System.currentTimeMillis() - start}ms, sessions: ${sessionsInfo.value2.size}")
 
             // Use the first active session if available
             if (!sessionsInfo.value2.isEmpty()) {
@@ -207,6 +208,7 @@ class ExtIntegratorApiManager @Inject constructor(
         queryProofParametersRequest: QueryProofGenResponse
     ): UniversalProof? {
         try {
+            val totalStart = System.currentTimeMillis()
             Log.d("PlonkQuery", "=== Starting generateQueryProofPlonk ===")
 
             if (passportInfo.value == null) {
@@ -221,51 +223,52 @@ class ExtIntegratorApiManager @Inject constructor(
             Log.d("PlonkQuery", "✓ passportInfo and identityInfo are available")
 
             // Build inputs for Plonk query proof
-            Log.d("PlonkQuery", "→ Building query inputs...")
+            var stepStart = System.currentTimeMillis()
             val inputs = buildPlonkQueryInputs(queryProofParametersRequest)
-            Log.d("PlonkQuery", "✓ Query inputs built: ${inputs.keys}")
+            Log.d("PlonkQuery", "✓ buildPlonkQueryInputs: ${System.currentTimeMillis() - stepStart}ms")
 
             // Read bytecode from assets
-            Log.d("PlonkQuery", "→ Reading circuit bytecode from assets...")
+            stepStart = System.currentTimeMillis()
             val assetContext: Context = context.createPackageContext("com.grnddsystems.celestials", 0)
             val assetManager = assetContext.assets
             val circuitByteCode = assetManager.open("query.json").bufferedReader().use { it.readText() }
-            Log.d("PlonkQuery", "✓ Circuit bytecode loaded: ${circuitByteCode.length} bytes")
+            Log.d("PlonkQuery", "✓ readCircuitBytecode: ${System.currentTimeMillis() - stepStart}ms (${circuitByteCode.length} bytes)")
 
             // Download trusted setup (same as for registration)
-            Log.d("PlonkQuery", "→ Downloading trusted setup...")
+            stepStart = System.currentTimeMillis()
             val circuitDownloader = com.grnddsystems.celestials.modules.passportScan.CircuitNoirDownloader(context)
             val trustedSetupPath = circuitDownloader.downloadTrustedSetup { progress, isEnded ->
                 Log.d("PlonkQuery", "Trusted setup download: $progress% ${if (isEnded) "(done)" else ""}")
             }
-            Log.d("PlonkQuery", "✓ Trusted setup ready at: $trustedSetupPath")
+            Log.d("PlonkQuery", "✓ downloadTrustedSetup: ${System.currentTimeMillis() - stepStart}ms")
 
             val customDispatcher = java.util.concurrent.Executors.newFixedThreadPool(1) { runnable ->
                 Thread(null, runnable, "LargeStackThread", 100 * 1024 * 1024) // 100 MB stack size
             }.asCoroutineDispatcher()
 
             return withContext(customDispatcher) {
+                com.grnddsystems.celestials.util.NoirLock.mutex.lock()
                 try {
-                    Log.d("PlonkQuery", "→ Creating circuit from JSON manifest...")
+                    stepStart = System.currentTimeMillis()
                     val circuit = com.noirandroid.lib.Circuit.fromJsonManifest(circuitByteCode)
-                    Log.d("PlonkQuery", "✓ Circuit created")
+                    Log.d("PlonkQuery", "✓ fromJsonManifest: ${System.currentTimeMillis() - stepStart}ms")
 
-                    Log.d("PlonkQuery", "→ Setting up SRS...")
+                    stepStart = System.currentTimeMillis()
                     circuit.setupSrs(trustedSetupPath, false)
-                    Log.d("PlonkQuery", "✓ SRS setup complete")
+                    Log.d("PlonkQuery", "✓ setupSrs: ${System.currentTimeMillis() - stepStart}ms")
 
-                    Log.d("PlonkQuery", "→ Starting Plonk query proof generation...")
+                    stepStart = System.currentTimeMillis()
                     val noirProof = circuit.prove(inputs, proofType = "plonk", recursive = false)
-                    Log.d("PlonkQuery", "✓ Proof generated: ${noirProof.proof.take(50)}...")
+                    Log.d("PlonkQuery", "✓ circuit.prove: ${System.currentTimeMillis() - stepStart}ms")
 
-                    Log.d("PlonkQuery", "→ Parsing PlonkProof for query circuit...")
-                    // Use PlonkProof.fromHexString() for automatic public signal detection
-                    //val plonkProof = com.grnddsystems.celestials.util.data.PlonkProof.fromHexString(noirProof.proof)
                     val plonkProof = UniversalProofFactory.fromPlonkBytes(Numeric.hexStringToByteArray(noirProof.proof))
+                    Log.d("PlonkQuery", "=== TOTAL generateQueryProofPlonk: ${System.currentTimeMillis() - totalStart}ms ===")
                     plonkProof
                 } catch (e: Exception) {
                     Log.e("PlonkQuery", "✗ Error in proof generation", e)
                     throw e
+                } finally {
+                    com.grnddsystems.celestials.util.NoirLock.mutex.unlock()
                 }
             }
         } catch (e: Exception) {

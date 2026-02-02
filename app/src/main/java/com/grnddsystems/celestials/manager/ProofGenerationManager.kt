@@ -436,20 +436,24 @@ class ProofGenerationManager @Inject constructor(
         val inputs = buildPlonkRegistrationInputs(eDocument, registerIdentityCircuitType)
 
         return withContext(customDispatcher) {
-            val circuitByteCode = File(byteCodePath).readText()
+            com.grnddsystems.celestials.util.NoirLock.mutex.lock()
+            try {
+                val circuitByteCode = File(byteCodePath).readText()
 
+                val circuit = Circuit.fromJsonManifest(circuitByteCode)
 
-            val circuit = Circuit.fromJsonManifest(circuitByteCode)
+                circuit.setupSrs(trustedSetupPath, false)
 
-            circuit.setupSrs(trustedSetupPath, false)
+                ErrorHandler.logDebug("Plonk", "Start proving")
 
-            ErrorHandler.logDebug("Plonk", "Start proving")
+                val proof = circuit.prove(inputs, proofType = "plonk", recursive = false)
 
-            val proof = circuit.prove(inputs, proofType = "plonk", recursive = false)
+                val zk = UniversalProofFactory.fromPlonkBytes(Numeric.hexStringToByteArray(proof.proof))
 
-            val zk = UniversalProofFactory.fromPlonkBytes(Numeric.hexStringToByteArray(proof.proof))
-
-            return@withContext zk
+                zk
+            } finally {
+                com.grnddsystems.celestials.util.NoirLock.mutex.unlock()
+            }
         }
     }
 

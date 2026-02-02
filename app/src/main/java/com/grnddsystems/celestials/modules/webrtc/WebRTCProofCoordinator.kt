@@ -60,6 +60,7 @@ class WebRTCProofCoordinator @Inject constructor(
     private val _flowState = MutableStateFlow<ProofFlowState>(ProofFlowState.Idle)
     val flowState: StateFlow<ProofFlowState> = _flowState.asStateFlow()
 
+
     sealed class ProofFlowState {
         data object Idle : ProofFlowState()
         data object Connecting : ProofFlowState()
@@ -80,6 +81,13 @@ class WebRTCProofCoordinator @Inject constructor(
             Log.d(TAG, "=== Starting proof flow with peer: $peerId ===")
             Log.d(TAG, "WebRTCManager: $webRTCManager")
             Log.d(TAG, "Current flow state: ${_flowState.value}")
+
+            // Prevent duplicate flow if already running
+            val currentState = _flowState.value
+            if (currentState !is ProofFlowState.Idle && currentState !is ProofFlowState.Error && currentState !is ProofFlowState.Completed) {
+                Log.w(TAG, "Flow already in progress (state: $currentState), ignoring")
+                return
+            }
 
             _flowState.value = ProofFlowState.Connecting
             Log.d(TAG, "Updated flow state to: Connecting")
@@ -104,10 +112,16 @@ class WebRTCProofCoordinator @Inject constructor(
                         }
                         is ConnectionState.Disconnected -> {
                             Log.d(TAG, "✗ Disconnected")
+                            if (_flowState.value !is ProofFlowState.Idle && _flowState.value !is ProofFlowState.Completed) {
+                                Log.d(TAG, "Resetting flow state to Idle")
+                                _flowState.value = ProofFlowState.Idle
+                    
+                            }
                         }
                         is ConnectionState.Error -> {
                             Log.e(TAG, "✗ Connection error: ${state.message}")
                             _flowState.value = ProofFlowState.Error(state.message)
+                
                         }
                         else -> {
                             Log.d(TAG, "Other connection state: $state")
@@ -131,6 +145,7 @@ class WebRTCProofCoordinator @Inject constructor(
         } catch (e: Exception) {
             Log.e(TAG, "✗ Proof flow failed", e)
             _flowState.value = ProofFlowState.Error(e.message ?: "Unknown error")
+
         }
     }
 
@@ -222,9 +237,13 @@ class WebRTCProofCoordinator @Inject constructor(
                 val params = paramsMessage.data.attributes
                 Log.d(TAG, "Query proof params: eventId=${params.eventId}")
 
+                val flowStart = System.currentTimeMillis()
+
                 // Load passport info first
                 _flowState.value = ProofFlowState.GeneratingProof("Loading passport info...")
+                var stepStart = System.currentTimeMillis()
                 extIntegratorApiManager.loadPassportInfo()
+                Log.d(TAG, "TIMING loadPassportInfo: ${System.currentTimeMillis() - stepStart}ms")
 
                 // Convert WebRTC params to QueryProofGenResponse format
                 // Desktop sends hex strings, need to convert to Long
@@ -261,7 +280,9 @@ class WebRTCProofCoordinator @Inject constructor(
 
                 // Generate query proof using ExtIntegratorApiManager (Plonk)
                 _flowState.value = ProofFlowState.GeneratingProof("Generating query proof...")
+                stepStart = System.currentTimeMillis()
                 val queryProof = extIntegratorApiManager.generateQueryProofPlonk(context, queryProofRequest)
+                Log.d(TAG, "TIMING generateQueryProofPlonk: ${System.currentTimeMillis() - stepStart}ms")
 
                 if (queryProof == null) {
                     _flowState.value = ProofFlowState.Error("Failed to generate query proof")
@@ -269,6 +290,7 @@ class WebRTCProofCoordinator @Inject constructor(
                 }
 
                 Log.d(TAG, "✓ Query proof generated (Plonk)")
+                Log.d(TAG, "TIMING total flow (params→proof): ${System.currentTimeMillis() - flowStart}ms")
 
                 // Get registration proof
                 _flowState.value = ProofFlowState.GeneratingProof("Getting registration proof...")
@@ -351,10 +373,12 @@ class WebRTCProofCoordinator @Inject constructor(
                 } else {
                     _flowState.value = ProofFlowState.Error("Failed to send query proof")
                 }
+    
 
             } catch (e: Exception) {
                 Log.e(TAG, "✗ Failed to send query proof", e)
                 _flowState.value = ProofFlowState.Error("Failed to send proof: ${e.message}")
+    
             }
         }
     }
