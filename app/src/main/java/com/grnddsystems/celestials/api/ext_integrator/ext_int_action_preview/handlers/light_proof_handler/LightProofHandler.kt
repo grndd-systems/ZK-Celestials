@@ -1,4 +1,4 @@
-package com.grnddsystems.celestials.api.ext_integrator.ext_int_action_preview.handlers.light_proof_handler
+package com.rarilabs.rarime.api.ext_integrator.ext_int_action_preview.handlers.light_proof_handler
 
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
@@ -9,16 +9,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.grnddsystems.celestials.R
-import com.grnddsystems.celestials.api.ext_integrator.ext_int_action_preview.components.HandlerPreviewerLayout
-import com.grnddsystems.celestials.api.ext_integrator.models.NoActiveIdentity
-import com.grnddsystems.celestials.api.ext_integrator.models.NoPassport
-import com.grnddsystems.celestials.api.ext_integrator.models.YourAgeDoesNotMeetTheRequirements
-import com.grnddsystems.celestials.api.ext_integrator.models.YourCitizenshipDoesNotMeetTheRequirements
-import com.grnddsystems.celestials.modules.main.LocalMainViewModel
-import com.grnddsystems.celestials.ui.components.SnackbarSeverity
-import com.grnddsystems.celestials.ui.components.getSnackbarDefaultShowOptions
-import com.grnddsystems.celestials.util.ErrorHandler
+import com.rarilabs.rarime.R
+import com.rarilabs.rarime.api.ext_integrator.ext_int_action_preview.components.HandlerPreviewerLayout
+import com.rarilabs.rarime.api.ext_integrator.models.NoActiveIdentity
+import com.rarilabs.rarime.api.ext_integrator.models.NoPassport
+import com.rarilabs.rarime.api.ext_integrator.models.YourAgeDoesNotMeetTheRequirements
+import com.rarilabs.rarime.api.ext_integrator.models.YourCitizenshipDoesNotMeetTheRequirements
+import com.rarilabs.rarime.modules.main.LocalMainViewModel
+import com.rarilabs.rarime.ui.components.SnackbarSeverity
+import com.rarilabs.rarime.ui.components.getSnackbarDefaultShowOptions
+import com.rarilabs.rarime.util.ErrorHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch

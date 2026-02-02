@@ -1,8 +1,9 @@
-package com.grnddsystems.celestials.modules.main
+package com.rarilabs.rarime.modules.main
 
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
@@ -24,13 +26,12 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
-import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -45,18 +46,18 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.grnddsystems.celestials.R
-import com.grnddsystems.celestials.modules.qr.ScanQrScreen
-import com.grnddsystems.celestials.ui.components.AppBottomSheet
-import com.grnddsystems.celestials.ui.components.AppIcon
-import com.grnddsystems.celestials.ui.components.AppLogo
-import com.grnddsystems.celestials.ui.components.UiSnackbarDefault
-import com.grnddsystems.celestials.ui.components.enter_program.EnterProgramFlow
-import com.grnddsystems.celestials.ui.components.enter_program.UNSPECIFIED_PASSPORT_STEPS
-import com.grnddsystems.celestials.ui.components.rememberAppSheetState
-import com.grnddsystems.celestials.ui.theme.AppTheme
-import com.grnddsystems.celestials.ui.theme.RarimeTheme
-import com.grnddsystems.celestials.util.Screen
+import com.rarilabs.rarime.R
+import com.rarilabs.rarime.modules.qr.ScanQrScreen
+import com.rarilabs.rarime.ui.components.AppBottomSheet
+import com.rarilabs.rarime.ui.components.AppIcon
+import com.rarilabs.rarime.ui.components.AppLogo
+import com.rarilabs.rarime.ui.components.UiSnackbarDefault
+import com.rarilabs.rarime.ui.components.enter_program.EnterProgramFlow
+import com.rarilabs.rarime.ui.components.enter_program.UNSPECIFIED_PASSPORT_STEPS
+import com.rarilabs.rarime.ui.components.rememberAppSheetState
+import com.rarilabs.rarime.ui.theme.AppTheme
+import com.rarilabs.rarime.ui.theme.RarimeTheme
+import com.rarilabs.rarime.util.Screen
 
 val mainRoutes = listOf(
     Screen.Main.Home.route,
@@ -181,7 +182,6 @@ fun MainScreenContent(
 ) {
     val mainViewModel = LocalMainViewModel.current
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
 
 
     val passportStatus by mainViewModel.passportStatus.collectAsState()
@@ -320,69 +320,10 @@ fun MainScreenContent(
             ) {
                 ScanQrScreen(onBack = {
                     qrCodeState.hide()
-                }, onScan = { scannedData ->
+                }, onScan = {
+                    val uri = it.toUri()
                     qrCodeState.hide()
-
-                    Log.d("MainScreen", "=== QR Code Scanned ===")
-                    Log.d("MainScreen", "Scanned data: $scannedData")
-
-                    // Check if this is a WebRTC QR code
-                    // Expected formats:
-                    // - zkpassport://connect?peerId={id}&type=registration
-                    // - webrtc://peer/{peerId}
-                    // - ?peer={peerId} or ?peerId={id}
-                    if (scannedData.contains("zkpassport://", ignoreCase = true) ||
-                        scannedData.contains("webrtc", ignoreCase = true) ||
-                        scannedData.contains("peerId=", ignoreCase = true) ||
-                        scannedData.contains("peer=", ignoreCase = true)) {
-                        Log.d("MainScreen", "✓ Detected WebRTC QR code")
-
-                        // Extract peer ID from the QR data
-                        val peerId = when {
-                            scannedData.contains("peerId=", ignoreCase = true) -> {
-                                // Extract from query parameter: ?peerId={id}
-                                val index = scannedData.indexOf("peerId=", ignoreCase = true)
-                                if (index >= 0) {
-                                    scannedData.substring(index + "peerId=".length)
-                                        .substringBefore("&").trim()
-                                } else ""
-                            }
-                            scannedData.contains("peer=", ignoreCase = true) -> {
-                                // Extract from query parameter: ?peer={id}
-                                val index = scannedData.indexOf("peer=", ignoreCase = true)
-                                if (index >= 0) {
-                                    scannedData.substring(index + "peer=".length)
-                                        .substringBefore("&").trim()
-                                } else ""
-                            }
-                            scannedData.contains("/peer/") -> {
-                                // Extract from path: webrtc://peer/{peerId}
-                                scannedData.substringAfter("/peer/").trim()
-                            }
-                            else -> scannedData.trim() // Assume whole string is peer ID
-                        }
-
-                        Log.d("MainScreen", "Extracted peer ID: $peerId")
-
-                        if (peerId.isNotEmpty()) {
-                            Log.d("MainScreen", "→ Starting WebRTC proof flow...")
-                            coroutineScope.launch {
-                                try {
-                                    mainViewModel.startWebRTCProofFlow(peerId)
-                                    Log.d("MainScreen", "✓ WebRTC flow started successfully")
-                                } catch (e: Exception) {
-                                    Log.e("MainScreen", "✗ Failed to start WebRTC flow", e)
-                                }
-                            }
-                        } else {
-                            Log.w("MainScreen", "⚠ Empty peer ID after extraction")
-                        }
-                    } else {
-                        Log.d("MainScreen", "→ Handling as external integrator URI")
-                        // Handle as external integrator URI (existing behavior)
-                        val uri = scannedData.toUri()
-                        mainViewModel.setExtIntDataURI(uri)
-                    }
+                    mainViewModel.setExtIntDataURI(uri)
                 })
             }
 

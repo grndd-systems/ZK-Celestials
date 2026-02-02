@@ -1,4 +1,4 @@
-package com.grnddsystems.celestials.modules.passportScan.nfc
+package com.rarilabs.rarime.modules.passportScan.nfc
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,16 +14,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.grnddsystems.celestials.R
-import com.grnddsystems.celestials.ui.base.ButtonSize
+import com.rarilabs.rarime.R
+import com.rarilabs.rarime.ui.base.ButtonSize
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import com.grnddsystems.celestials.ui.components.AppSheetState
-import com.grnddsystems.celestials.ui.components.DottedProgressBar
-import com.grnddsystems.celestials.ui.components.SecondaryButton
-import com.grnddsystems.celestials.ui.components.rememberAppSheetState
-import com.grnddsystems.celestials.ui.theme.RarimeTheme
+import com.rarilabs.rarime.ui.components.AppSheetState
+import com.rarilabs.rarime.ui.components.DottedProgressBar
+import com.rarilabs.rarime.ui.components.SecondaryButton
+import com.rarilabs.rarime.ui.components.rememberAppSheetState
+import com.rarilabs.rarime.ui.theme.RarimeTheme
 
 val currentStepDescription = mapOf(
     Pair(NfcScanStep.PREPARING, "Place your passport cover to the back of your phone"),

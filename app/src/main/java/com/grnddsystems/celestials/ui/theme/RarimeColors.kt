@@ -1,5 +1,5 @@
 //added brand colors Celestial ID
-package com.grnddsystems.celestials.ui.theme
+package com.rarilabs.rarime.ui.theme
 
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue

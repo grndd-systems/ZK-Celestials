@@ -1,4 +1,4 @@
-package com.grnddsystems.celestials.modules.votes.voteProcessScreen
+package com.rarilabs.rarime.modules.votes.voteProcessScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -29,21 +29,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
-import com.grnddsystems.celestials.R
-import com.grnddsystems.celestials.api.voting.models.MOCKED_POLL_ITEM
-import com.grnddsystems.celestials.api.voting.models.PollCriteria
-import com.grnddsystems.celestials.api.voting.models.PollCriteriaStatus
-import com.grnddsystems.celestials.api.voting.models.UserInPoll
-import com.grnddsystems.celestials.data.enums.AppColorScheme
-import com.grnddsystems.celestials.data.enums.isDark
-import com.grnddsystems.celestials.ui.base.BaseIconButton
-import com.grnddsystems.celestials.ui.base.ButtonSize
-import com.grnddsystems.celestials.ui.components.AppIcon
-import com.grnddsystems.celestials.ui.components.HorizontalDivider
-import com.grnddsystems.celestials.ui.components.PrimaryButton
-import com.grnddsystems.celestials.ui.theme.RarimeTheme
-import com.grnddsystems.celestials.util.DateUtil.getDateMessage
-import com.grnddsystems.celestials.util.Screen
+import com.rarilabs.rarime.R
+import com.rarilabs.rarime.api.voting.models.MOCKED_POLL_ITEM
+import com.rarilabs.rarime.api.voting.models.PollCriteria
+import com.rarilabs.rarime.api.voting.models.PollCriteriaStatus
+import com.rarilabs.rarime.api.voting.models.UserInPoll
+import com.rarilabs.rarime.data.enums.AppColorScheme
+import com.rarilabs.rarime.data.enums.isDark
+import com.rarilabs.rarime.ui.base.BaseIconButton
+import com.rarilabs.rarime.ui.base.ButtonSize
+import com.rarilabs.rarime.ui.components.AppIcon
+import com.rarilabs.rarime.ui.components.HorizontalDivider
+import com.rarilabs.rarime.ui.components.PrimaryButton
+import com.rarilabs.rarime.ui.theme.RarimeTheme
+import com.rarilabs.rarime.util.DateUtil.getDateMessage
+import com.rarilabs.rarime.util.Screen
 import kotlinx.coroutines.launch
 
 private enum class VotingStatus {

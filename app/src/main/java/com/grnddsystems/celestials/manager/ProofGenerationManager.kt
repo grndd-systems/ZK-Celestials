@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalStdlibApi::class)
 
-package com.grnddsystems.celestials.manager
+package com.rarilabs.rarime.manager
 
 import CircuitAlgorithmType
 import CircuitPassportHashType
@@ -10,33 +10,33 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.noirandroid.lib.Circuit
-import com.grnddsystems.celestials.BaseConfig
-import com.grnddsystems.celestials.BuildConfig
-import com.grnddsystems.celestials.api.registration.PassportAlreadyRegisteredByOtherPK
-import com.grnddsystems.celestials.data.enums.PassportStatus
-import com.grnddsystems.celestials.modules.passportScan.CircuitDownloader
-import com.grnddsystems.celestials.modules.passportScan.CircuitNoirDownloader
-import com.grnddsystems.celestials.modules.passportScan.DownloadCircuitError
-import com.grnddsystems.celestials.modules.passportScan.DownloadRequest
-import com.grnddsystems.celestials.modules.passportScan.models.CryptoUtilsPassport
-import com.grnddsystems.celestials.modules.passportScan.models.EDocument
-import com.grnddsystems.celestials.modules.passportScan.models.RegisterIdentityInputs
-import com.grnddsystems.celestials.modules.passportScan.models.RegisterIdentityLightInputs
-import com.grnddsystems.celestials.modules.passportScan.nfc.SODFileOwn
-import com.grnddsystems.celestials.util.Constants.NOT_ALLOWED_COUNTRIES
-import com.grnddsystems.celestials.util.ErrorHandler
-import com.grnddsystems.celestials.util.SecurityUtil
-import com.grnddsystems.celestials.util.ZKPUseCase
-import com.grnddsystems.celestials.util.circuits.CircuitUtil
-import com.grnddsystems.celestials.util.circuits.RegisterNoirCircuitData
-import com.grnddsystems.celestials.util.circuits.RegisteredCircuitData
-import com.grnddsystems.celestials.util.data.GrothProof
-import com.grnddsystems.celestials.util.data.UniversalProof
-import com.grnddsystems.celestials.util.data.UniversalProofFactory
-import com.grnddsystems.celestials.util.decodeHexString
-import com.grnddsystems.celestials.util.generateLightRegistrationProofByCircuitType
-import com.grnddsystems.celestials.util.generateRegistrationProofByCircuitType
-import com.grnddsystems.celestials.util.toBits
+import com.rarilabs.rarime.BaseConfig
+import com.rarilabs.rarime.BuildConfig
+import com.rarilabs.rarime.api.registration.PassportAlreadyRegisteredByOtherPK
+import com.rarilabs.rarime.data.enums.PassportStatus
+import com.rarilabs.rarime.modules.passportScan.CircuitDownloader
+import com.rarilabs.rarime.modules.passportScan.CircuitNoirDownloader
+import com.rarilabs.rarime.modules.passportScan.DownloadCircuitError
+import com.rarilabs.rarime.modules.passportScan.DownloadRequest
+import com.rarilabs.rarime.modules.passportScan.models.CryptoUtilsPassport
+import com.rarilabs.rarime.modules.passportScan.models.EDocument
+import com.rarilabs.rarime.modules.passportScan.models.RegisterIdentityInputs
+import com.rarilabs.rarime.modules.passportScan.models.RegisterIdentityLightInputs
+import com.rarilabs.rarime.modules.passportScan.nfc.SODFileOwn
+import com.rarilabs.rarime.util.Constants.NOT_ALLOWED_COUNTRIES
+import com.rarilabs.rarime.util.ErrorHandler
+import com.rarilabs.rarime.util.SecurityUtil
+import com.rarilabs.rarime.util.ZKPUseCase
+import com.rarilabs.rarime.util.circuits.CircuitUtil
+import com.rarilabs.rarime.util.circuits.RegisterNoirCircuitData
+import com.rarilabs.rarime.util.circuits.RegisteredCircuitData
+import com.rarilabs.rarime.util.data.GrothProof
+import com.rarilabs.rarime.util.data.UniversalProof
+import com.rarilabs.rarime.util.data.UniversalProofFactory
+import com.rarilabs.rarime.util.decodeHexString
+import com.rarilabs.rarime.util.generateLightRegistrationProofByCircuitType
+import com.rarilabs.rarime.util.generateRegistrationProofByCircuitType
+import com.rarilabs.rarime.util.toBits
 import identity.X509Util
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,6 +52,7 @@ import kotlinx.coroutines.withContext
 import org.bouncycastle.jce.interfaces.ECPublicKey
 import org.web3j.utils.Numeric
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.math.BigInteger
 import java.util.concurrent.Executors
@@ -89,8 +90,7 @@ class ProofGenerationManager @Inject constructor(
 
     private val TAG = ProofGenerationManager::class.java.simpleName
     private val second = 1000L
-    // Changed to property to get fresh value each time (key is auto-generated on first launch)
-    private val privateKeyBytes get() = identityManager.privateKeyBytes
+    private val privateKeyBytes = identityManager.privateKeyBytes
 
     private fun resetState() {
         _state.value = PassportProofState.READING_DATA
@@ -99,27 +99,40 @@ class ProofGenerationManager @Inject constructor(
 
     private suspend fun registerCertificate(eDocument: EDocument) {
         try {
+            ErrorHandler.logDebug(TAG, "Starting certificate registration")
             val sodStream = eDocument.sod!!.decodeHexString().inputStream()
             val sodFile = SODFileOwn(sodStream)
             val x509Util = X509Util()
 
             val slaveCertificate = SecurityUtil.convertToPEM(sodFile.docSigningCertificate)
             val certificatesSMTAddress = BaseConfig.CERTIFICATES_SMT_CONTRACT_ADDRESS
+            ErrorHandler.logDebug(TAG, "Using certificates SMT contract address: $certificatesSMTAddress")
             val certificatesSMTContract =
                 rarimoContractManager.getPoseidonSMT(certificatesSMTAddress)
             val icao = readICAO(application.applicationContext)
+            if (icao == null) {
+                ErrorHandler.logError(TAG, "Failed to read ICAO master certificate for certificate registration")
+                throw IllegalStateException("ICAO master certificate not available")
+            }
 
             val slaveCertificateIndex = x509Util.getSlaveCertificateIndex(
                 slaveCertificate.toByteArray(), icao
             )
+            ErrorHandler.logDebug(TAG, "Certificate index: ${Numeric.toHexString(slaveCertificateIndex)}")
 
             val proof = withContext(Dispatchers.IO) {
-                certificatesSMTContract.getProof(slaveCertificateIndex).send()
+                try {
+                    certificatesSMTContract.getProof(slaveCertificateIndex).send()
+                } catch (e: Exception) {
+                    ErrorHandler.logError(TAG, "Error calling getProof for certificate registration", e)
+                    throw e
+                }
             }
             if (proof?.existence == true) {
                 ErrorHandler.logDebug(TAG, "Passport certificate is already registered")
                 return
             }
+            ErrorHandler.logDebug(TAG, "Certificate not found in SMT, registering...")
             val callDataBuilder = identity.CallDataBuilder()
             val callData = callDataBuilder.buildRegisterCertificateCalldata(
                 icao, slaveCertificate.toByteArray()
@@ -137,7 +150,10 @@ class ProofGenerationManager @Inject constructor(
             val res =
                 rarimoContractManager.checkIsTransactionSuccessful(response.data.attributes.tx_hash)
             if (!res) {
-                ErrorHandler.logError(TAG, "Transaction failed ${response.data.attributes.tx_hash}")
+                ErrorHandler.logError(TAG, "Certificate registration transaction failed: ${response.data.attributes.tx_hash}")
+                throw IllegalStateException("Certificate registration transaction failed")
+            } else {
+                ErrorHandler.logDebug(TAG, "Certificate registration transaction successful")
             }
         } catch (e: Exception) {
             ErrorHandler.logError(TAG, "Error in registerCertificate", e)
@@ -155,12 +171,11 @@ class ProofGenerationManager @Inject constructor(
             _state.value = PassportProofState.APPLYING_ZERO_KNOWLEDGE
 
             val proof = if (RegisterNoirCircuitData.fromValue(circuitType.buildName()) != null) {
-                Log.d("Before registration", circuitType.buildName().toString())
                 generateRegisterIdentityProofPlonk(
                     eDocument, registerIdentityCircuitType = circuitType
                 )
             } else {
-                 Log.d("Before registration", "Circom proof generation")
+
                 generateRegisterIdentityProofGroth(eDocument, circuitType)
             }
 
@@ -182,20 +197,33 @@ class ProofGenerationManager @Inject constructor(
                 isDocumentRegistered(eDocument, proof)
             } catch (e: Exception) {
                 if (e is PassportAlreadyRegisteredByOtherPK && !eDocument.dg15.isNullOrEmpty()) {
-                    Log.d("Second without DG15", "without dg 15")
+                    ErrorHandler.logDebug(TAG, "Retrying registration without DG15")
                     doc = eDocument.copy(dg15 = "")
-                    isDocumentRegistered(doc, proof)
+                    try {
+                        isDocumentRegistered(doc, proof)
+                    } catch (e2: Exception) {
+                        ErrorHandler.logError(TAG, "Document still registered after removing DG15", e2)
+                        throw e2
+                    }
+                } else {
+                    throw e
                 }
-
-                throw e
             }
 
             if (!isDocumentRegistered) {
-                Log.d("Before registration", doc.dg15.toString())
-                // Disable for now. Only generate and save proof to send it via web rtc
-                /*registrationManager.register(
-                    proof, doc, registrationManager.masterCertProof.value!!, false, circuitName
-                )*/
+                ErrorHandler.logDebug(TAG, "Document not registered, proceeding with registration")
+                val masterCertProof = registrationManager.masterCertProof.value
+                if (masterCertProof == null) {
+                    ErrorHandler.logError(TAG, "Master certificate proof is null - cannot register")
+                    throw IllegalStateException("Master certificate proof is required for registration")
+                }
+                ErrorHandler.logDebug(TAG, "Calling registration manager with circuit: $circuitName")
+                registrationManager.register(
+                    proof, doc, masterCertProof, false, circuitName
+                )
+                ErrorHandler.logDebug(TAG, "Registration completed successfully")
+            } else {
+                ErrorHandler.logDebug(TAG, "Document already registered, skipping registration")
             }
 
             _state.value = PassportProofState.FINALIZING
@@ -207,58 +235,105 @@ class ProofGenerationManager @Inject constructor(
     }
 
     private suspend fun isDocumentRegistered(eDocument: EDocument, proof: UniversalProof): Boolean {
-        Log.d("DG15", eDocument.dg15.toString())
-        val passportInfo = registrationManager.getPassportInfo(eDocument, proof)
-        if (passportInfo == null) {
+        try {
+            ErrorHandler.logDebug(TAG, "Checking if document is already registered")
+            val passportInfo = registrationManager.getPassportInfo(eDocument, proof)
+            if (passportInfo == null) {
+                ErrorHandler.logDebug(TAG, "Passport info is null - document not registered")
+                return false
+            }
+            val passportInfoIdentity = passportInfo.component1()?.activeIdentity
+
+            if (passportInfoIdentity == null) {
+                ErrorHandler.logDebug(TAG, "Active identity is null - document not registered")
+                return false
+            }
+
+            val ZERO_BYTES32 = ByteArray(32) { 0 }
+
+            if (passportInfoIdentity.contentEquals(ZERO_BYTES32)) {
+                ErrorHandler.logDebug(TAG, "Active identity is zero - document not registered")
+                return false
+            }
+
+            val currentIdentityKey = identityManager.getProfiler().publicKeyHash
+            val passportIdentityHex = passportInfoIdentity.toHexString()
+            val currentIdentityHex = currentIdentityKey.toHexString()
+
+            ErrorHandler.logDebug(TAG, "Passport identity: $passportIdentityHex")
+            ErrorHandler.logDebug(TAG, "Current identity: $currentIdentityHex")
+
+            if (passportIdentityHex == currentIdentityHex) {
+                ErrorHandler.logDebug(TAG, "Passport is already registered with this PK")
+                return true
+            }
+
+            ErrorHandler.logError(TAG, "Passport is already registered with a different PK. Passport: $passportIdentityHex, Current: $currentIdentityHex")
+            throw PassportAlreadyRegisteredByOtherPK()
+        } catch (e: PassportAlreadyRegisteredByOtherPK) {
+            throw e
+        } catch (e: Exception) {
+            ErrorHandler.logError(TAG, "Error checking document registration status", e)
+            // If we can't check, assume not registered and let registration proceed
+            // The contract will reject if it's already registered
             return false
         }
-
-        // In new architecture, multiple sessions can exist simultaneously
-        // Registration should always proceed to create a new session for this device
-        // Check if passport has any active sessions
-        val hasActiveSessions = passportInfo.activeSessionCount.toLong() > 0
-
-        if (hasActiveSessions) {
-            ErrorHandler.logDebug(TAG, "Passport has ${passportInfo.activeSessionCount} active sessions")
-        } else {
-            ErrorHandler.logDebug(TAG, "Passport has no active sessions yet")
-        }
-
-        // Always return false to allow registration/session creation to proceed
-        return false
     }
 
     private suspend fun lightRegistration(eDocument: EDocument): UniversalProof.Light {
         try {
-            // Get local copy for smart cast
-            val pkBytes = privateKeyBytes ?: throw IllegalStateException("privateKeyBytes is null")
+            if (privateKeyBytes == null) {
+                ErrorHandler.logError(TAG, "privateKeyBytes is null in lightRegistration")
+                throw IllegalStateException("privateKeyBytes is null")
+            }
             _state.value = PassportProofState.READING_DATA
 
             val registerIdentityCircuitName = eDocument.getRegisterIdentityLightCircuitName()
-            ErrorHandler.logDebug(TAG, "registerIdentityCircuitName: $registerIdentityCircuitName")
+            ErrorHandler.logDebug(TAG, "Light registration circuit name: $registerIdentityCircuitName")
             val registeredCircuitData = RegisteredCircuitData.fromValue(registerIdentityCircuitName)
-                ?: throw IllegalStateException("Circuit $registerIdentityCircuitName is not supported")
-
+                ?: run {
+                    ErrorHandler.logError(TAG, "Circuit $registerIdentityCircuitName is not supported for light registration")
+                    throw IllegalStateException("Circuit $registerIdentityCircuitName is not supported")
+                }
 
             _state.value = PassportProofState.APPLYING_ZERO_KNOWLEDGE
 
             // Download circuit files
             val filePaths = withContext(Dispatchers.Default) {
-                CircuitDownloader(application).downloadGrothFiles(registeredCircuitData) { progress, visibility ->
-                    _downloadProgress.value = progress
+                try {
+                    CircuitDownloader(application).downloadGrothFiles(registeredCircuitData) { progress, visibility ->
+                        _downloadProgress.value = progress
+                    }
+                } catch (e: Exception) {
+                    ErrorHandler.logError(TAG, "Failed to download Groth files for light registration", e)
+                    throw DownloadCircuitError()
                 }
-            } ?: throw DownloadCircuitError()
-
+            } ?: run {
+                ErrorHandler.logError(TAG, "Circuit file paths are null for light registration")
+                throw DownloadCircuitError()
+            }
+            ErrorHandler.logDebug(TAG, "Light registration circuit files downloaded")
 
             val lightProof = withContext(Dispatchers.Default) {
-                generateLightRegistrationProof(
-                    filePaths, eDocument, pkBytes, registeredCircuitData
-                )
+                try {
+                    generateLightRegistrationProof(
+                        filePaths, eDocument, privateKeyBytes, registeredCircuitData
+                    )
+                } catch (e: Exception) {
+                    ErrorHandler.logError(TAG, "Failed to generate light registration proof", e)
+                    throw e
+                }
             }
+            ErrorHandler.logDebug(TAG, "Light registration proof generated successfully")
 
             _state.value = PassportProofState.CREATING_CONFIDENTIAL_PROFILE
 
-            val registerResponse = registrationManager.lightRegistration(eDocument, lightProof)
+            val registerResponse = try {
+                registrationManager.lightRegistration(eDocument, lightProof)
+            } catch (e: Exception) {
+                ErrorHandler.logError(TAG, "Failed to call lightRegistration API", e)
+                throw e
+            }
             val profile = identityManager.getProfiler()
             val currentIdentityKey = profile.publicKeyHash
 
@@ -266,23 +341,38 @@ class ProofGenerationManager @Inject constructor(
                 UniversalProofFactory.fromLight(registerResponse.data.attributes, lightProof)
 
             val passportInfo = withContext(Dispatchers.IO) {
-                registrationManager.getPassportInfo(eDocument, universalProof)
+                try {
+                    registrationManager.getPassportInfo(eDocument, universalProof)
+                } catch (e: Exception) {
+                    ErrorHandler.logError(TAG, "Failed to get passport info for light registration", e)
+                    null
+                }
             }
-
-            // In new architecture, registration always proceeds to create a new session
-            // Just log the session count for debugging
+            
             if (passportInfo != null) {
-                ErrorHandler.logDebug(TAG, "Passport has ${passportInfo.activeSessionCount} active sessions")
+                val passportInfoKey = passportInfo.component1()
+                if (passportInfoKey?.activeIdentity?.contentEquals(currentIdentityKey) == true) {
+                    ErrorHandler.logDebug(TAG, "Passport is already registered with this PK (light registration)")
+                    registrationManager.setRegistrationProof(universalProof)
+                    identityManager.setLightRegistrationData(registerResponse.data.attributes)
+                    return UniversalProof.fromLight(registerResponse.data.attributes, lightProof)
+                }
             }
+            
             delay(second * 2)
             _state.value = PassportProofState.FINALIZING
             val res = withContext(Dispatchers.IO) {
-                registrationManager.lightRegisterRelayer(lightProof, registerResponse)
+                try {
+                    registrationManager.lightRegisterRelayer(lightProof, registerResponse)
+                } catch (e: Exception) {
+                    ErrorHandler.logError(TAG, "Failed to submit light registration to relayer", e)
+                    throw e
+                }
             }
-            res
             registrationManager.setRegistrationProof(universalProof)
             identityManager.setLightRegistrationData(registerResponse.data.attributes)
             delay(second)
+            ErrorHandler.logDebug(TAG, "Light registration completed successfully")
             return UniversalProof.fromLight(registerResponse.data.attributes, lightProof)
         } catch (e: Exception) {
             ErrorHandler.logError(TAG, "Error in lightRegistration", e)
@@ -410,49 +500,84 @@ class ProofGenerationManager @Inject constructor(
 
         ErrorHandler.logDebug("Plonk", "Plonk Start registration")
 
-        val trustedSetupPath =
+        val circuitData = RegisterNoirCircuitData.fromValue(registerIdentityCircuitType.buildName())
+        if (circuitData == null) {
+            ErrorHandler.logError(TAG, "Circuit data is null for: ${registerIdentityCircuitType.buildName()}")
+            throw IllegalStateException("Circuit data not found for ${registerIdentityCircuitType.buildName()}")
+        }
+
+        val trustedSetupPath = try {
             circuitDownloader.downloadTrustedSetup(onProgressUpdate = { progress, isEnded ->
                 if (progress != _downloadProgress.value) {
                     _downloadProgress.value = progress
                 }
             })
+        } catch (e: Exception) {
+            ErrorHandler.logError(TAG, "Failed to download trusted setup for Plonk", e)
+            throw e
+        }
+        ErrorHandler.logDebug("Plonk", "Trusted setup downloaded to: $trustedSetupPath")
 
-        ErrorHandler.logDebug("Plonk", "Plonk Circuit downloaded")
-
-
-        val circuitData = RegisterNoirCircuitData.fromValue(registerIdentityCircuitType.buildName())
-
-        val byteCodePath =
-            circuitDownloader.downloadNoirByteCode(circuitData = circuitData!!) { progress, isEnded ->
-
+        val byteCodePath = try {
+            circuitDownloader.downloadNoirByteCode(circuitData = circuitData) { progress, isEnded ->
                 if (_downloadProgress.value != progress) {
                     _downloadProgress.value = progress
                 }
             }
-
+        } catch (e: Exception) {
+            ErrorHandler.logError(TAG, "Failed to download Noir bytecode for circuit: ${circuitData.value}", e)
+            throw e
+        }
+        ErrorHandler.logDebug("Plonk", "Noir bytecode downloaded to: $byteCodePath")
 
         _state.value = PassportProofState.APPLYING_ZERO_KNOWLEDGE
 
-        val inputs = buildPlonkRegistrationInputs(eDocument, registerIdentityCircuitType)
+        val inputs = try {
+            buildPlonkRegistrationInputs(eDocument, registerIdentityCircuitType)
+        } catch (e: Exception) {
+            ErrorHandler.logError(TAG, "Failed to build Plonk registration inputs", e)
+            throw e
+        }
+        ErrorHandler.logDebug("Plonk", "Registration inputs built successfully")
 
         return withContext(customDispatcher) {
-            com.grnddsystems.celestials.util.NoirLock.mutex.lock()
             try {
                 val circuitByteCode = File(byteCodePath).readText()
+                if (circuitByteCode.isEmpty()) {
+                    ErrorHandler.logError(TAG, "Circuit bytecode is empty")
+                    throw IllegalStateException("Circuit bytecode is empty")
+                }
 
                 val circuit = Circuit.fromJsonManifest(circuitByteCode)
+                ErrorHandler.logDebug("Plonk", "Circuit loaded from manifest")
 
-                circuit.setupSrs(trustedSetupPath, false)
+                val setupResult = try {
+                    circuit.setupSrs(trustedSetupPath, false)
+                } catch (e: Exception) {
+                    ErrorHandler.logError(TAG, "Failed to setup SRS with trusted setup", e)
+                    throw e
+                }
+                ErrorHandler.logDebug("Plonk", "SRS setup completed")
 
                 ErrorHandler.logDebug("Plonk", "Start proving")
-
-                val proof = circuit.prove(inputs, proofType = "plonk", recursive = false)
+                val proof = try {
+                    circuit.prove(inputs, proofType = "plonk", recursive = false)
+                } catch (e: Exception) {
+                    ErrorHandler.logError(TAG, "Proof generation failed", e)
+                    throw e
+                }
+                if (proof.proof.isNullOrEmpty()) {
+                    ErrorHandler.logError(TAG, "Generated proof is empty")
+                    throw IllegalStateException("Generated proof is empty")
+                }
+                ErrorHandler.logDebug("Plonk", "Proof generated successfully, length: ${proof.proof.length}")
 
                 val zk = UniversalProofFactory.fromPlonkBytes(Numeric.hexStringToByteArray(proof.proof))
-
-                zk
-            } finally {
-                com.grnddsystems.celestials.util.NoirLock.mutex.unlock()
+                ErrorHandler.logDebug("Plonk", "Universal proof created from Plonk bytes")
+                return@withContext zk
+            } catch (e: Exception) {
+                ErrorHandler.logError(TAG, "Error in Plonk proof generation", e)
+                throw e
             }
         }
     }
@@ -467,25 +592,47 @@ class ProofGenerationManager @Inject constructor(
         val circuitDownloader = CircuitDownloader(application)
 
         val filePaths = withContext(Dispatchers.Default) {
-            circuitDownloader.downloadGrothFiles(circuitData) { progress, visibility ->
-                _downloadProgress.value = progress
+            try {
+                circuitDownloader.downloadGrothFiles(circuitData) { progress, visibility ->
+                    _downloadProgress.value = progress
+                }
+            } catch (e: Exception) {
+                ErrorHandler.logError(TAG, "Failed to download Groth circuit files for: ${circuitData.value}", e)
+                throw DownloadCircuitError()
             }
-        } ?: throw DownloadCircuitError()
+        } ?: run {
+            ErrorHandler.logError(TAG, "Circuit file paths are null for: ${circuitData.value}")
+            throw DownloadCircuitError()
+        }
+        ErrorHandler.logDebug(TAG, "Groth circuit files downloaded. Zkey: ${filePaths.zkey}, Dat: ${filePaths.dat}")
 
         ErrorHandler.logDebug(TAG, "Generating Groth registration proof")
 
         _state.value = PassportProofState.APPLYING_ZERO_KNOWLEDGE
 
-        val inputs = buildGrothRegistrationInputs(eDocument, registerIdentityCircuitType)
-        val assetContext: Context = application.createPackageContext("com.grnddsystems.celestials", 0)
+        val inputs = try {
+            buildGrothRegistrationInputs(eDocument, registerIdentityCircuitType)
+        } catch (e: Exception) {
+            ErrorHandler.logError(TAG, "Failed to build Groth registration inputs", e)
+            throw e
+        }
+        ErrorHandler.logDebug(TAG, "Groth registration inputs built successfully, size: ${inputs.size} bytes")
+        
+        val assetContext: Context = application.createPackageContext("com.rarilabs.rarime", 0)
         val assetManager = assetContext.assets
         val zkp = ZKPUseCase(application, assetManager)
 
-        val proof = UniversalProofFactory.fromGroth(
-            generateRegistrationProofByCircuitType(
+        val proof = try {
+            val grothProof = generateRegistrationProofByCircuitType(
                 circuitData, filePaths, zkp, inputs
             )
-        )
+            ErrorHandler.logDebug(TAG, "Groth proof generated successfully")
+            UniversalProofFactory.fromGroth(grothProof)
+        } catch (e: Exception) {
+            ErrorHandler.logError(TAG, "Failed to generate Groth proof", e)
+            throw e
+        }
+        ErrorHandler.logDebug(TAG, "Universal proof created from Groth proof")
         return proof
     }
 
@@ -523,7 +670,7 @@ class ProofGenerationManager @Inject constructor(
         circuitData: RegisteredCircuitData
     ): GrothProof {
         val inputs = Gson().toJson(getLightRegistrationInputs(eDocument, privateKey)).toByteArray()
-        val assetContext: Context = application.createPackageContext("com.grnddsystems.celestials", 0)
+        val assetContext: Context = application.createPackageContext("com.rarilabs.rarime", 0)
         val assetManager = assetContext.assets
         val zkp = ZKPUseCase(application, assetManager)
         return generateLightRegistrationProofByCircuitType(circuitData, filePaths, zkp, inputs)
@@ -548,9 +695,6 @@ class ProofGenerationManager @Inject constructor(
     private suspend fun buildGrothRegistrationInputs(
         eDocument: EDocument, circuitType: RegisterIdentityCircuitType
     ): ByteArray {
-        // Get local copy for smart cast
-        val pkBytes = privateKeyBytes ?: throw IllegalStateException("privateKeyBytes is null")
-
         val gson = GsonBuilder().setPrettyPrinting().create()
         val sodFile = eDocument.getSodFile()
         val cert = sodFile.docSigningCertificate
@@ -559,12 +703,27 @@ class ProofGenerationManager @Inject constructor(
         val x509Utils = X509Util() // Adjust import if needed
 
         val proof = withContext(Dispatchers.IO) {
-            val icao = readICAO(application.applicationContext)
-            val slaveCertificateIndex =
-                x509Utils.getSlaveCertificateIndex(certPem.toByteArray(), icao)
-            val indexHex = slaveCertificateIndex.toHexString()
-            val contract = rarimoContractManager.getPoseidonSMT(certificatesSMTAddress)
-            contract.getProof(indexHex.hexToByteArray()).send()
+            try {
+                val icao = readICAO(application.applicationContext)
+                if (icao == null) {
+                    ErrorHandler.logError(TAG, "Failed to read ICAO master certificate")
+                    throw IllegalStateException("ICAO master certificate not available")
+                }
+                val slaveCertificateIndex =
+                    x509Utils.getSlaveCertificateIndex(certPem.toByteArray(), icao)
+                ErrorHandler.logDebug(TAG, "Fetching SMT proof for certificate index: ${Numeric.toHexString(slaveCertificateIndex)}")
+                val contract = rarimoContractManager.getPoseidonSMT(certificatesSMTAddress)
+                val proofResult = contract.getProof(slaveCertificateIndex).send()
+                if (proofResult == null) {
+                    ErrorHandler.logError(TAG, "SMT proof is null for certificate index")
+                    throw IllegalStateException("SMT proof is null")
+                }
+                ErrorHandler.logDebug(TAG, "SMT proof fetched successfully. Root: ${Numeric.toHexString(proofResult.root)}, Siblings count: ${proofResult.siblings.size}")
+                proofResult
+            } catch (e: Exception) {
+                ErrorHandler.logError(TAG, "Error fetching SMT proof for Groth registration", e)
+                throw e
+            }
         }
 
         val encapsulatedContent = Numeric.hexStringToByteArray(sodFile.readASN1Data())
@@ -620,7 +779,7 @@ class ProofGenerationManager @Inject constructor(
         )
 
         val inputs = RegisterIdentityInputs(
-            skIdentity = Numeric.toHexStringWithPrefix(BigInteger(pkBytes)),
+            skIdentity = Numeric.toHexStringWithPrefix(BigInteger(privateKeyBytes)),
             encapsulatedContent = encapsulatedChunks,
             signedAttributes = signedAttrChunks,
             pubkey = pubKeyChunks,
@@ -637,8 +796,6 @@ class ProofGenerationManager @Inject constructor(
     private suspend fun buildPlonkRegistrationInputs(
         eDocument: EDocument, circuitType: RegisterIdentityCircuitType
     ): Map<String, Any> = withContext(Dispatchers.IO) {
-        // Get local copy for smart cast
-        val pkBytes = privateKeyBytes ?: throw IllegalStateException("privateKeyBytes is null")
 
         val sodFile = eDocument.getSodFile()
         val toHexList: (ByteArray) -> List<String> = { bytes ->
@@ -647,15 +804,31 @@ class ProofGenerationManager @Inject constructor(
 
         coroutineScope {
             val proofDeferred = async {
-                val cert = sodFile.docSigningCertificate
-                val certPem = SecurityUtil.convertToPEM(cert)
-                val icao = readICAO(application.applicationContext)
-                val x509Utils = X509Util()
-                val slaveCertificateIndex =
-                    x509Utils.getSlaveCertificateIndex(certPem.toByteArray(), icao)
-                val contract =
-                    rarimoContractManager.getPoseidonSMT(BaseConfig.CERTIFICATES_SMT_CONTRACT_ADDRESS)
-                contract.getProof(slaveCertificateIndex.toHexString().hexToByteArray()).send()
+                try {
+                    val cert = sodFile.docSigningCertificate
+                    val certPem = SecurityUtil.convertToPEM(cert)
+                    val icao = readICAO(application.applicationContext)
+                    if (icao == null) {
+                        ErrorHandler.logError(TAG, "Failed to read ICAO master certificate for Plonk")
+                        throw IllegalStateException("ICAO master certificate not available")
+                    }
+                    val x509Utils = X509Util()
+                    val slaveCertificateIndex =
+                        x509Utils.getSlaveCertificateIndex(certPem.toByteArray(), icao)
+                    ErrorHandler.logDebug(TAG, "Fetching SMT proof for Plonk certificate index: ${Numeric.toHexString(slaveCertificateIndex)}")
+                    val contract =
+                        rarimoContractManager.getPoseidonSMT(BaseConfig.CERTIFICATES_SMT_CONTRACT_ADDRESS)
+                    val proofResult = contract.getProof(slaveCertificateIndex).send()
+                    if (proofResult == null) {
+                        ErrorHandler.logError(TAG, "SMT proof is null for Plonk certificate index")
+                        throw IllegalStateException("SMT proof is null")
+                    }
+                    ErrorHandler.logDebug(TAG, "SMT proof fetched successfully for Plonk. Root: ${Numeric.toHexString(proofResult.root)}, Siblings count: ${proofResult.siblings.size}")
+                    proofResult
+                } catch (e: Exception) {
+                    ErrorHandler.logError(TAG, "Error fetching SMT proof for Plonk registration", e)
+                    throw e
+                }
             }
 
 
@@ -669,7 +842,7 @@ class ProofGenerationManager @Inject constructor(
             val dg15Deferred = eDocument.dg15?.decodeHexString()?.let(toHexList) ?: listOf()
             val ecDeferred = toHexList(Numeric.hexStringToByteArray(sodFile.readASN1Data()))
             val saDeferred = toHexList(sodFile.eContent)
-            val skIdentityDeferred = Numeric.toHexString(pkBytes)
+            val skIdentityDeferred = Numeric.toHexString(privateKeyBytes)
 
             val proof = proofDeferred.await()
 
@@ -692,12 +865,25 @@ class ProofGenerationManager @Inject constructor(
 
     private fun readICAO(context: Context): ByteArray? {
         return try {
-            val assetContext: Context = context.createPackageContext("com.grnddsystems.celestials", 0)
-            assetContext.assets.open("masters_asset.pem").use { inputStream ->
-                inputStream.readBytes()
+            // Use application context to ensure we get the correct assets
+            val appContext = context.applicationContext ?: context
+            appContext.assets.open("masters_asset.pem").use { inputStream ->
+                val bytes = inputStream.readBytes()
+                if (bytes.isEmpty()) {
+                    ErrorHandler.logError(TAG, "ICAO master certificate file is empty")
+                    return null
+                }
+                ErrorHandler.logDebug(TAG, "Successfully loaded ICAO master certificate (${bytes.size} bytes)")
+                bytes
             }
+        } catch (e: FileNotFoundException) {
+            ErrorHandler.logError(TAG, "ICAO master certificate file not found: masters_asset.pem. Please ensure the file exists in app/src/main/assets/", e)
+            null
         } catch (e: IOException) {
-            ErrorHandler.logError(TAG, "Error reading ICAO", e)
+            ErrorHandler.logError(TAG, "Error reading ICAO master certificate", e)
+            null
+        } catch (e: Exception) {
+            ErrorHandler.logError(TAG, "Unexpected error reading ICAO master certificate", e)
             null
         }
     }

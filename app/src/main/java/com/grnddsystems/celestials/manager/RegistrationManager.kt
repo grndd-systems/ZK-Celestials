@@ -1,29 +1,30 @@
-package com.grnddsystems.celestials.manager
+package com.rarilabs.rarime.manager
 
 import RegisterIdentityCircuitType
 import android.util.Log
 import com.google.gson.Gson
-import com.grnddsystems.celestials.BaseConfig
-import com.grnddsystems.celestials.api.registration.RegistrationAPIManager
-import com.grnddsystems.celestials.api.registration.UserAlreadyRevoked
-import com.grnddsystems.celestials.api.registration.models.VerifySodResponse
-import com.grnddsystems.celestials.contracts.rarimo.PoseidonSMT.Proof
-import com.grnddsystems.celestials.contracts.rarimo.StateKeeper
-import com.grnddsystems.celestials.data.enums.PassportStatus
-import com.grnddsystems.celestials.modules.passportScan.models.EDocument
-import com.grnddsystems.celestials.util.Constants.NOT_ALLOWED_COUNTRIES
-import com.grnddsystems.celestials.util.Dg15FileOwn
-import com.grnddsystems.celestials.util.ErrorHandler
-import com.grnddsystems.celestials.util.data.GrothProof
-import com.grnddsystems.celestials.util.data.UniversalProof
-import com.grnddsystems.celestials.util.decodeHexString
-import com.grnddsystems.celestials.util.publicKeyToPem
+import com.rarilabs.rarime.BaseConfig
+import com.rarilabs.rarime.api.registration.RegistrationAPIManager
+import com.rarilabs.rarime.api.registration.UserAlreadyRevoked
+import com.rarilabs.rarime.api.registration.models.VerifySodResponse
+import com.rarilabs.rarime.contracts.rarimo.PoseidonSMT.Proof
+import com.rarilabs.rarime.contracts.rarimo.StateKeeper
+import com.rarilabs.rarime.data.enums.PassportStatus
+import com.rarilabs.rarime.modules.passportScan.models.EDocument
+import com.rarilabs.rarime.util.Constants.NOT_ALLOWED_COUNTRIES
+import com.rarilabs.rarime.util.Dg15FileOwn
+import com.rarilabs.rarime.util.ErrorHandler
+import com.rarilabs.rarime.util.data.GrothProof
+import com.rarilabs.rarime.util.data.UniversalProof
+import com.rarilabs.rarime.util.decodeHexString
+import com.rarilabs.rarime.util.publicKeyToPem
 import identity.CallDataBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
+import org.web3j.tuples.generated.Tuple2
 import org.web3j.utils.Numeric
 import javax.inject.Inject
 
@@ -104,14 +105,7 @@ class RegistrationManager @Inject constructor(
     ) {
         _eDocument.value = eDocument
 
-        // Log AA signature details
-        ErrorHandler.logDebug("RegistrationManager", "=== AA Signature in register() ===")
-        ErrorHandler.logDebug("RegistrationManager", "aaSignature present: ${eDocument.aaSignature != null}")
-        if (eDocument.aaSignature != null) {
-            ErrorHandler.logDebug("RegistrationManager", "aaSignature: ${Numeric.toHexString(eDocument.aaSignature)}")
-            ErrorHandler.logDebug("RegistrationManager", "aaSignature length: ${eDocument.aaSignature!!.size}")
-        }
-        ErrorHandler.logDebug("RegistrationManager", "dg15 present: ${!eDocument.dg15.isNullOrEmpty()}")
+        ErrorHandler.logDebug("RegistrationManager", "Starting registration. Circuit: $registerIdentityCircuitName, IsRevoking: $isUserRevoking")
 
         val pubKeyPem = if (!eDocument.dg15.isNullOrEmpty()) {
             eDocument.getDg15File()!!.publicKey.publicKeyToPem()
@@ -127,6 +121,7 @@ class RegistrationManager @Inject constructor(
 
         val callData = when (zkProof) {
             is UniversalProof.Groth -> {
+                ErrorHandler.logDebug("RegistrationManager", "Building Groth registration calldata")
                 callDataBuilder.buildRegisterCalldata(
                     zkProof.getProofJson().toByteArray(),
                     eDocument.aaSignature,
@@ -139,6 +134,7 @@ class RegistrationManager @Inject constructor(
             }
 
             is UniversalProof.Light -> {
+                ErrorHandler.logDebug("RegistrationManager", "Building Light registration calldata")
                 callDataBuilder.buildRegisterCalldata(
                     zkProof.getProofJson().toByteArray(),
                     eDocument.aaSignature,
@@ -151,9 +147,7 @@ class RegistrationManager @Inject constructor(
             }
 
             is UniversalProof.Plonk -> {
-
-                Log.i("UniversalProof.Plonk", zkProof.proof.proof)
-
+                ErrorHandler.logDebug("RegistrationManager", "Building Plonk registration calldata")
                 callDataBuilder.buildNoirRegisterCalldata(
                     zkProof.proof.rawProof,
                     eDocument.aaSignature,
@@ -167,10 +161,22 @@ class RegistrationManager @Inject constructor(
         }
 
         withContext(Dispatchers.IO) {
-            val response = relayerRegister(callData, BaseConfig.REGISTER_CONTRACT_ADDRESS)
+            try {
+                ErrorHandler.logDebug("RegistrationManager", "Submitting registration to contract: ${BaseConfig.REGISTER_CONTRACT_ADDRESS}")
+                val response = relayerRegister(callData, BaseConfig.REGISTER_CONTRACT_ADDRESS)
 
-            response.data.attributes.tx_hash.let {
-                rarimoContractManager.checkIsTransactionSuccessful(it)
+                response.data.attributes.tx_hash.let {
+                    ErrorHandler.logDebug("RegistrationManager", "Registration transaction submitted. Tx Hash: $it")
+                    val isSuccessful = rarimoContractManager.checkIsTransactionSuccessful(it)
+                    if (isSuccessful) {
+                        ErrorHandler.logDebug("RegistrationManager", "Registration transaction confirmed successfully")
+                    } else {
+                        ErrorHandler.logError("RegistrationManager", "Registration transaction failed: $it")
+                    }
+                }
+            } catch (e: Exception) {
+                ErrorHandler.logError("RegistrationManager", "Error during registration", e)
+                throw e
             }
         }
     }
@@ -182,17 +188,34 @@ class RegistrationManager @Inject constructor(
     suspend fun getPassportInfo(
         eDocument: EDocument,
         zkProof: UniversalProof,
-    ): StateKeeper.PassportInfo? {
+    ): Tuple2<StateKeeper.PassportInfo, StateKeeper.IdentityInfo>? {
         try {
             val stateKeeperContract = rarimoContractManager.getStateKeeper()
+            ErrorHandler.logDebug("RegistrationManager", "StateKeeper contract loaded: ${BaseConfig.STATE_KEEPER_CONTRACT_ADDRESS}")
 
             val passportInfoKeyBytes =
                 passportManager.getPassportInfoKeyBytes(eDocument, zkProof)
+            ErrorHandler.logDebug("RegistrationManager", "Passport info key: ${org.web3j.utils.Numeric.toHexString(passportInfoKeyBytes)}")
 
             val passportInfo = withContext(Dispatchers.IO) {
-                stateKeeperContract.getPassportInfo(passportInfoKeyBytes).send()
+                try {
+                    stateKeeperContract.getPassportInfo(passportInfoKeyBytes).send()
+                } catch (e: Exception) {
+                    ErrorHandler.logError("RegistrationManager", "Error calling getPassportInfo on contract", e)
+                    throw e
+                }
             }
 
+            if (passportInfo == null) {
+                ErrorHandler.logDebug("RegistrationManager", "Passport info is null - passport not registered")
+                return null
+            }
+
+            val activeIdentity = passportInfo.component1()?.activeIdentity
+            val ZERO_BYTES32 = ByteArray(32) { 0 }
+            val isRegistered = activeIdentity != null && !activeIdentity.contentEquals(ZERO_BYTES32)
+            ErrorHandler.logDebug("RegistrationManager", "Passport registration status: $isRegistered")
+            
             return passportInfo
         } catch (e: Exception) {
             ErrorHandler.logError("RegistrationManager", "Error getting passport info", e)
@@ -251,18 +274,26 @@ class RegistrationManager @Inject constructor(
                 getPassportInfo(eDocument.value!!, registrationProof.value!!)
             }
 
-            // Check if passport has active sessions
-            val hasActiveSessions = passportInfo?.activeSessionCount?.toLong() ?: 0L > 0
+            _activeIdentity.value = passportInfo!!.component1()!!.activeIdentity
 
-            if (hasActiveSessions) {
-                ErrorHandler.logDebug("Revoke", "Passport has active sessions: ${passportInfo?.activeSessionCount}")
+            ErrorHandler.logDebug("ActiveIdentity", _activeIdentity.value.toHexString())
+
+            val ZERO_BYTES32 = ByteArray(32) { 0 }
+            val isUserRevoking =
+                !passportInfo.component1().activeIdentity.contentEquals(ZERO_BYTES32)
+
+            if (isUserRevoking) {
+                ErrorHandler.logDebug("Revoke", "Passport is registered, revoking")
             } else {
-                ErrorHandler.logDebug("Revoke", "Passport has no active sessions")
+                ErrorHandler.logDebug("Revoke", "Passport is not registered")
             }
 
-            // Registration should continue regardless of existing sessions
-            // Multiple devices can have active sessions simultaneously
-            // Return null as challenge is no longer needed in new architecture
+            if (isUserRevoking) {
+                _revocationChallenge.value =
+                    passportInfo.component1().activeIdentity.copyOfRange(24, 32)
+                return@withContext _revocationChallenge.value
+            }
+
             return@withContext null
         }
     }
