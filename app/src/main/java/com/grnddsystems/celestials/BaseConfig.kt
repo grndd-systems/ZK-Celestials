@@ -244,7 +244,7 @@ object TestNetConfig : IConfig {
     override val VOTING_WEBSITE_URL: String = "https://freedomtool.org"
 
     override val NOIR_TRUSTED_SETUP_URL: String =
-        "https://storage.googleapis.com/rarimo-store/trusted-setups/ultraPlonkTrustedSetup.dat"
+        "https://storage.googleapis.com/zk-celestial-store/trusted-setup/ultraPlonkTrustedSetup.dat"
 
 
     override val FACE_REGISTRY_ADDRESS: String = "0x3C0f27AC1817820C1BA41337B53090652aE4F448"
@@ -528,7 +528,7 @@ object MainnetConfig : IConfig {
     override val VOTING_WEBSITE_URL: String = "https://freedomtool.org"
 
     override val NOIR_TRUSTED_SETUP_URL: String =
-        "https://storage.googleapis.com/rarimo-store/trusted-setups/ultraPlonkTrustedSetup.dat"
+        "https://storage.googleapis.com/zk-celestial-store/trusted-setup/ultraPlonkTrustedSetup.dat"
 
 
     override val FACE_REGISTRY_ADDRESS: String = "0x3C0f27AC1817820C1BA41337B53090652aE4F448"
@@ -754,6 +754,6 @@ object MainnetConfig : IConfig {
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_26_512_3_2_336_248_1_1384_2_256.json"
 
     override val queryIdentity: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/vv0.1.0/queryIdentity.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/queryIdentity.json"
 
 }
