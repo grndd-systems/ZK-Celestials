@@ -1,0 +1,679 @@
+package com.rarilabs.celestial.modules.main
+
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.core.net.toUri
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
+import com.rarilabs.celestial.R
+import com.rarilabs.celestial.api.ext_integrator.ext_int_action_preview.ExtIntActionPreview
+import com.rarilabs.celestial.api.voting.models.MOCKED_POLL_ITEM
+import com.rarilabs.celestial.data.enums.SecurityCheckState
+import com.rarilabs.celestial.modules.faq.FAQScreen
+import com.rarilabs.celestial.modules.home.v3.HomeScreenV3
+import com.rarilabs.celestial.modules.intro.IntroLegalScreen
+import com.rarilabs.celestial.modules.main.guards.AuthGuard
+import com.rarilabs.celestial.modules.maintenance.MaintenanceScreen
+import com.rarilabs.celestial.modules.notifications.NotificationsScreen
+import com.rarilabs.celestial.modules.passportScan.ScanPassportScreen
+import com.rarilabs.celestial.modules.passportVerify.VerifyPassportScreen
+import com.rarilabs.celestial.modules.profile.AppIconScreen
+import com.rarilabs.celestial.modules.profile.AuthMethodScreen
+import com.rarilabs.celestial.modules.profile.ExportKeysScreen
+import com.rarilabs.celestial.modules.profile.LanguageScreen
+import com.rarilabs.celestial.modules.profile.ProfileScreen
+import com.rarilabs.celestial.modules.profile.ThemeScreen
+import com.rarilabs.celestial.modules.register.NewIdentityScreen
+import com.rarilabs.celestial.modules.security.EnableBiometricsScreen
+import com.rarilabs.celestial.modules.security.EnablePasscodeScreen
+import com.rarilabs.celestial.modules.security.LockScreen
+import com.rarilabs.celestial.modules.security.SetupPasscode
+import com.rarilabs.celestial.modules.votes.voteProcessScreen.VoteProcessScreen
+import com.rarilabs.celestial.modules.wallet.WalletReceiveScreen
+import com.rarilabs.celestial.modules.wallet.WalletScreen
+import com.rarilabs.celestial.modules.wallet.WalletSendScreen
+import com.rarilabs.celestial.modules.you.ZkIdentityDebugScreen
+import com.rarilabs.celestial.modules.you.ZkIdentityScreen
+import com.rarilabs.celestial.modules.you.ZkIdentityScreenViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.rarilabs.celestial.ui.components.AppWebView
+import com.rarilabs.celestial.ui.components.CongratsInvitationModalContent
+import com.rarilabs.celestial.util.AppIconUtil
+import com.rarilabs.celestial.util.BiometricUtil
+import com.rarilabs.celestial.util.Constants
+import com.rarilabs.celestial.util.ErrorHandler
+import com.rarilabs.celestial.util.LocaleUtil
+import com.rarilabs.celestial.util.Screen
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun MainScreenRoutes(
+    navController: NavHostController,
+    simpleNavigate: (String) -> Unit,
+    navigateWithPopUp: (String) -> Unit,
+) {
+    val mainViewModel = LocalMainViewModel.current
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    var savedNextNavScreen by remember { mutableStateOf<String?>(null) }
+    val appIcon by mainViewModel.appIcon.collectAsState()
+
+    val isLocked by mainViewModel.isScreenLocked.collectAsState()
+
+    val extIntDataURI by mainViewModel.extIntDataURI.collectAsState()
+
+    var extIntDataURIState: Pair<Uri?, Long>? by remember {
+        mutableStateOf(
+            null
+        )
+    }
+
+    LaunchedEffect(extIntDataURI) {
+        if (!isLocked) {
+            if (extIntDataURIState?.second != extIntDataURI?.second) {
+                extIntDataURIState = extIntDataURI
+
+            }
+        }
+    }
+
+
+    fun navigateWithSavedNextNavScreen(route: String) {
+        savedNextNavScreen?.let {
+            navigateWithPopUp(savedNextNavScreen!!)
+            savedNextNavScreen = null
+        } ?: run {
+            navigateWithPopUp(route)
+        }
+    }
+
+    key(extIntDataURIState?.second) {
+        extIntDataURIState?.first?.let { uri ->
+            ExtIntActionPreview(navigate = navigateWithPopUp, dataUri = uri, onError = {
+                extIntDataURIState = null
+                mainViewModel.setExtIntDataURI(null)
+            }, onCancel = {
+                extIntDataURIState = null
+                mainViewModel.setExtIntDataURI(null)
+            }, onSuccess = { extDestination, localDestination ->
+                if (!extDestination.isNullOrEmpty()) {
+                    val intent = Intent(Intent.ACTION_VIEW, extDestination.toUri())
+
+                    try {
+                        context.startActivity(intent)
+                    } catch (e: ActivityNotFoundException) {
+                        Toast.makeText(
+                            context, "No app available to open this link.", Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                if (!localDestination.isNullOrEmpty()) {
+                    navigateWithPopUp(localDestination)
+                }
+                extIntDataURIState = null
+                mainViewModel.setExtIntDataURI(null)
+            })
+        }
+    }
+
+
+
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Loading.route,
+        enterTransition = { fadeIn(animationSpec = tween(0)) },
+        exitTransition = { fadeOut(animationSpec = tween(0)) },
+    ) {
+
+        composable(Screen.Loading.route) {
+            val appLoadingState by mainViewModel.appLoadingStates.collectAsState()
+            val isScreenLocked by mainViewModel.isScreenLocked.collectAsState()
+
+            // Track if we've shown the splash for 2 seconds
+            var hasShownSplash by remember { mutableStateOf(false) }
+
+            // Wait 2 seconds before allowing navigation
+            LaunchedEffect(Unit) {
+                delay(2000)
+                hasShownSplash = true
+            }
+
+            LaunchedEffect(appLoadingState, isScreenLocked, hasShownSplash) {
+                // Only navigate after splash has been shown for 2 seconds
+                // Note: Private key is now automatically generated in initApp() if missing
+                if (!hasShownSplash) return@LaunchedEffect
+
+                when (appLoadingState) {
+                    AppLoadingStates.MAINTENANCE -> {
+                        navController.navigate(Screen.Maintenance.route) {
+                            popUpTo(Screen.Loading.route) { inclusive = true }
+                        }
+                    }
+
+                    AppLoadingStates.LOAD_FAILED -> {
+                        navController.navigate(Screen.LoadFailed.route) {
+                            popUpTo(Screen.Loading.route) { inclusive = true }
+                        }
+                    }
+
+                    AppLoadingStates.LOADED -> {
+                        delay(50)
+
+                        // Key is now automatically generated in initApp() if missing
+                        // Skip intro screen and go directly to main screen
+                        val destination = when {
+                            extIntDataURI != null -> Screen.ExtIntegrator.route
+                            else -> Screen.Main.Home.route
+                        }
+
+
+                        navController.navigate(destination) {
+                            popUpTo(Screen.Loading.route) { inclusive = true }
+                        }
+                    }
+
+                    AppLoadingStates.LOADING -> {
+                    }
+                }
+            }
+            AppLoadingScreen()
+        }
+
+        composable(Screen.Maintenance.route) {
+            MaintenanceScreen()
+        }
+
+        composable(Screen.LoadFailed.route) {
+            AppLoadingFailedScreen()
+        }
+
+        // Intro screen removed - key is now auto-generated on first launch
+        // Keeping route commented out in case it's referenced elsewhere
+        // composable(Screen.Intro.route) { ... }
+
+        navigation(
+            startDestination = Screen.Register.NewIdentity.route, route = Screen.Register.route
+        ) {
+            composable(Screen.Register.NewIdentity.route) {
+                ScreenInsetsContainer {
+                    NewIdentityScreen(onNext = {
+                        coroutineScope.launch {
+                            mainViewModel.finishIntro()
+                            navigateWithPopUp(Screen.Main.Home.route)
+                        }
+
+                    }, onBack = { navController.popBackStack() })
+                }
+            }
+            composable(Screen.Register.ImportIdentity.route) {
+                ScreenInsetsContainer {
+                    NewIdentityScreen(
+                        isImporting = true,
+                        onBack = { navController.popBackStack() },
+                        onNext = {
+                            coroutineScope.launch {
+                                mainViewModel.finishIntro()
+                                navigateWithPopUp(Screen.Main.Home.route)
+                            }
+
+                        },
+                    )
+                }
+            }
+        }
+
+        navigation(
+            startDestination = Screen.Passcode.EnablePasscode.route, route = Screen.Passcode.route
+        ) {
+            composable(Screen.Passcode.EnablePasscode.route) {
+                ScreenInsetsContainer {
+                    EnablePasscodeScreen(
+                        onNext = { simpleNavigate(Screen.Passcode.AddPasscode.route) },
+                        onSkip = {
+                            mainViewModel.updatePasscodeState(SecurityCheckState.DISABLED)
+                            navigateWithSavedNextNavScreen(Screen.Main.route)
+                        })
+                }
+            }
+
+            composable(Screen.Passcode.AddPasscode.route) {
+                ScreenInsetsContainer {
+                    SetupPasscode(onPasscodeChange = {
+                        if (BiometricUtil.isSupported(context)) {
+                            navigateWithPopUp(Screen.EnableBiometrics.route)
+                        } else {
+                            mainViewModel.updateBiometricsState(SecurityCheckState.DISABLED)
+                            navigateWithPopUp(Screen.Main.route)
+                        }
+                    }, onClose = {
+                        navController.popBackStack(
+                            Screen.Passcode.EnablePasscode.route, false
+                        )
+                    })
+                }
+            }
+        }
+
+        composable(Screen.NotificationsList.route) {
+            ScreenInsetsContainer {
+                NotificationsScreen(onBack = { navController.popBackStack() })
+            }
+        }
+
+        composable(Screen.EnableBiometrics.route) {
+            ScreenInsetsContainer {
+                EnableBiometricsScreen(onNext = {
+                    navigateWithSavedNextNavScreen(Screen.Main.route)
+                }, onSkip = {
+                    navigateWithSavedNextNavScreen(Screen.Main.route)
+                })
+            }
+        }
+
+        composable(Screen.Lock.route) {
+            ScreenInsetsContainer {
+                LockScreen(
+                    onPass = { it ->
+                        navController.popBackStack()
+                        val route = savedNextNavScreen ?: Screen.Main.Home.route
+
+                        navController.navigate(route) {
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                        if (extIntDataURI != null) {
+                            extIntDataURIState = extIntDataURI
+                        }
+                        savedNextNavScreen = null
+                    })
+            }
+        }
+
+        //Scan Flow
+
+        composable(Screen.ScanPassport.ScanPassportPoints.route) {
+            ScreenInsetsContainer {
+                ScanPassportScreen(onClose = {
+                    coroutineScope.launch {
+                        navigateWithPopUp(Screen.Main.Identity.route)
+                    }
+                }, onClaim = {
+                    coroutineScope.launch {
+                        navigateWithPopUp(Screen.Claim.Reserve.route)
+                    }
+                }, setVisibilityOfBottomBar = {})
+            }
+        }
+
+        composable(Screen.Claim.Reserve.route) {
+            VerifyPassportScreen(
+                onSendError = { navigateWithPopUp(Screen.Main.Profile.route) },
+                onFinish = {
+                    navigateWithPopUp(Screen.Main.route)
+                })
+        }
+
+
+        navigation(
+            startDestination = Screen.Main.Home.route, route = Screen.Main.route
+        ) {
+
+            composable(Screen.Main.Home.route) {
+                SharedTransitionLayout {
+                    AuthGuard(navigate = simpleNavigate) {
+                        HomeScreenV3(
+                            navigate = simpleNavigate,
+                            navigateWithPopUp = navigateWithPopUp,
+                            sharedTransitionScope = this@SharedTransitionLayout,
+                            setVisibilityOfBottomBar = { mainViewModel.setBottomBarVisibility(it) },
+                        )
+                    }
+                }
+            }
+
+            composable(Screen.Main.DebugIdentity.route) {
+                AuthGuard(navigate = simpleNavigate) {
+                    ZkIdentityDebugScreen(
+                        navigate = simpleNavigate,
+                        onClose = {
+                            coroutineScope.launch {
+                                navigateWithPopUp(Screen.Main.route)
+                            }
+                        },
+                        setBottomBarVisibility = { mainViewModel.setBottomBarVisibility(it) })
+                }
+            }
+
+            composable(Screen.Main.Identity.route) {
+                AuthGuard(navigate = simpleNavigate) {
+                    IdentityScreenWithLegalFlow(
+                        navigate = simpleNavigate,
+                        onClose = {
+                            coroutineScope.launch {
+                                navigateWithPopUp(Screen.Main.route)
+                            }
+                        },
+                        onClaim = {
+                            coroutineScope.launch {
+                                navigateWithPopUp(Screen.Claim.Specific.route)
+                            }
+                        },
+                        setBottomBarVisibility = { mainViewModel.setBottomBarVisibility(it) }
+                    )
+                }
+            }
+
+            composable(
+                Screen.Main.Vote.route,
+                arguments = listOf(navArgument("vote_id") { type = NavType.StringType }),
+            ) { backStackEntry ->
+                val voteId = backStackEntry.arguments?.getString("vote_id")
+
+
+                voteId?.let {
+                    VoteProcessScreen(
+                        selectedPoll = MOCKED_POLL_ITEM,
+                        onBackClick = { navController.popBackStack() },
+                        onVote = {})
+                } ?: run {
+                    navigateWithPopUp(Screen.Main.Home.route)
+                }
+            }
+
+            composable(Screen.Main.Wallet.route) {
+                AuthGuard(navigate = navigateWithPopUp) {
+                    ScreenInsetsContainer {
+                        WalletScreen(navigate = { simpleNavigate(it) })
+                    }
+                }
+            }
+            composable(Screen.Main.Wallet.Receive.route) {
+                AuthGuard(navigate = navigateWithPopUp) {
+                    ScreenInsetsContainer {
+                        WalletReceiveScreen(onBack = { navController.popBackStack() })
+                    }
+                }
+            }
+            composable(Screen.Main.Wallet.Send.route) {
+                AuthGuard(navigate = navigateWithPopUp) {
+                    ScreenInsetsContainer {
+                        WalletSendScreen(onBack = { navController.popBackStack() })
+                    }
+                }
+            }
+            composable(Screen.Main.Profile.route) {
+                AuthGuard(navigate = navigateWithPopUp) {
+                    ScreenInsetsContainer {
+                        ProfileScreen(
+                            appIcon = appIcon, navigate = { simpleNavigate(it) })
+                    }
+                }
+            }
+            composable(Screen.Main.Profile.AuthMethod.route) {
+                AuthGuard(navigate = navigateWithPopUp) {
+                    ScreenInsetsContainer {
+                        AuthMethodScreen(onBack = { navController.popBackStack() })
+                    }
+                }
+            }
+
+            composable(Screen.Main.Profile.ExportKeys.route) {
+                AuthGuard(navigate = navigateWithPopUp) {
+                    ScreenInsetsContainer {
+                        ExportKeysScreen({ navController.popBackStack() })
+                    }
+                }
+            }
+            composable(Screen.Main.Profile.Language.route) {
+                AuthGuard(navigate = navigateWithPopUp) {
+                    ScreenInsetsContainer {
+                        LanguageScreen(onLanguageChange = {
+                            LocaleUtil.updateLocale(context, it.localeTag)
+                        }, onBack = { navController.popBackStack() })
+                    }
+                }
+            }
+
+            composable(Screen.Main.Profile.Theme.route) {
+                AuthGuard(navigate = navigateWithPopUp) {
+                    ScreenInsetsContainer {
+                        ThemeScreen(onBack = { navController.popBackStack() })
+                    }
+                }
+            }
+
+            composable(Screen.Main.Profile.AppIcon.route) {
+                AuthGuard(navigate = navigateWithPopUp) {
+                    ScreenInsetsContainer {
+                        AppIconScreen(appIcon = appIcon, onAppIconChange = {
+                            mainViewModel.setAppIcon(it)
+                            AppIconUtil.setIcon(context, it)
+                        }, onBack = { navController.popBackStack() })
+                    }
+                }
+            }
+            composable(Screen.Main.Profile.Terms.route) {
+                AuthGuard(navigate = navigateWithPopUp) {
+                    ScreenInsetsContainer {
+                        AppWebView(
+                            title = stringResource(R.string.terms_of_use),
+                            url = Constants.TERMS_URL,
+                            onBack = { navController.popBackStack() })
+                    }
+                }
+            }
+            //added faq navcontroller
+            composable("faq") {
+                FAQScreen(navController = navController)
+            }
+            composable(Screen.Main.Profile.Privacy.route) {
+                AuthGuard(navigate = navigateWithPopUp) {
+                    ScreenInsetsContainer {
+                        AppWebView(
+                            title = stringResource(R.string.privacy_policy),
+                            url = Constants.PRIVACY_URL,
+                            onBack = { navController.popBackStack() })
+                    }
+                }
+            }
+        }
+
+        composable(
+            route = Screen.Invitation.route, arguments = listOf(
+                navArgument("code") {
+                    type = NavType.StringType
+                })
+        ) { entry ->
+            val code = entry.arguments?.getString("code")
+            AuthGuard(
+                init = {
+                    code?.let {
+                        savedNextNavScreen = Screen.Invitation.route.replace("{code}", code)
+                    } ?: run {
+                        savedNextNavScreen = Screen.Main.route
+                    }
+                },
+                navigate = navigateWithPopUp,
+            ) {
+                AcceptInvitation(code = code, onFinish = {
+                    mainViewModel.setModalVisibility(true)
+                    mainViewModel.setModalContent {
+                        CongratsInvitationModalContent(
+                            onClose = {
+                                mainViewModel.setModalVisibility(false)
+                            })
+                    }
+
+                    navigateWithPopUp(Screen.Main.Home.route)
+                }, onError = { navigateWithPopUp(Screen.Main.Home.route) })
+            }
+        }
+
+        composable(
+            route = Screen.ExtIntegrator.route,
+        ) {
+            AuthGuard(init = {
+                savedNextNavScreen = Screen.Main.Home.route
+            }, navigate = navigateWithPopUp, content = {
+                LaunchedEffect(Unit) {
+                    extIntDataURIState = extIntDataURI
+                }
+            })
+        }
+
+    }
+}
+// changed main routes with identity
+private enum class IdentityLegalScreenStep {
+    TERMS,
+    PRIVACY,
+    IDENTITY
+}
+
+@Composable
+fun IdentityScreenWithLegalFlow(
+    navigate: (String) -> Unit,
+    onClose: () -> Unit,
+    onClaim: () -> Unit,
+    setBottomBarVisibility: (Boolean) -> Unit,
+    viewModel: ZkIdentityScreenViewModel = hiltViewModel()
+) {
+    val hasShownLegalScreens = remember { viewModel.getIdentityLegalScreensShown() }
+    var currentStep by remember { mutableStateOf<IdentityLegalScreenStep?>(
+        if (hasShownLegalScreens) IdentityLegalScreenStep.IDENTITY else IdentityLegalScreenStep.TERMS
+    ) }
+
+    // Hide bottom bar immediately when showing legal screens (runs during composition)
+    SideEffect {
+        when (currentStep) {
+            IdentityLegalScreenStep.TERMS, IdentityLegalScreenStep.PRIVACY -> {
+                setBottomBarVisibility(false)
+            }
+            IdentityLegalScreenStep.IDENTITY -> {
+                setBottomBarVisibility(true)
+            }
+            null -> {
+                setBottomBarVisibility(true)
+            }
+        }
+    }
+
+    // Also use LaunchedEffect to ensure it persists after MainScreen's automatic behavior
+    LaunchedEffect(currentStep) {
+        // Small delay to ensure this runs after MainScreen's LaunchedEffect
+        kotlinx.coroutines.delay(10)
+        when (currentStep) {
+            IdentityLegalScreenStep.TERMS, IdentityLegalScreenStep.PRIVACY -> {
+                setBottomBarVisibility(false)
+            }
+            IdentityLegalScreenStep.IDENTITY -> {
+                setBottomBarVisibility(true)
+            }
+            null -> {
+                setBottomBarVisibility(true)
+            }
+        }
+    }
+
+    when (currentStep) {
+        IdentityLegalScreenStep.TERMS -> {
+            IntroLegalScreen(
+                url = "https://rarime.com/general-terms.html",
+                title = "Terms of Use",
+                onAgree = {
+                    currentStep = IdentityLegalScreenStep.PRIVACY
+                }
+            )
+        }
+        IdentityLegalScreenStep.PRIVACY -> {
+            IntroLegalScreen(
+                url = "https://rarime.com/privacy-notice.html",
+                title = "Privacy Policy",
+                onAgree = {
+                    viewModel.saveIdentityLegalScreensShown(true)
+                    currentStep = IdentityLegalScreenStep.IDENTITY
+                }
+            )
+        }
+        IdentityLegalScreenStep.IDENTITY -> {
+            ZkIdentityScreen(
+                navigate = navigate,
+                onClose = onClose,
+                onClaim = onClaim,
+                setBottomBarVisibility = setBottomBarVisibility
+            )
+        }
+        null -> {
+            // This shouldn't happen, but handle it gracefully
+            ZkIdentityScreen(
+                navigate = navigate,
+                onClose = onClose,
+                onClaim = onClaim,
+                setBottomBarVisibility = setBottomBarVisibility
+            )
+        }
+    }
+}
+
+@Composable
+fun AcceptInvitation(
+    onFinish: () -> Unit, onError: () -> Unit, code: String?
+) {
+    val mainViewModel = LocalMainViewModel.current
+
+    val scope = rememberCoroutineScope()
+
+    suspend fun acceptInvitation() {
+        ErrorHandler.logDebug("MainScreen", "acceptInvitation: $code")
+        try {
+            code?.let {
+                mainViewModel.acceptInvitation(code)
+
+                //mainViewModel.loadUserDetails()
+
+                onFinish()
+            } ?: run {
+                throw Exception("No code provided")
+            }
+        } catch (e: Exception) {
+            ErrorHandler.logError("MainScreen", "acceptInvitation: $e", e)
+            onError()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        scope.launch {
+            acceptInvitation()
+        }
+    }
+
+    AppLoadingScreen()
+}

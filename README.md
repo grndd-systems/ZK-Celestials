@@ -12,7 +12,7 @@ Rarimo App is a self-custody identity wallet, that unlocks private but verifiabl
 
 Requires Android 8.1 or higher.
 
-[![Google Play Image](https://rarime-landing-test.netlify.app/images/google-play.svg)](https://play.google.com/store/apps/details?id=com.rarilabs.rarime)
+[![Google Play Image](https://rarime-landing-test.netlify.app/images/google-play.svg)](https://play.google.com/store/apps/details?id=com.rarilabs.celestial)
 
 
 ## Features
