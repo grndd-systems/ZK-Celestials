@@ -4,11 +4,11 @@ plugins {
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
     id("kotlin-parcelize")
-    // id("com.google.gms.google-services")  // commented for testing-debugging
+    id("com.google.gms.google-services")  // Required for Firebase
 }
 
 android {
-    namespace = "com.rarilabs.rarime"
+    namespace = "com.grnddsystems.celestials"
     compileSdk = 35
 
     bundle {
@@ -27,7 +27,7 @@ android {
 
     defaultConfig {
 
-        applicationId = "com.rarilabs.rarime"
+        applicationId = "com.grnddsystems.celestials"
         minSdk = 27
         targetSdk = 35
         versionCode = 121
@@ -218,6 +218,10 @@ dependencies {
     implementation(files("libs/bionet-release.aar"))
     implementation(files("libs/noir.aar"))
 
+    // WebRTC Library
+    implementation(files("libs/webrtc-core.aar"))
+    implementation(files("libs/webrtc-firebase.aar"))
+
     // QR Code
     implementation("com.google.mlkit:barcode-scanning:17.3.0")
     implementation("network.chaintech:qr-kit:1.0.6")
@@ -262,7 +266,7 @@ dependencies {
     implementation("com.google.firebase:firebase-core:9.6.1")
 
     implementation("com.google.android.gms:play-services-auth:20.7.0")
-    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.apis:google-api-services-drive:v3-rev20220815-2.0.0")
     implementation("com.google.api-client:google-api-client:2.0.0")
     implementation("com.google.api-client:google-api-client-android:1.32.1")
@@ -272,6 +276,12 @@ dependencies {
     implementation("androidx.hilt:hilt-work:1.0.0") // ?
     implementation("androidx.work:work-runtime-ktx:2.9.1")
     implementation("com.google.firebase:firebase-messaging:24.0.1")
+
+    // Firebase Realtime Database for WebRTC signaling
+    implementation("com.google.firebase:firebase-database-ktx")
+
+    // WebRTC
+    implementation("io.github.webrtc-sdk:android:125.6422.04")
 
 
 
