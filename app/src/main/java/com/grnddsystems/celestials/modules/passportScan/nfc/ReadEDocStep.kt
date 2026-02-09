@@ -1,4 +1,4 @@
-package com.rarilabs.rarime.modules.passportScan.nfc
+package com.grnddsystems.celestials.modules.passportScan.nfc
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -29,18 +29,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.rarilabs.rarime.R
-import com.rarilabs.rarime.manager.ScanNFCState
-import com.rarilabs.rarime.modules.passportScan.ScanPassportLayout
-import com.rarilabs.rarime.modules.passportScan.components.ScanGuidesTrigger
-import com.rarilabs.rarime.modules.passportScan.components.SpecificPassportGuide
-import com.rarilabs.rarime.modules.passportScan.models.EDocument
-import com.rarilabs.rarime.modules.passportScan.models.ReadEDocStepViewModel
-import com.rarilabs.rarime.ui.base.ButtonSize
-import com.rarilabs.rarime.ui.components.AppBottomSheet
-import com.rarilabs.rarime.ui.components.PrimaryButton
-import com.rarilabs.rarime.ui.components.rememberAppSheetState
-import com.rarilabs.rarime.ui.theme.RarimeTheme
+import com.grnddsystems.celestials.R
+import com.grnddsystems.celestials.manager.ScanNFCState
+import com.grnddsystems.celestials.modules.passportScan.ScanPassportLayout
+import com.grnddsystems.celestials.modules.passportScan.components.ScanGuidesTrigger
+import com.grnddsystems.celestials.modules.passportScan.components.SpecificPassportGuide
+import com.grnddsystems.celestials.modules.passportScan.models.EDocument
+import com.grnddsystems.celestials.modules.passportScan.models.ReadEDocStepViewModel
+import com.grnddsystems.celestials.ui.base.ButtonSize
+import com.grnddsystems.celestials.ui.components.AppBottomSheet
+import com.grnddsystems.celestials.ui.components.PrimaryButton
+import com.grnddsystems.celestials.ui.components.rememberAppSheetState
+import com.grnddsystems.celestials.ui.theme.RarimeTheme
 import net.sf.scuba.data.Gender
 import okio.IOException
 import org.jmrtd.lds.icao.MRZInfo

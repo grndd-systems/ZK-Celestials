@@ -176,26 +176,65 @@ private fun TabItem(
         )
     }
 }
-
-// added function to open to send email
 private fun openEmailClient(
     context: Context,
     email: String,
     subject: String,
     body: String
 ) {
-    val intent = Intent(Intent.ACTION_SENDTO).apply {
-        data = Uri.parse("mailto:$email")
+    // Method 1: Try direct mailto with parameters
+    val mailtoUri = "mailto:$email?subject=${Uri.encode(subject)}&body=${Uri.encode(body)}"
+    val emailIntent = Intent(Intent.ACTION_VIEW, Uri.parse(mailtoUri)).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    // Method 2: Fallback to SENDTO
+    val sendToIntent = Intent(Intent.ACTION_SENDTO).apply {
+        data = Uri.parse("mailto:")
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
         putExtra(Intent.EXTRA_SUBJECT, subject)
         putExtra(Intent.EXTRA_TEXT, body)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    // Method 3: Last resort - SEND with rfc822
+    val sendIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "message/rfc822"
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+        putExtra(Intent.EXTRA_SUBJECT, subject)
+        putExtra(Intent.EXTRA_TEXT, body)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 
     try {
-        context.startActivity(Intent.createChooser(intent, "Send Email"))
-    } catch (e: Exception) {
-        Toast.makeText(context, "No email client found", Toast.LENGTH_SHORT).show()
+        // Try METHOD 1 first (most direct)
+        context.startActivity(emailIntent)
+    } catch (e1: Exception) {
+        try {
+            // Try METHOD 2 (with chooser to exclude PayPal)
+            val packageManager = context.packageManager
+            val activities = packageManager.queryIntentActivities(sendToIntent, 0)
+
+            if (activities.isNotEmpty()) {
+                val chooser = Intent.createChooser(sendToIntent, "Send Email")
+                context.startActivity(chooser)
+            } else {
+                // Try METHOD 3 as last resort
+                val activities3 = packageManager.queryIntentActivities(sendIntent, 0)
+                if (activities3.isNotEmpty()) {
+                    val chooser = Intent.createChooser(sendIntent, "Send Email")
+                    context.startActivity(chooser)
+                } else {
+                    Toast.makeText(context, "No email app found. Install Gmail or Outlook.", Toast.LENGTH_LONG).show()
+                }
+            }
+        } catch (e2: Exception) {
+            Toast.makeText(context, "Failed to open email client", Toast.LENGTH_SHORT).show()
+            android.util.Log.e("BottomTabBar", "All email methods failed", e2)
+        }
     }
 }
+
 @Preview
 @Composable
 private fun BottomTabBarPreview() {

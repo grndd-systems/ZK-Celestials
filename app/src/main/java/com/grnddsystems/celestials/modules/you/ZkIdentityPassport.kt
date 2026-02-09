@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -18,19 +19,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.grnddsystems.celestials.R
 import com.grnddsystems.celestials.data.enums.PassportCardLook
 import com.grnddsystems.celestials.data.enums.PassportIdentifier
 import com.grnddsystems.celestials.data.enums.PassportStatus
+import com.grnddsystems.celestials.manager.PassportProofState
 import com.grnddsystems.celestials.modules.main.LocalMainViewModel
 import com.grnddsystems.celestials.modules.main.ScreenInsets
 import com.grnddsystems.celestials.modules.passportScan.models.EDocument
 import com.grnddsystems.celestials.modules.passportScan.models.PersonDetails
 import com.grnddsystems.celestials.ui.theme.RarimeTheme
 import com.grnddsystems.celestials.util.ErrorHandler
+import com.grnddsystems.celestials.util.ProofNotificationHelper
 
 @Composable
 fun ZkIdentityPassport(
@@ -50,6 +57,42 @@ fun ZkIdentityPassport(
 
     val retryRegistration = homeViewModel::retryRegistration
 
+    // ← ДОДАНО: Context і Lifecycle для нотифікації
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    // ← ДОДАНО: Відстеження lifecycle для нотифікації під час APPLYING_ZERO_KNOWLEDGE
+    DisposableEffect(lifecycleOwner, registrationStatus.loadingState) {
+        val observer = LifecycleEventObserver { _, event ->
+            // Показувати нотифікацію тільки на етапі APPLYING_ZERO_KNOWLEDGE
+            val isApplyingZK = registrationStatus.loadingState == PassportProofState.APPLYING_ZERO_KNOWLEDGE
+            val isUnregistered = registrationStatus.passportStatus == PassportStatus.UNREGISTERED
+
+            when (event) {
+                Lifecycle.Event.ON_PAUSE -> {
+                    // App goes to background - show notification if applying ZK
+                    if (isApplyingZK && isUnregistered) {
+                        ProofNotificationHelper.showPassportProofNotification(context)
+                        Log.d("PassportProof", "→ Notification shown (APPLYING_ZK)")
+                    }
+                }
+                Lifecycle.Event.ON_RESUME -> {
+                    // App returns to foreground - cancel notification
+                    ProofNotificationHelper.cancelPassportProofNotification(context)
+                    Log.d("PassportProof", "→ Notification cancelled (app resumed)")
+                }
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            // Cancel notification when component is disposed
+            ProofNotificationHelper.cancelPassportProofNotification(context)
+        }
+    }
+
     LaunchedEffect(Unit) {
         Log.i("Status", passportStatus.name)
         if (passportStatus == PassportStatus.UNREGISTERED) {
@@ -62,6 +105,14 @@ fun ZkIdentityPassport(
             }
         } else if (passportStatus == PassportStatus.ALREADY_REGISTERED_BY_OTHER_PK) {
             homeViewModel.setAlreadyRegisteredByOtherPK()
+        }
+    }
+
+    // ← ДОДАНО: Відміна нотифікації після завершення proof generation
+    LaunchedEffect(registrationStatus.passportStatus) {
+        if (registrationStatus.passportStatus != PassportStatus.UNREGISTERED) {
+            ProofNotificationHelper.cancelPassportProofNotification(context)
+            Log.d("PassportProof", "→ Notification cancelled (registration complete)")
         }
     }
 
@@ -108,13 +159,6 @@ fun ZkIdentityPassportContent(
                 style = RarimeTheme.typography.subtitle4,
                 color = RarimeTheme.colors.textPrimary
             )
-//            Column(
-//                Modifier
-//                    .clip(RoundedCornerShape(100.dp))
-//                    .background(RarimeTheme.colors.componentPrimary)
-//            ) {
-//                AppIcon(modifier = Modifier.padding(10.dp), id = R.drawable.ic_plus)
-//            }
         }
 
         Column(Modifier.padding(start = 12.dp, end = 12.dp, top = 20.dp)) {

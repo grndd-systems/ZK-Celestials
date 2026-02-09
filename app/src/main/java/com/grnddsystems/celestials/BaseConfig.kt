@@ -244,7 +244,7 @@ object TestNetConfig : IConfig {
     override val VOTING_WEBSITE_URL: String = "https://freedomtool.org"
 
     override val NOIR_TRUSTED_SETUP_URL: String =
-        "https://storage.googleapis.com/rarimo-store/trusted-setups/ultraPlonkTrustedSetup.dat"
+        "https://storage.googleapis.com/zk-celestial-store/trusted-setup/ultraPlonkTrustedSetup.dat"
 
 
     override val FACE_REGISTRY_ADDRESS: String = "0x3C0f27AC1817820C1BA41337B53090652aE4F448"
@@ -477,7 +477,7 @@ object TestNetConfig : IConfig {
 
 // Mainnet
 object MainnetConfig : IConfig {
-  override val RELAYER_URL = "https://registration-relayer-1062715874572.europe-west1.run.app"
+    override val RELAYER_URL = "https://registration-relayer-1062715874572.europe-west1.run.app"
     override val COSMOS_RPC_URL = "https://rpc-api.node1.mainnet-beta.rarimo.com"
     override val EVM_SERVICE_URL =
         "https://api.orgs.app.stage.rarime.com/integrations/evm-airdrop-svc-glo/"
@@ -528,7 +528,7 @@ object MainnetConfig : IConfig {
     override val VOTING_WEBSITE_URL: String = "https://freedomtool.org"
 
     override val NOIR_TRUSTED_SETUP_URL: String =
-        "https://storage.googleapis.com/rarimo-store/trusted-setups/ultraPlonkTrustedSetup.dat"
+        "https://storage.googleapis.com/zk-celestial-store/trusted-setup/ultraPlonkTrustedSetup.dat"
 
 
     override val FACE_REGISTRY_ADDRESS: String = "0x3C0f27AC1817820C1BA41337B53090652aE4F448"
@@ -754,6 +754,6 @@ object MainnetConfig : IConfig {
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_26_512_3_2_336_248_1_1384_2_256.json"
 
     override val queryIdentity: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/vv0.1.0/queryIdentity.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/queryIdentity.json"
 
 }

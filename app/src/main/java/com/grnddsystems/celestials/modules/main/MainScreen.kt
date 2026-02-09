@@ -1,9 +1,8 @@
-package com.rarilabs.rarime.modules.main
+package com.grnddsystems.celestials.modules.main
 
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,24 +13,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -46,18 +46,23 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.rarilabs.rarime.R
-import com.rarilabs.rarime.modules.qr.ScanQrScreen
-import com.rarilabs.rarime.ui.components.AppBottomSheet
-import com.rarilabs.rarime.ui.components.AppIcon
-import com.rarilabs.rarime.ui.components.AppLogo
-import com.rarilabs.rarime.ui.components.UiSnackbarDefault
-import com.rarilabs.rarime.ui.components.enter_program.EnterProgramFlow
-import com.rarilabs.rarime.ui.components.enter_program.UNSPECIFIED_PASSPORT_STEPS
-import com.rarilabs.rarime.ui.components.rememberAppSheetState
-import com.rarilabs.rarime.ui.theme.AppTheme
-import com.rarilabs.rarime.ui.theme.RarimeTheme
-import com.rarilabs.rarime.util.Screen
+import com.grnddsystems.celestials.R
+import com.grnddsystems.celestials.modules.qr.ScanQrScreen
+import com.grnddsystems.celestials.modules.qr.QrProofProgressSheet
+import com.grnddsystems.celestials.ui.components.AppBottomSheet
+import com.grnddsystems.celestials.ui.components.AppIcon
+import com.grnddsystems.celestials.ui.components.AppLogo
+import com.grnddsystems.celestials.ui.components.UiSnackbarDefault
+import com.grnddsystems.celestials.ui.components.enter_program.EnterProgramFlow
+import com.grnddsystems.celestials.ui.components.enter_program.UNSPECIFIED_PASSPORT_STEPS
+import com.grnddsystems.celestials.ui.components.rememberAppSheetState
+import com.grnddsystems.celestials.ui.theme.AppTheme
+import com.grnddsystems.celestials.ui.theme.RarimeTheme
+import com.grnddsystems.celestials.util.Screen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.grnddsystems.celestials.util.ProofNotificationHelper
 
 val mainRoutes = listOf(
     Screen.Main.Home.route,
@@ -90,7 +95,7 @@ fun SplashScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color(0xFF000000)),
+            .background(color = RarimeTheme.colors.backgroundPrimary),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -106,7 +111,7 @@ fun SplashScreen() {
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.weight(1f)
             ) {
-              AppLogo()
+                AppLogo()
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -115,7 +120,7 @@ fun SplashScreen() {
                     Spacer(modifier = Modifier.height(35.dp))
                     Text(
                         text = "Welcome to",
-                        color = RarimeTheme.colors.primaryDarker,
+                        color = RarimeTheme.colors.textPrimary,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Normal,
                         textAlign = TextAlign.Center
@@ -123,7 +128,7 @@ fun SplashScreen() {
                     Spacer(modifier = Modifier.height(35.dp))
                     Text(
                         text = "ZK-KYC",
-                        color = RarimeTheme.colors.primaryDarker,
+                        color = RarimeTheme.colors.textPrimary,
                         style = TextStyle(
                             fontFamily = FontFamily(Font(R.font.sudo)),
                             fontSize = 48.sp,
@@ -133,7 +138,7 @@ fun SplashScreen() {
                     )
                     Text(
                         text = "celestials id",
-                        color = RarimeTheme.colors.primaryDarker,
+                        color = RarimeTheme.colors.textPrimary,
                         style = TextStyle(
                             fontFamily = FontFamily(Font(R.font.sudo)),
                             fontSize = 48.sp,
@@ -149,7 +154,7 @@ fun SplashScreen() {
             // reason: Add "Based on Rarime" text at bottom with safe area padding
             Text(
                 text = "Based on Rarime",
-                color = Color.White.copy(alpha = 0.5f),
+                color = RarimeTheme.colors.textSecondary,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Normal,
                 textAlign = TextAlign.Center,
@@ -182,6 +187,7 @@ fun MainScreenContent(
 ) {
     val mainViewModel = LocalMainViewModel.current
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
 
     val passportStatus by mainViewModel.passportStatus.collectAsState()
@@ -196,6 +202,8 @@ fun MainScreenContent(
 
     val enterProgramSheetState = rememberAppSheetState()
     val qrCodeState = rememberAppSheetState()
+    val qrProofProgressState = rememberAppSheetState(false) // ← ДОДАНО для QR Progress
+
     val isBottomBarShown by mainViewModel.isBottomBarShown.collectAsState()
     // Use remember to cache navBackStackEntry and currentRoute
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -320,13 +328,110 @@ fun MainScreenContent(
             ) {
                 ScanQrScreen(onBack = {
                     qrCodeState.hide()
-                }, onScan = {
-                    val uri = it.toUri()
+                }, onScan = { scannedData ->
                     qrCodeState.hide()
-                    mainViewModel.setExtIntDataURI(uri)
+                    qrProofProgressState.show()
+
+                    Log.d("MainScreen", "=== QR Code Scanned ===")
+                    Log.d("MainScreen", "Scanned data: $scannedData")
+
+                    // Check if this is a WebRTC QR code
+                    // Expected formats:
+                    // - zkpassport://connect?peerId={id}&type=registration
+                    // - webrtc://peer/{peerId}
+                    // - ?peer={peerId} or ?peerId={id}
+                    if (scannedData.contains("zkpassport://", ignoreCase = true) ||
+                        scannedData.contains("webrtc", ignoreCase = true) ||
+                        scannedData.contains("peerId=", ignoreCase = true) ||
+                        scannedData.contains("peer=", ignoreCase = true)) {
+                        Log.d("MainScreen", "✓ Detected WebRTC QR code")
+
+                        // Extract peer ID from the QR data
+                        val peerId = when {
+                            scannedData.contains("peerId=", ignoreCase = true) -> {
+                                // Extract from query parameter: ?peerId={id}
+                                val index = scannedData.indexOf("peerId=", ignoreCase = true)
+                                if (index >= 0) {
+                                    scannedData.substring(index + "peerId=".length)
+                                        .substringBefore("&").trim()
+                                } else ""
+                            }
+                            scannedData.contains("peer=", ignoreCase = true) -> {
+                                // Extract from query parameter: ?peer={id}
+                                val index = scannedData.indexOf("peer=", ignoreCase = true)
+                                if (index >= 0) {
+                                    scannedData.substring(index + "peer=".length)
+                                        .substringBefore("&").trim()
+                                } else ""
+                            }
+                            scannedData.contains("/peer/") -> {
+                                // Extract from path: webrtc://peer/{peerId}
+                                scannedData.substringAfter("/peer/").trim()
+                            }
+                            else -> scannedData.trim() // Assume whole string is peer ID
+                        }
+
+                        Log.d("MainScreen", "Extracted peer ID: $peerId")
+
+                        if (peerId.isNotEmpty()) {
+                            Log.d("MainScreen", "→ Starting WebRTC proof flow...")
+                            coroutineScope.launch {
+                                try {
+                                    mainViewModel.startWebRTCProofFlow(peerId)
+                                    Log.d("MainScreen", "✓ WebRTC flow started successfully")
+                                } catch (e: Exception) {
+                                    Log.e("MainScreen", "✗ Failed to start WebRTC flow", e)
+                                }
+                            }
+                        } else {
+                            Log.w("MainScreen", "⚠ Empty peer ID after extraction")
+                        }
+                    } else {
+                        Log.d("MainScreen", "→ Handling as external integrator URI")
+                        // Handle as external integrator URI (existing behavior)
+                        val uri = scannedData.toUri()
+                        mainViewModel.setExtIntDataURI(uri)
+                    }
                 })
             }
+// QR Proof Progress Bottom Sheet
+            val lifecycleOwner = LocalLifecycleOwner.current
 
+            AppBottomSheet(
+                state = qrProofProgressState,
+                fullScreen = false,
+                isHeaderEnabled = false
+            ) {
+                DisposableEffect(lifecycleOwner) {
+                    val observer = LifecycleEventObserver { _, event ->
+                        when (event) {
+                            Lifecycle.Event.ON_PAUSE -> {
+                                if (qrProofProgressState.showSheet) {
+                                    ProofNotificationHelper.showQrProofNotification(context)
+                                }
+                            }
+                            Lifecycle.Event.ON_RESUME -> {
+                                ProofNotificationHelper.cancelQrProofNotification(context)
+                            }
+                            else -> {}
+                        }
+                    }
+                    lifecycleOwner.lifecycle.addObserver(observer)
+
+                    onDispose {
+                        lifecycleOwner.lifecycle.removeObserver(observer)
+                        ProofNotificationHelper.cancelQrProofNotification(context)
+                    }
+                }
+
+                QrProofProgressSheet(
+                    proofSheetState = qrProofProgressState,
+                    onComplete = {
+                        Log.d("MainScreen", "✓ QR proof generation completed")
+                        ProofNotificationHelper.cancelQrProofNotification(context)
+                    }
+                )
+            }
             AppBottomSheet(
                 state = enterProgramSheetState,
                 fullScreen = true,

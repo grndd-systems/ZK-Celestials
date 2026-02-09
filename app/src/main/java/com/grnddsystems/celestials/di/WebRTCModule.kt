@@ -5,6 +5,7 @@ import com.grndd.celestials.webrtc.core.WebRTCManager
 import com.grndd.celestials.webrtc.firebase.FirebaseSignalingManager
 import com.grndd.celestials.webrtc.models.WebRTCConfig
 import com.grndd.celestials.webrtc.signaling.SignalingManager
+import com.google.firebase.FirebaseApp
 import com.grnddsystems.celestials.BuildConfig
 import dagger.Module
 import dagger.Provides
@@ -23,8 +24,10 @@ object WebRTCModule {
     @Provides
     @Singleton
     fun provideSignalingManager(): SignalingManager {
+        val databaseUrl = FirebaseApp.getInstance().options.databaseUrl
+            ?: throw IllegalStateException("firebase_url not found in google-services.json")
         return FirebaseSignalingManager(
-            databaseUrl = "https://testground-3159d-default-rtdb.europe-west1.firebasedatabase.app",
+            databaseUrl = databaseUrl,
             basePath = "signals",
             enableDebugLogging = BuildConfig.DEBUG
         )

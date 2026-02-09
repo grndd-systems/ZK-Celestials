@@ -1,8 +1,10 @@
 package com.grnddsystems.celestials.modules.profile
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -187,15 +189,12 @@ fun ProfileScreenContent(
                         iconId = R.drawable.zk_email,
                         title = "Give us Feedback",
                         onClick = {
-                            val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                data = Uri.parse("mailto:help@grndd.systems")
-                                putExtra(Intent.EXTRA_SUBJECT, "ZK Celestials ID Support")
-                                putExtra(Intent.EXTRA_TEXT, "Hello Support Team,\n\n")
-                            }
-                            try {
-                                context.startActivity(Intent.createChooser(intent, "Send Email"))
-                            } catch (e: Exception) {
-                            }
+                            openEmailClient(
+                                context = context,
+                                email = "help@grndd.systems",
+                                subject = "ZK Celestials ID Support",
+                                body = "Hello Support Team,\n\n"
+                            )
                         }
                     )
 
@@ -331,6 +330,62 @@ private fun ProfileRow(
                 size = 20.dp,
                 tint = contentColors.trailingIcon,
             )
+        }
+    }
+}
+
+private fun openEmailClient(
+    context: Context,
+    email: String,
+    subject: String,
+    body: String
+) {
+    // Method 1: Try direct mailto with parameters
+    val mailtoUri = "mailto:$email?subject=${Uri.encode(subject)}&body=${Uri.encode(body)}"
+    val emailIntent = Intent(Intent.ACTION_VIEW, Uri.parse(mailtoUri)).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    // Method 2: Fallback to SENDTO
+    val sendToIntent = Intent(Intent.ACTION_SENDTO).apply {
+        data = Uri.parse("mailto:")
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+        putExtra(Intent.EXTRA_SUBJECT, subject)
+        putExtra(Intent.EXTRA_TEXT, body)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    // Method 3: Last resort - SEND with rfc822
+    val sendIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "message/rfc822"
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+        putExtra(Intent.EXTRA_SUBJECT, subject)
+        putExtra(Intent.EXTRA_TEXT, body)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    try {
+        context.startActivity(emailIntent)
+    } catch (e1: Exception) {
+        try {
+            val packageManager = context.packageManager
+            val activities = packageManager.queryIntentActivities(sendToIntent, 0)
+
+            if (activities.isNotEmpty()) {
+                val chooser = Intent.createChooser(sendToIntent, "Send Email")
+                context.startActivity(chooser)
+            } else {
+                val activities3 = packageManager.queryIntentActivities(sendIntent, 0)
+                if (activities3.isNotEmpty()) {
+                    val chooser = Intent.createChooser(sendIntent, "Send Email")
+                    context.startActivity(chooser)
+                } else {
+                    Toast.makeText(context, "No email app found. Install Gmail or Outlook.", Toast.LENGTH_LONG).show()
+                }
+            }
+        } catch (e2: Exception) {
+            Toast.makeText(context, "Failed to open email client", Toast.LENGTH_SHORT).show()
+            android.util.Log.e("ProfileScreen", "All email methods failed", e2)
         }
     }
 }
