@@ -53,6 +53,17 @@ class CircuitNoirDownloader(private val context: Context) {
         return file.absolutePath
     }
 
+    suspend fun downloadQueryByteCode(
+        onProgressUpdate: (Int, Boolean) -> Unit
+    ): String {
+        val url = BaseConfig.queryIdentity
+        val filePath = url.split("/").last()
+        Log.i("circuit plonk url", "Query: $url")
+        return fileDownloader.downloadFileBlocking(url, filePath) { progress ->
+            onProgressUpdate(progress, false)
+        }.absolutePath
+    }
+
     fun deleteRedunantFiles(circuitData: RegisteredCircuitData) {
         val trustedSetup = getTrustedSetupPath()
 

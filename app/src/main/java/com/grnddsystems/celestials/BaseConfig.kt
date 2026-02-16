@@ -260,224 +260,224 @@ object TestNetConfig : IConfig {
 
 
     override val registerIdentity_1_160_3_4_576_200_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentity_1_160_3_4_576_200_NA-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentity_1_160_3_4_576_200_NA-download.zip"
 
 
     override val registerIdentity_14_256_3_4_336_64_1_1480_5_296: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentity_14_256_3_4_336_64_1_1480_5_296-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentity_14_256_3_4_336_64_1_1480_5_296-download.zip"
 
     override val registerIdentity_1_256_3_6_336_560_1_2744_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentity_1_256_3_6_336_560_1_2744_4_256-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentity_1_256_3_6_336_560_1_2744_4_256-download.zip"
     override val registerIdentity_20_256_3_5_336_72_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentity_20_256_3_5_336_72_NA-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentity_20_256_3_5_336_72_NA-download.zip"
 
     override val registerIdentity_4_160_3_3_336_216_1_1296_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentity_4_160_3_3_336_216_1_1296_3_256-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentity_4_160_3_3_336_216_1_1296_3_256-download.zip"
     override val registerIdentity_20_160_3_3_736_200_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentity_20_160_3_3_736_200_NA-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentity_20_160_3_3_736_200_NA-download.zip"
 
 
     override val registerIdentityLight160: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight160-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentityLight160-download.zip"
     override val registerIdentityLight224: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight224-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentityLight224-download.zip"
     override val registerIdentityLight256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight256-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentityLight256-download.zip"
     override val registerIdentityLight384: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight384-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentityLight384-download.zip"
     override val registerIdentityLight512: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight512-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentityLight512-download.zip"
 
 
     override val registerIdentity_10_256_3_3_576_248_1_1184_5_264: String =
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v1.0.4/registerIdentity_10_256_3_3_576_248_1_1184_5_264.json"
     override val registerIdentity_11_256_3_3_576_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_3_576_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_3_576_248_NA.json"
     override val registerIdentity_11_256_3_4_336_232_1_1480_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_4_336_232_1_1480_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_4_336_232_1_1480_4_256.json"
     override val registerIdentity_11_256_3_5_576_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_5_576_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_5_576_248_NA.json"
     override val registerIdentity_14_256_3_3_576_240_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_14_256_3_3_576_240_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_14_256_3_3_576_240_NA.json"
     override val registerIdentity_14_256_3_4_336_232_1_1480_5_296: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_14_256_3_4_336_232_1_1480_5_296.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_14_256_3_4_336_232_1_1480_5_296.json"
     override val registerIdentity_14_256_3_4_576_248_1_1496_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_14_256_3_4_576_248_1_1496_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_14_256_3_4_576_248_1_1496_3_256.json"
     override val registerIdentity_1_256_3_4_576_232_1_1480_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_4_576_232_1_1480_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_4_576_232_1_1480_3_256.json"
     override val registerIdentity_1_256_3_4_600_248_1_1496_3_256: String =
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v1.0.4/registerIdentity_1_256_3_4_600_248_1_1496_3_256.json"
     override val registerIdentity_1_256_3_5_336_248_1_2120_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_5_336_248_1_2120_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_5_336_248_1_2120_4_256.json"
     override val registerIdentity_2_256_3_4_336_232_1_1480_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_2_256_3_4_336_232_1_1480_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_2_256_3_4_336_232_1_1480_4_256.json"
     override val registerIdentity_2_256_3_4_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_2_256_3_4_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_2_256_3_4_336_248_NA.json"
     override val registerIdentity_20_160_3_2_576_184_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_20_160_3_2_576_184_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_20_160_3_2_576_184_NA.json"
     override val registerIdentity_20_160_3_3_576_200_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_20_160_3_3_576_200_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_20_160_3_3_576_200_NA.json"
     override val registerIdentity_20_256_3_5_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_20_256_3_5_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_20_256_3_5_336_248_NA.json"
     override val registerIdentity_21_256_3_3_576_232_NA: String =
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v1.0.4/registerIdentity_21_256_3_3_576_232_NA.json"
     override val registerIdentity_23_160_3_3_576_200_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_23_160_3_3_576_200_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_23_160_3_3_576_200_NA.json"
     override val registerIdentity_24_256_3_4_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_24_256_3_4_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_24_256_3_4_336_248_NA.json"
     override val registerIdentity_3_256_3_4_600_248_1_1496_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_3_256_3_4_600_248_1_1496_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_3_256_3_4_600_248_1_1496_3_256.json"
     override val registerIdentity_3_512_3_3_336_264_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_3_512_3_3_336_264_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_3_512_3_3_336_264_NA.json"
 
     override val registerIdentity_6_160_3_3_336_216_1_1080_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_6_160_3_3_336_216_1_1080_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_6_160_3_3_336_216_1_1080_3_256.json"
     override val registerIdentity_1_256_3_5_576_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_5_576_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_5_576_248_NA.json"
     override val registerIdentity_1_256_3_6_576_264_1_2448_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_6_576_264_1_2448_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_6_576_264_1_2448_3_256.json"
     override val registerIdentity_2_256_3_6_336_264_21_2448_6_2008: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_2_256_3_6_336_264_21_2448_6_2008.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_2_256_3_6_336_264_21_2448_6_2008.json"
     override val registerIdentity_2_256_3_6_336_248_1_2432_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_2_256_3_6_336_248_1_2432_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_2_256_3_6_336_248_1_2432_3_256.json"
     override val registerIdentity_2_256_3_6_576_248_1_2432_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_2_256_3_6_576_248_1_2432_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_2_256_3_6_576_248_1_2432_3_256.json"
     override val registerIdentity_20_256_3_3_336_224_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_20_256_3_3_336_224_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_20_256_3_3_336_224_NA.json"
     override val registerIdentity_21_256_3_4_576_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_21_256_3_4_576_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_21_256_3_4_576_232_NA.json"
 
 
     override val registerIdentity_11_256_3_5_584_264_1_2136_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_5_584_264_1_2136_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_5_584_264_1_2136_4_256.json"
 
     override val registerIdentity_11_256_3_5_576_264_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_5_576_264_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_5_576_264_NA.json"
 
     override val registerIdentity_2_256_3_4_336_248_22_1496_7_2408: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_2_256_3_4_336_248_22_1496_7_2408.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_2_256_3_4_336_248_22_1496_7_2408.json"
 
     override val registerIdentity_1_256_3_4_336_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_4_336_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_4_336_232_NA.json"
 
     override val registerIdentity_25_384_3_3_336_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_25_384_3_3_336_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_25_384_3_3_336_232_NA.json"
     override val registerIdentity_25_384_3_4_336_264_1_2904_2_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_25_384_3_4_336_264_1_2904_2_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_25_384_3_4_336_264_1_2904_2_256.json"
     override val registerIdentity_26_512_3_3_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_26_512_3_3_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_26_512_3_3_336_248_NA.json"
     override val registerIdentity_26_512_3_3_336_264_1_1968_2_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_26_512_3_3_336_264_1_1968_2_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_26_512_3_3_336_264_1_1968_2_256.json"
     override val registerIdentity_27_512_3_4_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_27_512_3_4_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_27_512_3_4_336_248_NA.json"
 
     override val registerIdentity_1_256_3_5_336_248_1_2120_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_5_336_248_1_2120_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_5_336_248_1_2120_3_256.json"
     override val registerIdentity_7_160_3_3_336_216_1_1080_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_7_160_3_3_336_216_1_1080_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_7_160_3_3_336_216_1_1080_3_256.json"
 
     override val registerIdentity_8_160_3_3_336_216_1_1080_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_8_160_3_3_336_216_1_1080_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_8_160_3_3_336_216_1_1080_3_256.json"
 
     override val registerIdentity_3_256_3_3_576_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_3_256_3_3_576_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_3_256_3_3_576_248_NA.json"
 
     override val registerIdentity_25_384_3_3_336_264_1_2024_3_296: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_25_384_3_3_336_264_1_2024_3_296.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_25_384_3_3_336_264_1_2024_3_296.json"
 
     override val registerIdentity_28_384_3_3_576_264_24_2024_4_2792: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_28_384_3_3_576_264_24_2024_4_2792.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_28_384_3_3_576_264_24_2024_4_2792.json"
     override val registerIdentity_1_256_3_6_576_248_1_2432_5_296: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_6_576_248_1_2432_5_296.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_6_576_248_1_2432_5_296.json"
     override val registerIdentity_25_384_3_3_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_25_384_3_3_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_25_384_3_3_336_248_NA.json"
 
     override val registerIdentity_1_160_3_3_576_200_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_160_3_3_576_200_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_160_3_3_576_200_NA.json"
     override val registerIdentity_1_256_3_3_576_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_3_576_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_3_576_248_NA.json"
     override val registerIdentity_1_256_3_4_336_232_1_1480_5_296: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_4_336_232_1_1480_5_296.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_4_336_232_1_1480_5_296.json"
 
     override val registerIdentity_1_256_3_6_336_248_1_2744_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v/v0.1.0/registerIdentity_1_256_3_6_336_248_1_2744_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v/v0.2.0/registerIdentity_1_256_3_6_336_248_1_2744_4_256.json"
     override val registerIdentity_2_256_3_6_336_264_1_2448_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v/v0.1.0/registerIdentity_2_256_3_6_336_264_1_2448_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v/v0.2.0/registerIdentity_2_256_3_6_336_264_1_2448_3_256.json"
     override val registerIdentity_3_160_3_3_336_200_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v/v0.1.0/registerIdentity_3_160_3_3_336_200_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v/v0.2.0/registerIdentity_3_160_3_3_336_200_NA.json"
 
     override val registerIdentity_3_160_3_4_576_216_1_1512_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_3_160_3_4_576_216_1_1512_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_3_160_3_4_576_216_1_1512_3_256.json"
     override val registerIdentity_11_256_3_2_336_216_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_2_336_216_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_2_336_216_NA.json"
     override val registerIdentity_11_256_3_3_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_3_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_3_336_248_NA.json"
 
     override val registerIdentity_11_256_3_3_576_240_1_864_5_264: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_3_576_240_1_864_5_264.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_3_576_240_1_864_5_264.json"
     override val registerIdentity_11_256_3_3_576_248_1_1184_5_264: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_3_576_248_1_1184_5_264.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_3_576_248_1_1184_5_264.json"
     override val registerIdentity_11_256_3_4_584_248_1_1496_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_4_584_248_1_1496_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_4_584_248_1_1496_4_256.json"
 
     override val registerIdentity_11_256_3_5_576_248_1_1808_5_296: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_5_576_248_1_1808_5_296.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_5_576_248_1_1808_5_296.json"
     override val registerIdentity_12_256_3_3_336_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_12_256_3_3_336_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_12_256_3_3_336_232_NA.json"
     override val registerIdentity_15_512_3_3_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_15_512_3_3_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_15_512_3_3_336_248_NA.json"
 
     override val registerIdentity_21_256_3_3_336_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_21_256_3_3_336_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_21_256_3_3_336_232_NA.json"
     override val registerIdentity_21_256_3_5_576_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_21_256_3_5_576_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_21_256_3_5_576_232_NA.json"
     override val registerIdentity_24_256_3_4_336_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_24_256_3_4_336_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_24_256_3_4_336_232_NA.json"
 
     override val registerIdentity_11_256_3_5_576_248_1_1808_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_5_576_248_1_1808_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_5_576_248_1_1808_4_256.json"
 
     override val registerIdentity_25_384_3_5_576_248_20_3768_3_2008: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_25_384_3_5_576_248_20_3768_3_2008.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_25_384_3_5_576_248_20_3768_3_2008.json"
     override val registerIdentity_1_256_3_6_336_248_1_2432_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_6_336_248_1_2432_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_6_336_248_1_2432_3_256.json"
     override val registerIdentity_2_256_3_5_336_248_22_1808_7_2408: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_2_256_3_5_336_248_22_1808_7_2408.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_2_256_3_5_336_248_22_1808_7_2408.json"
 
     override val registerIdentity_1_256_3_4_336_248_1_1496_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_4_336_248_1_1496_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_4_336_248_1_1496_4_256.json"
     override val registerIdentity_11_256_3_4_576_248_1_1496_5_296: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_4_576_248_1_1496_5_296.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_4_576_248_1_1496_5_296.json"
 
     override val registerIdentity_1_256_3_5_344_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_5_344_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_5_344_232_NA.json"
     override val registerIdentity_21_256_3_7_336_264_21_3072_6_2008: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_21_256_3_7_336_264_21_3072_6_2008.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_21_256_3_7_336_264_21_3072_6_2008.json"
 
     override val registerIdentity_1_256_3_5_336_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_5_336_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_5_336_232_NA.json"
 
     override val registerIdentity_1_256_3_7_336_264_20_2760_6_2008: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_7_336_264_20_2760_6_2008.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_7_336_264_20_2760_6_2008.json"
 
     override val registerIdentity_1_256_3_4_336_232_1_1480_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_4_336_232_1_1480_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_4_336_232_1_1480_4_256.json"
 
     override val registerIdentity_1_256_3_4_336_248_1_560_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_4_336_248_1_560_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_4_336_248_1_560_4_256.json"
 
     override val registerIdentity_26_512_3_2_336_248_1_1384_2_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_26_512_3_2_336_248_1_1384_2_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_26_512_3_2_336_248_1_1384_2_256.json"
 
     override val queryIdentity: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/vv0.1.0/queryIdentity.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/queryIdentity.json"
 
 
 }
 
 // Mainnet
 object MainnetConfig : IConfig {
-  override val RELAYER_URL = "https://registration-relayer-1062715874572.europe-west1.run.app"
+    override val RELAYER_URL = "https://registration-relayer-1062715874572.europe-west1.run.app"
     override val COSMOS_RPC_URL = "https://rpc-api.node1.mainnet-beta.rarimo.com"
     override val EVM_SERVICE_URL =
         "https://api.orgs.app.stage.rarime.com/integrations/evm-airdrop-svc-glo/"
@@ -544,216 +544,216 @@ object MainnetConfig : IConfig {
 
 
     override val registerIdentity_1_160_3_4_576_200_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentity_1_160_3_4_576_200_NA-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentity_1_160_3_4_576_200_NA-download.zip"
 
 
     override val registerIdentity_14_256_3_4_336_64_1_1480_5_296: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentity_14_256_3_4_336_64_1_1480_5_296-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentity_14_256_3_4_336_64_1_1480_5_296-download.zip"
 
     override val registerIdentity_1_256_3_6_336_560_1_2744_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentity_1_256_3_6_336_560_1_2744_4_256-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentity_1_256_3_6_336_560_1_2744_4_256-download.zip"
     override val registerIdentity_20_256_3_5_336_72_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentity_20_256_3_5_336_72_NA-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentity_20_256_3_5_336_72_NA-download.zip"
 
     override val registerIdentity_4_160_3_3_336_216_1_1296_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentity_4_160_3_3_336_216_1_1296_3_256-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentity_4_160_3_3_336_216_1_1296_3_256-download.zip"
     override val registerIdentity_20_160_3_3_736_200_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentity_20_160_3_3_736_200_NA-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentity_20_160_3_3_736_200_NA-download.zip"
 
 
     override val registerIdentityLight160: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight160-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentityLight160-download.zip"
     override val registerIdentityLight224: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight224-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentityLight224-download.zip"
     override val registerIdentityLight256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight256-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentityLight256-download.zip"
     override val registerIdentityLight384: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight384-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentityLight384-download.zip"
     override val registerIdentityLight512: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.1.0/registerIdentityLight512-download.zip"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits/v0.2.0/registerIdentityLight512-download.zip"
 
 
     override val registerIdentity_10_256_3_3_576_248_1_1184_5_264: String =
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v1.0.4/registerIdentity_10_256_3_3_576_248_1_1184_5_264.json"
     override val registerIdentity_11_256_3_3_576_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_3_576_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_3_576_248_NA.json"
     override val registerIdentity_11_256_3_4_336_232_1_1480_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_4_336_232_1_1480_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_4_336_232_1_1480_4_256.json"
     override val registerIdentity_11_256_3_5_576_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_5_576_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_5_576_248_NA.json"
     override val registerIdentity_14_256_3_3_576_240_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_14_256_3_3_576_240_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_14_256_3_3_576_240_NA.json"
     override val registerIdentity_14_256_3_4_336_232_1_1480_5_296: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_14_256_3_4_336_232_1_1480_5_296.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_14_256_3_4_336_232_1_1480_5_296.json"
     override val registerIdentity_14_256_3_4_576_248_1_1496_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_14_256_3_4_576_248_1_1496_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_14_256_3_4_576_248_1_1496_3_256.json"
     override val registerIdentity_1_256_3_4_576_232_1_1480_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_4_576_232_1_1480_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_4_576_232_1_1480_3_256.json"
     override val registerIdentity_1_256_3_4_600_248_1_1496_3_256: String =
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v1.0.4/registerIdentity_1_256_3_4_600_248_1_1496_3_256.json"
     override val registerIdentity_1_256_3_5_336_248_1_2120_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_5_336_248_1_2120_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_5_336_248_1_2120_4_256.json"
     override val registerIdentity_2_256_3_4_336_232_1_1480_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_2_256_3_4_336_232_1_1480_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_2_256_3_4_336_232_1_1480_4_256.json"
     override val registerIdentity_2_256_3_4_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_2_256_3_4_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_2_256_3_4_336_248_NA.json"
     override val registerIdentity_20_160_3_2_576_184_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_20_160_3_2_576_184_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_20_160_3_2_576_184_NA.json"
     override val registerIdentity_20_160_3_3_576_200_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_20_160_3_3_576_200_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_20_160_3_3_576_200_NA.json"
     override val registerIdentity_20_256_3_5_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_20_256_3_5_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_20_256_3_5_336_248_NA.json"
     override val registerIdentity_21_256_3_3_576_232_NA: String =
         "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v1.0.4/registerIdentity_21_256_3_3_576_232_NA.json"
     override val registerIdentity_23_160_3_3_576_200_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_23_160_3_3_576_200_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_23_160_3_3_576_200_NA.json"
     override val registerIdentity_24_256_3_4_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_24_256_3_4_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_24_256_3_4_336_248_NA.json"
     override val registerIdentity_3_256_3_4_600_248_1_1496_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_3_256_3_4_600_248_1_1496_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_3_256_3_4_600_248_1_1496_3_256.json"
     override val registerIdentity_3_512_3_3_336_264_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_3_512_3_3_336_264_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_3_512_3_3_336_264_NA.json"
 
     override val registerIdentity_6_160_3_3_336_216_1_1080_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_6_160_3_3_336_216_1_1080_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_6_160_3_3_336_216_1_1080_3_256.json"
     override val registerIdentity_1_256_3_5_576_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_5_576_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_5_576_248_NA.json"
     override val registerIdentity_1_256_3_6_576_264_1_2448_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_6_576_264_1_2448_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_6_576_264_1_2448_3_256.json"
     override val registerIdentity_2_256_3_6_336_264_21_2448_6_2008: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_2_256_3_6_336_264_21_2448_6_2008.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_2_256_3_6_336_264_21_2448_6_2008.json"
     override val registerIdentity_2_256_3_6_336_248_1_2432_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_2_256_3_6_336_248_1_2432_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_2_256_3_6_336_248_1_2432_3_256.json"
     override val registerIdentity_2_256_3_6_576_248_1_2432_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_2_256_3_6_576_248_1_2432_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_2_256_3_6_576_248_1_2432_3_256.json"
     override val registerIdentity_20_256_3_3_336_224_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_20_256_3_3_336_224_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_20_256_3_3_336_224_NA.json"
     override val registerIdentity_21_256_3_4_576_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_21_256_3_4_576_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_21_256_3_4_576_232_NA.json"
 
 
     override val registerIdentity_11_256_3_5_584_264_1_2136_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_5_584_264_1_2136_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_5_584_264_1_2136_4_256.json"
 
     override val registerIdentity_11_256_3_5_576_264_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_5_576_264_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_5_576_264_NA.json"
 
     override val registerIdentity_2_256_3_4_336_248_22_1496_7_2408: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_2_256_3_4_336_248_22_1496_7_2408.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_2_256_3_4_336_248_22_1496_7_2408.json"
 
     override val registerIdentity_1_256_3_4_336_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_4_336_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_4_336_232_NA.json"
 
     override val registerIdentity_25_384_3_3_336_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_25_384_3_3_336_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_25_384_3_3_336_232_NA.json"
     override val registerIdentity_25_384_3_4_336_264_1_2904_2_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_25_384_3_4_336_264_1_2904_2_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_25_384_3_4_336_264_1_2904_2_256.json"
     override val registerIdentity_26_512_3_3_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_26_512_3_3_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_26_512_3_3_336_248_NA.json"
     override val registerIdentity_26_512_3_3_336_264_1_1968_2_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_26_512_3_3_336_264_1_1968_2_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_26_512_3_3_336_264_1_1968_2_256.json"
     override val registerIdentity_27_512_3_4_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_27_512_3_4_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_27_512_3_4_336_248_NA.json"
 
     override val registerIdentity_1_256_3_5_336_248_1_2120_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_5_336_248_1_2120_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_5_336_248_1_2120_3_256.json"
     override val registerIdentity_7_160_3_3_336_216_1_1080_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_7_160_3_3_336_216_1_1080_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_7_160_3_3_336_216_1_1080_3_256.json"
 
     override val registerIdentity_8_160_3_3_336_216_1_1080_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_8_160_3_3_336_216_1_1080_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_8_160_3_3_336_216_1_1080_3_256.json"
 
     override val registerIdentity_3_256_3_3_576_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_3_256_3_3_576_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_3_256_3_3_576_248_NA.json"
 
     override val registerIdentity_25_384_3_3_336_264_1_2024_3_296: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_25_384_3_3_336_264_1_2024_3_296.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_25_384_3_3_336_264_1_2024_3_296.json"
 
     override val registerIdentity_28_384_3_3_576_264_24_2024_4_2792: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_28_384_3_3_576_264_24_2024_4_2792.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_28_384_3_3_576_264_24_2024_4_2792.json"
     override val registerIdentity_1_256_3_6_576_248_1_2432_5_296: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_6_576_248_1_2432_5_296.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_6_576_248_1_2432_5_296.json"
     override val registerIdentity_25_384_3_3_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_25_384_3_3_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_25_384_3_3_336_248_NA.json"
 
     override val registerIdentity_1_160_3_3_576_200_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_160_3_3_576_200_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_160_3_3_576_200_NA.json"
     override val registerIdentity_1_256_3_3_576_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_3_576_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_3_576_248_NA.json"
     override val registerIdentity_1_256_3_4_336_232_1_1480_5_296: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_4_336_232_1_1480_5_296.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_4_336_232_1_1480_5_296.json"
 
     override val registerIdentity_1_256_3_6_336_248_1_2744_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v/v0.1.0/registerIdentity_1_256_3_6_336_248_1_2744_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v/v0.2.0/registerIdentity_1_256_3_6_336_248_1_2744_4_256.json"
     override val registerIdentity_2_256_3_6_336_264_1_2448_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v/v0.1.0/registerIdentity_2_256_3_6_336_264_1_2448_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v/v0.2.0/registerIdentity_2_256_3_6_336_264_1_2448_3_256.json"
     override val registerIdentity_3_160_3_3_336_200_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v/v0.1.0/registerIdentity_3_160_3_3_336_200_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v/v0.2.0/registerIdentity_3_160_3_3_336_200_NA.json"
 
     override val registerIdentity_3_160_3_4_576_216_1_1512_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_3_160_3_4_576_216_1_1512_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_3_160_3_4_576_216_1_1512_3_256.json"
     override val registerIdentity_11_256_3_2_336_216_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_2_336_216_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_2_336_216_NA.json"
     override val registerIdentity_11_256_3_3_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_3_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_3_336_248_NA.json"
 
     override val registerIdentity_11_256_3_3_576_240_1_864_5_264: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_3_576_240_1_864_5_264.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_3_576_240_1_864_5_264.json"
     override val registerIdentity_11_256_3_3_576_248_1_1184_5_264: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_3_576_248_1_1184_5_264.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_3_576_248_1_1184_5_264.json"
     override val registerIdentity_11_256_3_4_584_248_1_1496_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_4_584_248_1_1496_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_4_584_248_1_1496_4_256.json"
 
     override val registerIdentity_11_256_3_5_576_248_1_1808_5_296: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_5_576_248_1_1808_5_296.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_5_576_248_1_1808_5_296.json"
     override val registerIdentity_12_256_3_3_336_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_12_256_3_3_336_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_12_256_3_3_336_232_NA.json"
     override val registerIdentity_15_512_3_3_336_248_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_15_512_3_3_336_248_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_15_512_3_3_336_248_NA.json"
 
     override val registerIdentity_21_256_3_3_336_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_21_256_3_3_336_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_21_256_3_3_336_232_NA.json"
     override val registerIdentity_21_256_3_5_576_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_21_256_3_5_576_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_21_256_3_5_576_232_NA.json"
     override val registerIdentity_24_256_3_4_336_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_24_256_3_4_336_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_24_256_3_4_336_232_NA.json"
 
     override val registerIdentity_11_256_3_5_576_248_1_1808_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_5_576_248_1_1808_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_5_576_248_1_1808_4_256.json"
 
     override val registerIdentity_25_384_3_5_576_248_20_3768_3_2008: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_25_384_3_5_576_248_20_3768_3_2008.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_25_384_3_5_576_248_20_3768_3_2008.json"
     override val registerIdentity_1_256_3_6_336_248_1_2432_3_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_6_336_248_1_2432_3_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_6_336_248_1_2432_3_256.json"
     override val registerIdentity_2_256_3_5_336_248_22_1808_7_2408: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_2_256_3_5_336_248_22_1808_7_2408.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_2_256_3_5_336_248_22_1808_7_2408.json"
 
     override val registerIdentity_1_256_3_4_336_248_1_1496_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_4_336_248_1_1496_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_4_336_248_1_1496_4_256.json"
     override val registerIdentity_11_256_3_4_576_248_1_1496_5_296: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_11_256_3_4_576_248_1_1496_5_296.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_11_256_3_4_576_248_1_1496_5_296.json"
 
     override val registerIdentity_1_256_3_5_344_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_5_344_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_5_344_232_NA.json"
     override val registerIdentity_21_256_3_7_336_264_21_3072_6_2008: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_21_256_3_7_336_264_21_3072_6_2008.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_21_256_3_7_336_264_21_3072_6_2008.json"
 
     override val registerIdentity_1_256_3_5_336_232_NA: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_5_336_232_NA.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_5_336_232_NA.json"
 
     override val registerIdentity_1_256_3_7_336_264_20_2760_6_2008: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_7_336_264_20_2760_6_2008.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_7_336_264_20_2760_6_2008.json"
 
     override val registerIdentity_1_256_3_4_336_232_1_1480_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_4_336_232_1_1480_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_4_336_232_1_1480_4_256.json"
 
     override val registerIdentity_1_256_3_4_336_248_1_560_4_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_1_256_3_4_336_248_1_560_4_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_1_256_3_4_336_248_1_560_4_256.json"
 
     override val registerIdentity_26_512_3_2_336_248_1_1384_2_256: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/registerIdentity_26_512_3_2_336_248_1_1384_2_256.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/registerIdentity_26_512_3_2_336_248_1_1384_2_256.json"
 
     override val queryIdentity: String =
-        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.1.0/queryIdentity.json"
+        "https://storage.googleapis.com/zk-celestial-store/passport-zk-circuits-noir/v0.2.0/queryIdentity.json"
 
 }

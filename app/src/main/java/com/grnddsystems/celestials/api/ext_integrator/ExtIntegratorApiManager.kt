@@ -227,20 +227,26 @@ class ExtIntegratorApiManager @Inject constructor(
             val inputs = buildPlonkQueryInputs(queryProofParametersRequest)
             Log.d("PlonkQuery", "✓ buildPlonkQueryInputs: ${System.currentTimeMillis() - stepStart}ms")
 
-            // Read bytecode from assets
-            stepStart = System.currentTimeMillis()
-            val assetContext: Context = context.createPackageContext("com.grnddsystems.celestials", 0)
-            val assetManager = assetContext.assets
-            val circuitByteCode = assetManager.open("query.json").bufferedReader().use { it.readText() }
-            Log.d("PlonkQuery", "✓ readCircuitBytecode: ${System.currentTimeMillis() - stepStart}ms (${circuitByteCode.length} bytes)")
+            // Read bytecode and download trusted setup on IO thread
+            val (circuitByteCode, trustedSetupPath) = withContext(Dispatchers.IO) {
+                val circuitDownloader = com.grnddsystems.celestials.modules.passportScan.CircuitNoirDownloader(context)
 
-            // Download trusted setup (same as for registration)
-            stepStart = System.currentTimeMillis()
-            val circuitDownloader = com.grnddsystems.celestials.modules.passportScan.CircuitNoirDownloader(context)
-            val trustedSetupPath = circuitDownloader.downloadTrustedSetup { progress, isEnded ->
-                Log.d("PlonkQuery", "Trusted setup download: $progress% ${if (isEnded) "(done)" else ""}")
+                stepStart = System.currentTimeMillis()
+                val queryPath = circuitDownloader.downloadQueryByteCode { progress, isEnded ->
+                    Log.d("PlonkQuery", "Query circuit download: $progress% ${if (isEnded) "(done)" else ""}")
+                }
+                val byteCode = java.io.File(queryPath).readText()
+                Log.d("PlonkQuery", "✓ downloadQueryByteCode: ${System.currentTimeMillis() - stepStart}ms (${byteCode.length} bytes)")
+
+                // Download trusted setup (includes MD5 verification of ~100MB file)
+                stepStart = System.currentTimeMillis()
+                val setupPath = circuitDownloader.downloadTrustedSetup { progress, isEnded ->
+                    Log.d("PlonkQuery", "Trusted setup download: $progress% ${if (isEnded) "(done)" else ""}")
+                }
+                Log.d("PlonkQuery", "✓ downloadTrustedSetup: ${System.currentTimeMillis() - stepStart}ms")
+
+                Pair(byteCode, setupPath)
             }
-            Log.d("PlonkQuery", "✓ downloadTrustedSetup: ${System.currentTimeMillis() - stepStart}ms")
 
             val customDispatcher = java.util.concurrent.Executors.newFixedThreadPool(1) { runnable ->
                 Thread(null, runnable, "LargeStackThread", 100 * 1024 * 1024) // 100 MB stack size
