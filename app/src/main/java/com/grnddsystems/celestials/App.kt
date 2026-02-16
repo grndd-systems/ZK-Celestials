@@ -5,6 +5,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.grnddsystems.celestials.util.ErrorHandler
+import com.grnddsystems.celestials.util.FileIntegrityChecker
 import dagger.hilt.android.HiltAndroidApp
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.security.Security
@@ -44,6 +45,7 @@ class App : Application() {
         super.onCreate()
         android.util.Log.d("App", "=== App.onCreate START ===")
         ErrorHandler.initialize(this)
+        FileIntegrityChecker.init(this)
         setupBouncyCastle()
         setupFireBase()
         android.util.Log.d("App", "=== App.onCreate END ===")
