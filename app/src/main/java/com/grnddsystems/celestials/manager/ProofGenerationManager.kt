@@ -342,55 +342,11 @@ class ProofGenerationManager @Inject constructor(
 
                         else -> {
                             ErrorHandler.logError(
-                                TAG, "Default registration failed, trying light registration", e
+                                TAG, "Default registration failed", e
                             )
-                            try {
-                                val lightProof = lightRegistration(eDocument)
-                                identityManager.setRegistrationProof(lightProof)
-
-                                if (!NOT_ALLOWED_COUNTRIES.contains(eDocument.personDetails?.nationality)) {
-                                    passportManager.updatePassportStatus(PassportStatus.ALLOWED)
-                                } else {
-                                    passportManager.updatePassportStatus(PassportStatus.UNSUPPORTED_FOR_REWARDS)
-                                }
-
-                                lightProof
-                            } catch (e2: Exception) {
-                                when (e2) {
-                                    is PassportAlreadyRegisteredByOtherPK -> {
-                                        ErrorHandler.logError(
-                                            TAG,
-                                            "Passport already registered during light registration",
-                                            e2
-                                        )
-                                        passportManager.updatePassportStatus(PassportStatus.ALREADY_REGISTERED_BY_OTHER_PK)
-                                        _proofError.value = e2
-                                        throw e2
-                                    }
-
-                                    is DownloadCircuitError -> {
-                                        resetState()
-                                        ErrorHandler.logError(
-                                            TAG,
-                                            "Connection/Unpacking error during light registration",
-                                            e2
-                                        )
-                                        _proofError.value = e2
-                                        throw e2
-                                    }
-
-                                    else -> {
-                                        if (!NOT_ALLOWED_COUNTRIES.contains(eDocument.personDetails?.nationality)) {
-                                            passportManager.updatePassportStatus(PassportStatus.WAITLIST)
-                                        } else {
-                                            passportManager.updatePassportStatus(PassportStatus.WAITLIST_UNSUPPORTED_FOR_REWARDS)
-                                        }
-                                        ErrorHandler.logError(TAG, "Light registration failed", e2)
-                                        _proofError.value = e2
-                                        throw e2
-                                    }
-                                }
-                            }
+                            resetState()
+                            _proofError.value = e
+                            throw e
                         }
                     }
                 }
@@ -410,26 +366,27 @@ class ProofGenerationManager @Inject constructor(
 
         ErrorHandler.logDebug("Plonk", "Plonk Start registration")
 
-        val trustedSetupPath =
-            circuitDownloader.downloadTrustedSetup(onProgressUpdate = { progress, isEnded ->
-                if (progress != _downloadProgress.value) {
-                    _downloadProgress.value = progress
+        val (trustedSetupPath, byteCodePath) = withContext(Dispatchers.IO) {
+            val setupPath =
+                circuitDownloader.downloadTrustedSetup(onProgressUpdate = { progress, isEnded ->
+                    if (progress != _downloadProgress.value) {
+                        _downloadProgress.value = progress
+                    }
+                })
+
+            ErrorHandler.logDebug("Plonk", "Plonk Circuit downloaded")
+
+            val circuitData = RegisterNoirCircuitData.fromValue(registerIdentityCircuitType.buildName())
+
+            val codePath =
+                circuitDownloader.downloadNoirByteCode(circuitData = circuitData!!) { progress, isEnded ->
+                    if (_downloadProgress.value != progress) {
+                        _downloadProgress.value = progress
+                    }
                 }
-            })
 
-        ErrorHandler.logDebug("Plonk", "Plonk Circuit downloaded")
-
-
-        val circuitData = RegisterNoirCircuitData.fromValue(registerIdentityCircuitType.buildName())
-
-        val byteCodePath =
-            circuitDownloader.downloadNoirByteCode(circuitData = circuitData!!) { progress, isEnded ->
-
-                if (_downloadProgress.value != progress) {
-                    _downloadProgress.value = progress
-                }
-            }
-
+            Pair(setupPath, codePath)
+        }
 
         _state.value = PassportProofState.APPLYING_ZERO_KNOWLEDGE
 
@@ -665,10 +622,23 @@ class ProofGenerationManager @Inject constructor(
             val (pk, reductionPk, sig) = processSignatureData(circuitType, pubKeyData, sigBytes)
 
 
-            val dg1Deferred = toHexList(eDocument.dg1!!.decodeHexString())
-            val dg15Deferred = eDocument.dg15?.decodeHexString()?.let(toHexList) ?: listOf()
-            val ecDeferred = toHexList(Numeric.hexStringToByteArray(sodFile.readASN1Data()))
-            val saDeferred = toHexList(sodFile.eContent)
+            // SHA-prepad inputs to match circuit's prepadded hash functions
+            val dgHashType = circuitType.passportHashType
+            val sigHashType = circuitType.signatureType.hashAlgorithm
+
+            val dg1Padded = CircuitUtil.shaPrepad(eDocument.dg1!!.decodeHexString(), dgHashType)
+            val dg15Padded = eDocument.dg15?.decodeHexString()?.let {
+                CircuitUtil.shaPrepad(it, dgHashType)
+            }
+            val ecPadded = CircuitUtil.shaPrepad(
+                Numeric.hexStringToByteArray(sodFile.readASN1Data()), sigHashType
+            )
+            val saPadded = CircuitUtil.shaPrepad(sodFile.eContent, sigHashType)
+
+            val dg1Deferred = toHexList(dg1Padded)
+            val dg15Deferred = dg15Padded?.let(toHexList) ?: listOf()
+            val ecDeferred = toHexList(ecPadded)
+            val saDeferred = toHexList(saPadded)
             val skIdentityDeferred = Numeric.toHexString(pkBytes)
 
             val proof = proofDeferred.await()
