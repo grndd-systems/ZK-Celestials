@@ -159,7 +159,7 @@ data class EDocument(
             val ecHash = MessageDigest.getInstance(digestEncryptionAlgorithm, "BC")
                 .digest(encapsulatedContent)
 
-            val ecChunkNumber = getChunkNumber(encapsulatedContent, passportHashType.getChunkSize())
+            val ecChunkNumber = getChunkNumber(encapsulatedContent, passportHashType)
 
             // Find digest positions
             val ecDigestPosition = signedAttributes.findSubarrayIndex(ecHash)
@@ -204,7 +204,7 @@ data class EDocument(
                         } \n ${Numeric.toHexStringNoPrefix(encapsulatedContent)}"
                     )
 
-                val dg15ChunkNumber = getChunkNumber(dg15Raw, passportHashType.getChunkSize())
+                val dg15ChunkNumber = getChunkNumber(dg15Raw, passportHashType)
 
                 val pubkeyData: ByteArray
                 val aaAlgorithm: CircuitAlgorithmType
@@ -385,8 +385,10 @@ data class EDocument(
         return res
     }
 
-    private fun getChunkNumber(data: ByteArray, chunkSize: UInt): UInt {
-        val length = data.size.toUInt() * 8u + 1u + 64u
+    private fun getChunkNumber(data: ByteArray, hashType: CircuitPassportHashType): UInt {
+        val chunkSize = hashType.getChunkSize()
+        val lengthFieldBits = hashType.getLengthFieldBytes().toUInt() * 8u
+        val length = data.size.toUInt() * 8u + 1u + lengthFieldBits
         return length / chunkSize + if (length % chunkSize == 0u) 0u else 1u
     }
 

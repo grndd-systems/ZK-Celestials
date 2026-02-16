@@ -73,6 +73,20 @@ enum class CircuitPassportHashType(val value: String) {
         }
     }
 
+    fun getBlockSizeBytes(): Int {
+        return when (this) {
+            SHA1, SHA256 -> 64
+            SHA384, SHA512 -> 128
+        }
+    }
+
+    fun getLengthFieldBytes(): Int {
+        return when (this) {
+            SHA1, SHA256 -> 8
+            SHA384, SHA512 -> 16
+        }
+    }
+
     companion object {
         fun fromValue(value: String): CircuitPassportHashType? {
             return values().firstOrNull { it.value.equals(value, ignoreCase = true) }
@@ -158,7 +172,21 @@ enum class CircuitCurveType {
 }
 
 enum class CircuitHashAlgorithmType {
-    HA256, HA384, HA160, HA224, HA512
+    HA256, HA384, HA160, HA224, HA512;
+
+    fun getBlockSizeBytes(): Int {
+        return when (this) {
+            HA160, HA224, HA256 -> 64
+            HA384, HA512 -> 128
+        }
+    }
+
+    fun getLengthFieldBytes(): Int {
+        return when (this) {
+            HA160, HA224, HA256 -> 8
+            HA384, HA512 -> 16
+        }
+    }
 }
 
 fun ByteArray.findSubarrayIndex(subarray: ByteArray): UInt? {

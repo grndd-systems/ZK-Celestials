@@ -1,5 +1,7 @@
 package com.grnddsystems.celestials.util.circuits
 
+import CircuitHashAlgorithmType
+import CircuitPassportHashType
 import com.grnddsystems.celestials.util.toBits
 import org.bouncycastle.asn1.ASN1InputStream
 import org.bouncycastle.asn1.ASN1Integer
@@ -156,6 +158,39 @@ object CircuitUtil {
             mutX = mutX.divide(mod)
         }
         return result
+    }
+
+    /**
+     * Applies standard SHA (Merkle-Damgard) padding to a byte array.
+     * - Appends 0x80
+     * - Pads with zeros
+     * - Appends message length in bits as big-endian in the last lengthFieldBytes bytes
+     * Result size = chunkCount * blockSize bytes.
+     */
+    fun shaPrepad(data: ByteArray, blockSize: Int, lengthFieldBytes: Int): ByteArray {
+        val msgLenBits = data.size.toLong() * 8
+
+        val minPadded = data.size + 1 + lengthFieldBytes
+        val paddedSize = ((minPadded + blockSize - 1) / blockSize) * blockSize
+
+        val result = ByteArray(paddedSize)
+        System.arraycopy(data, 0, result, 0, data.size)
+        result[data.size] = 0x80.toByte()
+        // Write message length in bits as big-endian in the last 8 bytes
+        // (upper bytes of lengthField stay zero — sufficient for passport data sizes)
+        for (i in 0 until 8) {
+            result[paddedSize - 1 - i] = (msgLenBits ushr (i * 8)).toByte()
+        }
+
+        return result
+    }
+
+    fun shaPrepad(data: ByteArray, hashType: CircuitPassportHashType): ByteArray {
+        return shaPrepad(data, hashType.getBlockSizeBytes(), hashType.getLengthFieldBytes())
+    }
+
+    fun shaPrepad(data: ByteArray, hashType: CircuitHashAlgorithmType): ByteArray {
+        return shaPrepad(data, hashType.getBlockSizeBytes(), hashType.getLengthFieldBytes())
     }
 
 }
