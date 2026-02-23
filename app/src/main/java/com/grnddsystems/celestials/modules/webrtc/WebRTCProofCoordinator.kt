@@ -78,9 +78,7 @@ class WebRTCProofCoordinator @Inject constructor(
      */
     suspend fun startProofFlow(peerId: String) {
         try {
-            Log.d(TAG, "=== Starting proof flow with peer: $peerId ===")
-            Log.d(TAG, "WebRTCManager: $webRTCManager")
-            Log.d(TAG, "Current flow state: ${_flowState.value}")
+            Log.d(TAG, "Starting proof flow with peer: $peerId")
 
             // Prevent duplicate flow if already running
             val currentState = _flowState.value
@@ -164,7 +162,15 @@ class WebRTCProofCoordinator @Inject constructor(
                     return@launch
                 }
 
-                val passportKey = registrationProof.getPublicKey()
+                // Use passportKey (from AA) if available, otherwise fall back to passportHash.
+                // Passports without Active Authentication have passportKey=0 in proof outputs.
+                val rawPassportKey = registrationProof.getPublicKey()
+                val passportKey = if (rawPassportKey.toBigIntegerOrNull() == java.math.BigInteger.ZERO) {
+                    Log.d(TAG, "Passport doesn't support AA, using passportHash as passportKey")
+                    registrationProof.getPassportHash()
+                } else {
+                    rawPassportKey
+                }
                 val identityKey = registrationProof.getIdentityKey()
 
                 Log.d(TAG, "Passport key: ${passportKey.take(20)}...")
@@ -237,13 +243,9 @@ class WebRTCProofCoordinator @Inject constructor(
                 val params = paramsMessage.data.attributes
                 Log.d(TAG, "Query proof params: eventId=${params.eventId}")
 
-                val flowStart = System.currentTimeMillis()
-
                 // Load passport info first
                 _flowState.value = ProofFlowState.GeneratingProof("Loading passport info...")
-                var stepStart = System.currentTimeMillis()
                 extIntegratorApiManager.loadPassportInfo()
-                Log.d(TAG, "TIMING loadPassportInfo: ${System.currentTimeMillis() - stepStart}ms")
 
                 // Convert WebRTC params to QueryProofGenResponse format
                 // Desktop sends hex strings, need to convert to Long
@@ -280,17 +282,14 @@ class WebRTCProofCoordinator @Inject constructor(
 
                 // Generate query proof using ExtIntegratorApiManager (Plonk)
                 _flowState.value = ProofFlowState.GeneratingProof("Generating query proof...")
-                stepStart = System.currentTimeMillis()
                 val queryProof = extIntegratorApiManager.generateQueryProofPlonk(context, queryProofRequest)
-                Log.d(TAG, "TIMING generateQueryProofPlonk: ${System.currentTimeMillis() - stepStart}ms")
 
                 if (queryProof == null) {
                     _flowState.value = ProofFlowState.Error("Failed to generate query proof")
                     return@launch
                 }
 
-                Log.d(TAG, "✓ Query proof generated (Plonk)")
-                Log.d(TAG, "TIMING total flow (params→proof): ${System.currentTimeMillis() - flowStart}ms")
+                Log.d(TAG, "Query proof generated (Plonk)")
 
                 // Get registration proof
                 _flowState.value = ProofFlowState.GeneratingProof("Getting registration proof...")
@@ -326,17 +325,7 @@ class WebRTCProofCoordinator @Inject constructor(
                 // Extract zkPoints (proof bytes only, without public signals)
                 val zkPoints = when (queryProof) {
                     is UniversalProof.Plonk -> {
-                        // queryProof.proof.proof contains 0x prefix + proof bytes only (no public signals)
-                        val proofHex = queryProof.proof.proof
-                        Log.d(TAG, "=== Query Proof Public Signals ===")
-                        Log.d(TAG, "Public signals count: ${queryProof.proof.pub_signals.size}")
-                        queryProof.proof.pub_signals.forEachIndexed { index, signal ->
-                            Log.d(TAG, "  [$index] = $signal")
-                        }
-                        Log.d(TAG, "Proof hex starts: ${proofHex.take(100)}")
-                        Log.d(TAG, "Proof hex length: ${proofHex.length} chars")
-                        Log.d(TAG, "=================================")
-                        proofHex
+                        queryProof.proof.proof
                     }
                     is UniversalProof.Groth -> {
                         Gson().toJson(queryProof.proof.proof)
@@ -361,9 +350,10 @@ class WebRTCProofCoordinator @Inject constructor(
                 val message = QueryProofMessage(data = responseData)
                 val json = moshi.adapter(QueryProofMessage::class.java).toJson(message)
 
-                Log.d(TAG, "Sending query proof:")
-                Log.d(TAG, "  zkPoints: ${zkPoints.take(50)}...")
-                Log.d(TAG, "  needsRegistration: $needsRegistration")
+                Log.d(TAG, "Sending query proof (needsRegistration=$needsRegistration)")
+                if (registrationData != null) {
+                    Log.d(TAG, "Registration JSON: $json")
+                }
 
                 val success = webRTCManager.sendMessage(json)
 
@@ -412,12 +402,6 @@ class WebRTCProofCoordinator @Inject constructor(
         val dataType = PassportTypeUtils.getPassportDataType(circuitType)
         val zkType = PassportTypeUtils.getVerifierType(circuitName)
 
-        Log.d(TAG, "=== Passport Type Computation ===")
-        Log.d(TAG, "Circuit name: $circuitName")
-        Log.d(TAG, "Verifier name: Z_NOIR_PASSPORT_${circuitName.removePrefix("registerIdentity_")}")
-        Log.d(TAG, "Passport dataType: $dataType")
-        Log.d(TAG, "Verifier zkType: $zkType")
-        Log.d(TAG, "===================================")
 
         // Get passport hash from proof in hex format (with 0x prefix and 32-byte formatted)
         val passportHashHex = when (registrationProof) {
@@ -431,13 +415,13 @@ class WebRTCProofCoordinator @Inject constructor(
         }
 
         // Get AA public key from DG15 (modulus for RSA or X,Y coordinates for ECDSA)
-        val aaPublicKeyHex = eDocument.getAAPublicKeyHex() ?: "0x"
+        val aaPublicKeyHex = eDocument.getAAPublicKeyHex() ?: "0x00"
 
         // Get AA signature (Active Authentication signature)
-        val aaSignatureHex = eDocument.aaSignature?.let {
+        val aaSignatureHex = eDocument.aaSignature?.takeIf { it.isNotEmpty() }?.let {
             val hex = org.web3j.utils.Numeric.toHexString(it)
             if (hex.startsWith("0x")) hex else "0x$hex"
-        } ?: "0x"
+        } ?: "0x00"
 
         val passportData = PassportData(
             dataType = dataType,  // Computed from passport AA algorithm
@@ -447,39 +431,17 @@ class WebRTCProofCoordinator @Inject constructor(
             passportHash = passportHashHex
         )
 
-        // Convert public signals from decimal to hex
-        val passportKeyDecimal = regPubSignals.getOrNull(0) ?: "0"
-        val dgCommitDecimal = regPubSignals.getOrNull(2) ?: "0"
-        val identityKeyDecimal = regPubSignals.getOrNull(3) ?: "0"
-        val certificatesRootDecimal = regPubSignals.getOrNull(4) ?: "0"
-
-        val passportKeyHex = if (passportKeyDecimal == "0") {
-            "0x0"
-        } else {
-            val decimal = java.math.BigInteger(passportKeyDecimal)
-            org.web3j.utils.Numeric.toHexString(decimal.toByteArray())
+        // Convert public signals from decimal to hex (32-byte padded, no sign byte)
+        val toHex = { decStr: String ->
+            val bi = java.math.BigInteger(decStr)
+            if (bi == java.math.BigInteger.ZERO) "0x00"
+            else "0x" + bi.toString(16).padStart(64, '0')
         }
 
-        val dgCommitHex = if (dgCommitDecimal == "0") {
-            "0x0"
-        } else {
-            val decimal = java.math.BigInteger(dgCommitDecimal)
-            org.web3j.utils.Numeric.toHexString(decimal.toByteArray())
-        }
-
-        val identityKeyHex = if (identityKeyDecimal == "0") {
-            "0x0"
-        } else {
-            val decimal = java.math.BigInteger(identityKeyDecimal)
-            org.web3j.utils.Numeric.toHexString(decimal.toByteArray())
-        }
-
-        val certificatesRootHex = if (certificatesRootDecimal == "0") {
-            "0x0"
-        } else {
-            val decimal = java.math.BigInteger(certificatesRootDecimal)
-            org.web3j.utils.Numeric.toHexString(decimal.toByteArray())
-        }
+        val passportKeyHex = toHex(regPubSignals.getOrNull(0) ?: "0")
+        val dgCommitHex = toHex(regPubSignals.getOrNull(2) ?: "0")
+        val identityKeyHex = toHex(regPubSignals.getOrNull(3) ?: "0")
+        val certificatesRootHex = toHex(regPubSignals.getOrNull(4) ?: "0")
 
         Log.d(TAG, "Building registration data:")
         Log.d(TAG, "  publicKey: ${passportData.publicKey.take(20)}...")
