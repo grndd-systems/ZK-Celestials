@@ -371,7 +371,7 @@ data class EDocument(
             "secp256r1" -> CircuitCurveType.SECP256R1       // secp256r1
             "brainpoolp256r1" -> CircuitCurveType.BRAINPOOLP256  // brainpoolP256r1
             "brainpoolp320r1" -> CircuitCurveType.BRAINPOOL320R1 // brainpoolP320r1
-            "secp192r1" -> CircuitCurveType.SECP192R1       // secp192r1
+            "secp192r1", "prime192v1" -> CircuitCurveType.SECP192R1
             "brainpoolp384r1" -> CircuitCurveType.BRAINPOOLP384R1
             "secp224r1" -> CircuitCurveType.SECP224R1 // secp224r
             "prime256v1" -> CircuitCurveType.PRIME256V1
