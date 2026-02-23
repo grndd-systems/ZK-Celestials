@@ -11,6 +11,8 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.noirandroid.lib.Circuit
 import com.grnddsystems.celestials.BaseConfig
+import com.grnddsystems.celestials.util.NoirLock
+import kotlinx.coroutines.sync.withLock
 import com.grnddsystems.celestials.BuildConfig
 import com.grnddsystems.celestials.api.registration.PassportAlreadyRegisteredByOtherPK
 import com.grnddsystems.celestials.data.enums.PassportStatus
@@ -612,7 +614,8 @@ class ProofGenerationManager @Inject constructor(
                     x509Utils.getSlaveCertificateIndex(certPem.toByteArray(), icao)
                 val contract =
                     rarimoContractManager.getPoseidonSMT(BaseConfig.CERTIFICATES_SMT_CONTRACT_ADDRESS)
-                contract.getProof(slaveCertificateIndex.toHexString().hexToByteArray()).send()
+                val proof = contract.getProof(slaveCertificateIndex.toHexString().hexToByteArray()).send()
+                proof
             }
 
 
@@ -640,6 +643,7 @@ class ProofGenerationManager @Inject constructor(
             val ecDeferred = toHexList(ecPadded)
             val saDeferred = toHexList(saPadded)
             val skIdentityDeferred = Numeric.toHexString(pkBytes)
+
 
             val proof = proofDeferred.await()
 
@@ -701,7 +705,8 @@ class ProofGenerationManager @Inject constructor(
                         toHex
                     )
 
-                val sigBytes64 = CircuitUtil.parseECDSASignature(sigBytes)!!
+                val coordByteSize = pubKeyData.size / 2
+                val sigBytes64 = CircuitUtil.parseECDSASignature(sigBytes, coordByteSize)!!
                 val sigHalf = sigBytes64.size / 2
                 val sigR = sigBytes64.copyOfRange(0, sigHalf)
                 val sigS = sigBytes64.copyOfRange(sigHalf, sigBytes64.size)

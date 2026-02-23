@@ -55,21 +55,17 @@ sealed class UniversalProof {
         }
 
         /**
-         * Returns public key as hex string with 0x prefix
+         * Returns public key as hex string with 0x prefix (32 bytes padded)
          */
         fun getPublicKeyHex(): String {
-            val decimal = BigInteger(proof.pub_signals[0])
-            return Numeric.toHexString(decimal.toByteArray())
+            return "0x" + BigInteger(proof.pub_signals[0]).toString(16).padStart(64, '0')
         }
 
         /**
          * Returns passport hash as hex string with 0x prefix (32 bytes padded)
          */
         fun getPassportHashHex(): String {
-            val decimal = BigInteger(proof.pub_signals[1])
-            // Ensure 32 bytes (64 hex chars after 0x)
-            val hexStr = Numeric.toHexStringNoPrefix(decimal.toByteArray())
-            return "0x" + hexStr.padStart(64, '0')
+            return "0x" + BigInteger(proof.pub_signals[1]).toString(16).padStart(64, '0')
         }
     }
 
